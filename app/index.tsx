@@ -6,10 +6,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState } from "react";
 import supabase from "../lib/supabase.js";
-import { createNewProfile } from "../supabase_queries/auth";
 
 export default function Index() {
   const [email, setEmail] = useState("");
@@ -69,6 +67,11 @@ export default function Index() {
           <Text style={styles.errorText}>{signinError}</Text>
         ) : null}
       </View>
+      <Link href={"/passwordreset"} asChild>
+        <TouchableOpacity>
+          <Text style={styles.forgottenPasswordText}>Forgotten password?</Text>
+        </TouchableOpacity>
+      </Link>
     </View>
   );
 }
@@ -172,5 +175,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "QuicksandReg",
     alignSelf: "center",
+  },
+  forgottenPasswordText: {
+    color: "#8980F5",
+    fontFamily: "QuicksandReg",
+    fontSize: 16,
+    marginTop: 12,
+    textDecorationLine: "underline",
   },
 });

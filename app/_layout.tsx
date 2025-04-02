@@ -43,6 +43,14 @@ export default function RootLayout() {
           name="register"
           options={{ headerShown: false }}
         ></Stack.Screen>
+        <Stack.Screen
+          name="passwordreset"
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="changepassword"
+          options={{ headerShown: false }}
+        ></Stack.Screen>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
     </SupabaseContext.Provider>
