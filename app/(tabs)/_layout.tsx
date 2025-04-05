@@ -33,7 +33,7 @@ export default function TabLayout() {
           ),
         }}
       ></Tabs.Screen>
-      {/* <Tabs.Screen
+      <Tabs.Screen
         name="settings"
         options={{
           title: "Settings",
@@ -45,7 +45,7 @@ export default function TabLayout() {
             />
           ),
         }}
-      ></Tabs.Screen> */}
+      ></Tabs.Screen>
       {/* <Tabs.Screen
         name="subscriptions"
         options={{
