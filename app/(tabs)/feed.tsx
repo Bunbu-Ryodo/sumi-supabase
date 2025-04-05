@@ -1,10 +1,4 @@
-import {
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Text,
-  ActivityIndicator,
-} from "react-native";
+import { StyleSheet, ScrollView } from "react-native";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import {
@@ -38,11 +32,6 @@ export default function FeedScreen() {
     };
     checkUserAuthenticated();
   }, []);
-
-  const Logout = async function () {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
 
   const fetchExtracts = async function () {
     const { data, error } = await getExtracts();
@@ -80,9 +69,6 @@ export default function FeedScreen() {
             coverart={extract.coverart}
           />
         ))}
-      <TouchableOpacity style={styles.buttonPrimary} onPress={Logout}>
-        <Text style={styles.primaryButtonText}>Logout</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }
