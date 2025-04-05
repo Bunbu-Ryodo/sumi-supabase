@@ -12,7 +12,7 @@ import {
   lookUpUserProfile,
   getUserSession,
 } from "../../supabase_queries/auth.js";
-import { getExtracts } from "../../supabase_queries/feed";
+import { getExtracts } from "../../supabase_queries/feed.js";
 import supabase from "../../lib/supabase.js";
 import { ExtractType } from "../../types/types.js";
 import Extract from "../../components/extract";
@@ -63,6 +63,15 @@ export default function FeedScreen() {
       contentContainerStyle={styles.contentContainer}
       style={styles.container}
     >
+      {loading ? (
+        <ActivityIndicator size="large" color="#F6F7EB" />
+      ) : (
+        <TouchableOpacity style={styles.buttonPrimary} onPress={Logout}>
+          <Text style={styles.primaryButtonText}>Logout</Text>
+        </TouchableOpacity>
+      )}
+      {extracts.length > 0 && <Text>Done</Text>}
+
       {extracts &&
         extracts.map((extract: ExtractType, index: number) => (
           <Extract
@@ -80,9 +89,6 @@ export default function FeedScreen() {
             coverart={extract.coverart}
           />
         ))}
-      <TouchableOpacity style={styles.buttonPrimary} onPress={Logout}>
-        <Text style={styles.primaryButtonText}>Logout</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }
