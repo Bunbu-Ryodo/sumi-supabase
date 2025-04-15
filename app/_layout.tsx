@@ -51,6 +51,14 @@ export default function RootLayout() {
           name="changepassword"
           options={{ headerShown: false }}
         ></Stack.Screen>
+        <Stack.Screen
+          name="ereader/[id]"
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="share_text/[id]"
+          options={{ headerShown: false }}
+        ></Stack.Screen>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
     </SupabaseContext.Provider>
