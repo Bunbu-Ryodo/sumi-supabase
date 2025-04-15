@@ -28,22 +28,28 @@ export default function Extract({
   return (
     <View style={styles.extract}>
       <View style={styles.header}>
-        <Image source={{ uri: portrait }} style={styles.portrait}></Image>
-
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerTextTitle}>{title}</Text>
-          <Text style={styles.headerText}>Chapter {chapter}</Text>
-          <Text style={styles.headerText}>{author}</Text>
-          <Text style={styles.headerText}>({year})</Text>
+        <Link href={{ pathname: "/ereader/[id]", params: { id } }} asChild>
+          <Image source={{ uri: portrait }} style={styles.portrait}></Image>
+        </Link>
+        <Link href={{ pathname: "/ereader/[id]", params: { id } }} asChild>
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerTextTitle}>{title}</Text>
+            <Text style={styles.headerText}>Chapter {chapter}</Text>
+            <Text style={styles.headerText}>{author}</Text>
+            <Text style={styles.headerText}>({year})</Text>
+          </View>
+        </Link>
+      </View>
+      <Link href={{ pathname: "/ereader/[id]", params: { id } }} asChild>
+        <View style={styles.previewText}>
+          <Text style={styles.text}>{previewtext}</Text>
         </View>
-      </View>
-
-      <View style={styles.previewText}>
-        <Text style={styles.text}>{previewtext}</Text>
-      </View>
-      <View style={styles.thumbnail}>
-        <Image source={{ uri: coverart }} style={styles.thumbnail} />
-      </View>
+      </Link>
+      <Link href={{ pathname: "/ereader/[id]", params: { id } }} asChild>
+        <View style={styles.thumbnail}>
+          <Image source={{ uri: coverart }} style={styles.thumbnail} />
+        </View>
+      </Link>
 
       <View style={styles.engagementButtons}>
         <TouchableOpacity style={styles.icon} onPress={toggleLike}>
