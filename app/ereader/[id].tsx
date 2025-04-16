@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { getExtract } from "../../supabase_queries/extracts";
 import { ExtractType } from "../../types/types";
+import { updateSubscription } from "../../supabase_queries/subscriptions";
+import { getUserSession } from "../../supabase_queries/auth.js";
 
 export default function EReader() {
   let { id } = useLocalSearchParams();
@@ -36,20 +38,19 @@ export default function EReader() {
 
   const [loading, setLoading] = useState(true);
 
-  type CommentType = {
-    id: string;
-    extractId: string;
-    message: string;
-    readerTag: string;
-    userId: string;
-    time: string;
-    likes: number;
-  };
+  // type CommentType = {
+  //   id: string;
+  //   extractId: string;
+  //   message: string;
+  //   readerTag: string;
+  //   userId: string;
+  //   time: string;
+  //   likes: number;
+  // };
 
   const [like, setLike] = useState(false);
-  const [subscribe, setSubscribe] = useState(false);
-  const [message, setMessage] = useState("");
-  const [comments, setComments] = useState<CommentType[]>([]);
+  const [subscribed, setSubscribe] = useState(false);
+  const [userid, setUserid] = useState("");
 
   const copyToClipboard = async () => {
     const link = `http://localhost:8081/share_text/${extract.id}`;
@@ -61,33 +62,23 @@ export default function EReader() {
     setLike(!like);
   }
 
-  async function toggleSubscribe() {
-    await setSubscribe((prevState) => {
-      const subscribed = !prevState;
-
-      if (subscribed) {
-        subscribeToSeries();
-      } else if (!subscribed) {
-        unsubscribeFromSeries();
-      }
-
-      return subscribed;
-    });
+  async function subscribe() {
+    const subscription = await updateSubscription(
+      userid,
+      extract.textid,
+      extract.chapter + 1,
+      new Date()
+    );
   }
-
-  async function subscribeToSeries() {}
-
-  async function unsubscribeFromSeries() {}
 
   const router = useRouter();
 
-  const getComments = async () => {};
-
-  const postComment = async () => {};
-
-  const checkSubscriptions = async (textId: string) => {};
-
   const fetchExtract = async () => {
+    const user = await getUserSession();
+    if (user) {
+      setUserid(user?.id);
+    }
+
     const { data, error } = await getExtract(id);
 
     if (data) {
@@ -125,9 +116,9 @@ export default function EReader() {
                 />
               </TouchableOpacity>
               <View style={styles.subscribeContainer}>
-                <TouchableOpacity onPress={toggleSubscribe}>
+                <TouchableOpacity onPress={subscribe}>
                   <Ionicons
-                    name={subscribe ? "bookmark" : "bookmark-outline"}
+                    name={"bookmark-outline"}
                     size={24}
                     color="#FE7F2D"
                   />
