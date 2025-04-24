@@ -1,3 +1,5 @@
+import supabase from '../lib/supabase';
+
 export async function updatePassword(password){
     const { data, error } = await supabase.auth.updateUser({ password: password })
     return { data, error } 

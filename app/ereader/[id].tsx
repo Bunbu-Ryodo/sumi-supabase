@@ -16,14 +16,20 @@ import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { getExtract } from "../../supabase_queries/extracts";
 import { ExtractType } from "../../types/types";
-import { updateSubscription } from "../../supabase_queries/subscriptions";
+import {
+  checkForSubscription,
+  createSubscription,
+  activateSubscription,
+  deactivateSubscription,
+} from "../../supabase_queries/subscriptions";
 import { getUserSession } from "../../supabase_queries/auth.js";
+import supabase from "../../lib/supabase.js";
 
 export default function EReader() {
   let { id } = useLocalSearchParams();
 
   const [extract, setExtract] = useState<ExtractType>({
-    id: "",
+    id: 0,
     title: "",
     author: "",
     chapter: 0,
@@ -32,25 +38,14 @@ export default function EReader() {
     fulltext: "",
     portrait: "",
     coverart: "",
-    textid: "",
+    textid: 0,
     subscribeart: "",
   });
 
   const [loading, setLoading] = useState(true);
-
-  // type CommentType = {
-  //   id: string;
-  //   extractId: string;
-  //   message: string;
-  //   readerTag: string;
-  //   userId: string;
-  //   time: string;
-  //   likes: number;
-  // };
-
   const [like, setLike] = useState(false);
-  const [subscribed, setSubscribe] = useState(false);
-  const [userid, setUserid] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const [subid, setSubid] = useState(0);
 
   const copyToClipboard = async () => {
     const link = `http://localhost:8081/share_text/${extract.id}`;
@@ -63,12 +58,11 @@ export default function EReader() {
   }
 
   async function subscribe() {
-    const subscription = await updateSubscription(
-      userid,
-      extract.textid,
-      extract.chapter + 1,
-      new Date()
-    );
+    if (subscribed) {
+      deactivateSubscription(subid);
+    } else {
+      activateSubscription(subid);
+    }
   }
 
   const router = useRouter();
@@ -76,22 +70,72 @@ export default function EReader() {
   const fetchExtract = async () => {
     const user = await getUserSession();
     if (user) {
-      setUserid(user?.id);
-    }
+      const { data: extract, error } = await getExtract(id);
 
-    const { data, error } = await getExtract(id);
+      if (extract) {
+        setExtract(extract);
 
-    if (data) {
-      setExtract(data);
+        const subscriptionData = await checkForSubscription(
+          user.id,
+          extract.textid
+        );
+
+        if (subscriptionData.data && subscriptionData.data.length > 0) {
+          if (
+            subscriptionData.data[0].active &&
+            subscriptionData.data[0].textid === extract.textid
+          ) {
+            setSubscribed(true);
+          }
+          setSubid(subscriptionData.data[0].id);
+        } else {
+          const { insertData } = await createSubscription(
+            user.id,
+            extract.textid,
+            extract.chapter + 1,
+            new Date()
+          );
+
+          if (insertData) {
+            setSubid(insertData.id);
+          } else {
+            console.error("Error creating subscription:", insertData);
+          }
+        }
+      } else {
+        console.error("Error fetching extract:", error);
+      }
     } else {
-      console.error("Error fetching extract:", error);
+      router.push("/");
     }
+
     setLoading(false);
   };
 
   useEffect(() => {
     fetchExtract();
-  }, []);
+
+    const updateListener = supabase
+      .channel("insert-subscriptions")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "subscriptions",
+          filter: `id=eq.${subid}`,
+        },
+        (payload) => {
+          console.log("Insert event:", payload);
+          setSubscribed((subscribed) => !subscribed);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(updateListener);
+    };
+  }, [subid]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -118,7 +162,7 @@ export default function EReader() {
               <View style={styles.subscribeContainer}>
                 <TouchableOpacity onPress={subscribe}>
                   <Ionicons
-                    name={"bookmark-outline"}
+                    name={subscribed ? "bookmark" : "bookmark-outline"}
                     size={24}
                     color="#FE7F2D"
                   />

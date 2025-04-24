@@ -1,6 +1,6 @@
 export type ExtractType = {
-    id: string;
-    textid: string;
+    id: number;
+    textid: number;
     author: string;
     title: string;
     year: string;
@@ -10,4 +10,12 @@ export type ExtractType = {
     subscribeart: string;
     portrait: string;
     coverart: string;
+}
+
+export type SubscriptionType = {
+    id: number;
+    textid: number;
+    chapter: number;
+    date: Date;
+    active: boolean;
 }

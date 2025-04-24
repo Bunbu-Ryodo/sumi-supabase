@@ -16,7 +16,7 @@ const { data, error } = await supabase
 }
 
 export async function lookUpUserProfile(user_id){
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('profiles')
     .select('*')
     .eq('user_id', user_id)
