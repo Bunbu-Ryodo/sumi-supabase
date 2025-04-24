@@ -1,0 +1,69 @@
+import supabase from '../lib/supabase';
+import { SubscriptionType } from '../types/types';
+
+export async function createSubscription(userId: string, textId: number, chapter: number, date: Date)
+: Promise<{ insertData: SubscriptionType | null; insertError: any }>{
+  if (!userId || !textId || !chapter || !date) {
+    throw new Error("Missing required parameters");
+  }
+
+  const { data: insertData, error: insertError } = await supabase
+  .from('subscriptions')
+  .insert({ userid: userId, textid: textId, chapter: chapter, due: date });
+
+  if (insertError) {
+    throw new Error(`Error inserting new subscription: ${insertError.message}`);
+  }
+
+  return { insertData, insertError};  
+}
+
+export async function deleteSubscription(userId: string, textId: number)
+: Promise<{ data: SubscriptionType | null; deleteError: any }>{
+  const { data, error: deleteError } = await supabase
+  .from('subscriptions')
+  .delete()
+  .match({ userid: userId, textid: textId })
+
+  
+if (deleteError) {
+  throw new Error(`Error deleting existing subscription: ${deleteError.message}`);
+}
+
+return { data, deleteError }
+
+
+}
+
+export async function activateSubscription(id: number)
+: Promise<{ data: SubscriptionType | null; error: any }>{
+  const { data, error } = await supabase.from('subscriptions').update({active: true, due: new Date()}).eq('id', id)
+
+  return { data, error };
+}
+
+export async function deactivateSubscription(id: number)
+: Promise<{ data: SubscriptionType | null; error: any }>{
+  const { data, error } = await supabase.from('subscriptions').update({active: false}).eq('id', id)
+
+  return { data, error };
+}
+
+export async function checkForSubscription(userId: string, textId: number)
+: Promise<{ data: any[] | null; error: any }> {
+    if (!userId || !textId) {
+        throw new Error("Missing required parameters");
+    }
+
+    const { data, error } = await supabase
+        .from('subscriptions')
+        .select()
+        .match({ userid: userId, textid: textId })
+
+    if(error){
+      console.error("Error fetching subscription:", error.message);
+      return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
+}
