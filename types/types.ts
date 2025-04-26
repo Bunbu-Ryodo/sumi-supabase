@@ -16,6 +16,6 @@ export type SubscriptionType = {
     id: number;
     textid: number;
     chapter: number;
-    date: Date;
+    due: number;
     active: boolean;
 }

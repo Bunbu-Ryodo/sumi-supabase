@@ -61,7 +61,7 @@ export default function EReader() {
     if (subscribed) {
       deactivateSubscription(subid);
     } else {
-      activateSubscription(subid);
+      activateSubscription(subid, extract.chapter + 1);
     }
   }
 
@@ -89,14 +89,15 @@ export default function EReader() {
           }
           setSubid(subscriptionData.data[0].id);
         } else {
-          const { insertData } = await createSubscription(
+          const { data: insertData } = await createSubscription(
             user.id,
             extract.textid,
             extract.chapter + 1,
-            new Date()
+            new Date().getTime()
           );
 
           if (insertData) {
+            console.log("Subscription created successfully:", insertData);
             setSubid(insertData.id);
           } else {
             console.error("Error creating subscription:", insertData);

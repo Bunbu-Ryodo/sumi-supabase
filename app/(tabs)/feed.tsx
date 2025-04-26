@@ -7,7 +7,13 @@ import {
   getUserSession,
 } from "../../supabase_queries/auth.js";
 import { getExtracts } from "../../supabase_queries/feed";
-import supabase from "../../lib/supabase.js";
+import {
+  getAllDueSubscriptions,
+  getExtractByTextIdChapter,
+  createInstalment,
+  updateSubscription,
+  getAllInstalments,
+} from "../../supabase_queries/subscriptions";
 import { ExtractType } from "../../types/types.js";
 import Extract from "../../components/extract";
 
@@ -28,6 +34,58 @@ export default function FeedScreen() {
           await createNewProfile(user.id, new Date());
         }
         await fetchExtracts();
+        const { data: subscriptionData, error } = await getAllDueSubscriptions(
+          user.id
+        );
+        console.log("Subscriptions:", subscriptionData);
+        if (subscriptionData) {
+          for (let i = 0; i < subscriptionData.length; i++) {
+            console.log("textid", subscriptionData[i].textid);
+            console.log("chapter", subscriptionData[i].chapter);
+            const { data: extract, error } = await getExtractByTextIdChapter(
+              subscriptionData[i].textid,
+              subscriptionData[i].chapter
+            );
+            console.log("Extract:", extract);
+            console.log("index", i);
+
+            if (extract && extract.length > 0) {
+              const { data: instalmentData, error } = await createInstalment(
+                user.id,
+                extract[0].id,
+                extract[0].chapter,
+                extract[0].title,
+                extract[0].author,
+                subscriptionData[i].id
+              );
+
+              if (error) {
+                console.error("Error creating instalment:", error.message);
+              } else {
+                console.log("Instalment created successfully:", instalmentData);
+                const { data, error: updateError } = await updateSubscription(
+                  subscriptionData[i].id,
+                  subscriptionData[i].chapter + 1
+                );
+
+                if (updateError) {
+                  console.error(
+                    "Error updating subscription:",
+                    updateError.message
+                  );
+                } else {
+                  console.log("Subscription updated successfully:", data);
+                }
+              }
+            }
+          }
+        } else if (error) {
+          console.log("Error", error);
+        }
+        const { data, error: fetchInstalmentError } = await getAllInstalments(
+          user.id
+        );
+        console.log("Instalments:", data);
       }
     };
     checkUserAuthenticated();
