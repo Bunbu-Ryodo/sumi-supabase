@@ -46,6 +46,19 @@ export default function TabLayout() {
           ),
         }}
       ></Tabs.Screen>
+      <Tabs.Screen
+        name="subscriptions"
+        options={{
+          title: "Subscriptions",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "mail" : "mail-outline"}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      ></Tabs.Screen>
     </Tabs>
   );
 }

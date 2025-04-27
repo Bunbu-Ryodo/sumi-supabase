@@ -56,7 +56,8 @@ export default function FeedScreen() {
                 extract[0].chapter,
                 extract[0].title,
                 extract[0].author,
-                subscriptionData[i].id
+                subscriptionData[i].id,
+                subscriptionData[i].subscribeart
               );
 
               if (error) {

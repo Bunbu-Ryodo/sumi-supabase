@@ -94,7 +94,8 @@ export default function EReader() {
               user.id,
               extract.textid,
               extract.chapter + 1,
-              new Date().getTime()
+              new Date().getTime(),
+              extract.subscribeart
             );
 
           console.log("Insert data:", insertData);

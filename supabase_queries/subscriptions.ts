@@ -1,7 +1,7 @@
 import supabase from '../lib/supabase';
-import { SubscriptionType } from '../types/types';
+import { SubscriptionType, InstalmentType } from '../types/types';
 
-export async function createSubscription(userId: string, textId: number, chapter: number, due: number)
+export async function createSubscription(userId: string, textId: number, chapter: number, due: number, subscribeart: string)
 : Promise<{ data: SubscriptionType[] | null; error: any }>{
   if (!userId || !textId || !chapter || !due) {
     throw new Error("Missing required parameters");
@@ -9,7 +9,7 @@ export async function createSubscription(userId: string, textId: number, chapter
 
   const { data, error } = await supabase
   .from('subscriptions')
-  .insert({ userid: userId, textid: textId, chapter: chapter, due: due }).select();
+  .insert({ userid: userId, textid: textId, chapter: chapter, due: due, subscribeart: subscribeart }).select();
 
   if (error) {
     throw new Error(`Error inserting new subscription: ${error.message}`);
@@ -98,14 +98,14 @@ export async function getExtractByTextIdChapter(textId: number, chapter: number)
     return { data, error };
 }
 
-export async function createInstalment(userId: string, extractId: number, chapter: number, title: string, author: string, subscriptionId: number) : Promise<{ data: any[] | null; error: any }>{
+export async function createInstalment(userId: string, extractId: number, chapter: number, title: string, author: string, subscriptionId: number, subscribeart: string) : Promise<{ data: any[] | null; error: any }>{
   if(!userId || !extractId || !chapter || !title || !author){
     throw new Error("Missing required parameters");
   }
 
   const { data, error } = await supabase
     .from('instalments')
-    .insert({ userid: userId, extractid: extractId, chapter: chapter, title: title, author: author, subscriptionid: subscriptionId })
+    .insert({ userid: userId, extractid: extractId, chapter: chapter, title: title, author: author, subscriptionid: subscriptionId, subscribeart: subscribeart })
     .select();
 
     return { data, error };
@@ -125,7 +125,7 @@ export async function updateSubscription(subscriptionId: number, chapter: number
     return { data, error };
 }
 
-export async function getAllInstalments(userId: string) : Promise<{ data: any[] | null; error: any }>{
+export async function getAllInstalments(userId: string) : Promise<{ data: InstalmentType[] | null; error: any }>{
   if(!userId){
     throw new Error("Missing required parameters");
   }
