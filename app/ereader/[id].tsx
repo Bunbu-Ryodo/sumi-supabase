@@ -89,18 +89,21 @@ export default function EReader() {
           }
           setSubid(subscriptionData.data[0].id);
         } else {
-          const { data: insertData } = await createSubscription(
-            user.id,
-            extract.textid,
-            extract.chapter + 1,
-            new Date().getTime()
-          );
+          const { data: insertData, error: insertError } =
+            await createSubscription(
+              user.id,
+              extract.textid,
+              extract.chapter + 1,
+              new Date().getTime()
+            );
+
+          console.log("Insert data:", insertData);
 
           if (insertData) {
-            console.log("Subscription created successfully:", insertData);
-            setSubid(insertData.id);
-          } else {
-            console.error("Error creating subscription:", insertData);
+            console.log("Subscription created successfully:", insertData[0]);
+            setSubid(insertData[0].id);
+          } else if (insertError) {
+            console.error("Error creating subscription:", insertError);
           }
         }
       } else {
