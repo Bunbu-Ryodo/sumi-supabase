@@ -1,5 +1,12 @@
 import * as Clipboard from "expo-clipboard";
-import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { Link } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState, useEffect } from "react";
@@ -22,6 +29,12 @@ export default function Extract({
   function toggleLike() {
     setLike(!like);
   }
+
+  const copyToClipboard = async () => {
+    const link = `http://localhost:8081/share_text/${id}`;
+    await Clipboard.setStringAsync(link);
+    Alert.alert("Link to extract copied to clipboard!");
+  };
 
   useEffect(() => {}, []);
 
@@ -59,14 +72,14 @@ export default function Extract({
             color="#D64045"
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.icon}>
+        {/* <TouchableOpacity style={styles.icon}>
           <Ionicons
             name={subscribe ? "bookmark" : "bookmark-outline"}
             size={24}
             color="#FE7F2D"
           />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.icon}>
+        </TouchableOpacity> */}
+        <TouchableOpacity style={styles.icon} onPress={copyToClipboard}>
           <Ionicons name="clipboard-outline" size={24} color="#8980F5" />
         </TouchableOpacity>
       </View>
