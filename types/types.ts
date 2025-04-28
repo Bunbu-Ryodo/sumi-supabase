@@ -16,6 +16,21 @@ export type SubscriptionType = {
     id: number;
     textid: number;
     chapter: number;
-    date: Date;
+    due: number;
     active: boolean;
+    subscribeart: string;
 }
+
+export type InstalmentType = {
+    id: number;
+    extractid: number;
+    userid: string;
+    title: string;   
+    author: string;
+    chapter: string;
+    subscriptionid: number;   
+    subscribeart: string;
+}
+
+
+

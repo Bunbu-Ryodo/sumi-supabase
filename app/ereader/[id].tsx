@@ -61,7 +61,7 @@ export default function EReader() {
     if (subscribed) {
       deactivateSubscription(subid);
     } else {
-      activateSubscription(subid);
+      activateSubscription(subid, extract.chapter + 1);
     }
   }
 
@@ -89,17 +89,22 @@ export default function EReader() {
           }
           setSubid(subscriptionData.data[0].id);
         } else {
-          const { insertData } = await createSubscription(
-            user.id,
-            extract.textid,
-            extract.chapter + 1,
-            new Date()
-          );
+          const { data: insertData, error: insertError } =
+            await createSubscription(
+              user.id,
+              extract.textid,
+              extract.chapter + 1,
+              new Date().getTime(),
+              extract.subscribeart
+            );
+
+          console.log("Insert data:", insertData);
 
           if (insertData) {
-            setSubid(insertData.id);
-          } else {
-            console.error("Error creating subscription:", insertData);
+            console.log("Subscription created successfully:", insertData[0]);
+            setSubid(insertData[0].id);
+          } else if (insertError) {
+            console.error("Error creating subscription:", insertError);
           }
         }
       } else {

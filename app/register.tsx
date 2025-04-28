@@ -43,7 +43,6 @@ export default function Register() {
         password: password,
       })
       .then(({ data, error }) => {
-        console.log(data, "data");
         if (error) {
           console.error("Sign up error:", error.message);
           setRegisterError("Error registering, please try again");

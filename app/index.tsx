@@ -22,7 +22,6 @@ export default function Index() {
         password: password,
       })
       .then(({ data, error }) => {
-        console.log(data, "data");
         if (error) {
           console.error("Sign in error:", error.message);
           setSigninError(error.message);
