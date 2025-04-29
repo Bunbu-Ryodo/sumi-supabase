@@ -63,3 +63,20 @@ export async function markAsUnread(userId: string, extract: ExtractType){
      }
     }
 }
+
+export async function checkReadStatus(userId: string, extract: number) {
+  const { data: currentReadExtracts, error: fetchError } = await supabase
+    .from("profiles")
+    .select("readExtracts")
+    .eq("user_id", userId)
+    .single();
+
+  if (fetchError) {
+    console.error("Error fetching current read extracts:", fetchError);
+    return false;
+  } else {
+    const currentReadExtractsArray = currentReadExtracts.readExtracts || [];
+
+    return currentReadExtractsArray.some((item: ExtractType) => item.id === extract);
+  }
+}

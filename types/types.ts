@@ -32,5 +32,13 @@ export type InstalmentType = {
     subscribeart: string;
 }
 
+export type AchievementType = {
+    id: number;
+    title: string;
+    description: string;
+    score: number;
+    icon: string;
+}
+
 
 

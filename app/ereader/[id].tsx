@@ -22,7 +22,12 @@ import {
   activateSubscription,
   deactivateSubscription,
 } from "../../supabase_queries/subscriptions";
-import { markAsRead, markAsUnread } from "../../supabase_queries/profiles";
+import { awardAchievement } from "../../supabase_queries/achievements";
+import {
+  markAsRead,
+  markAsUnread,
+  checkReadStatus,
+} from "../../supabase_queries/profiles";
 import { getUserSession } from "../../supabase_queries/auth.js";
 import supabase from "../../lib/supabase.js";
 
@@ -119,6 +124,12 @@ export default function EReader() {
             console.error("Error creating subscription:", insertError);
           }
         }
+
+        const readStatus = await checkReadStatus(user.id, extract.id);
+
+        if (readStatus) {
+          setRead(true);
+        }
       } else {
         console.error("Error fetching extract:", error);
       }
@@ -149,6 +160,10 @@ export default function EReader() {
       )
       .subscribe();
 
+    const addAchievementToProfile = async (userid: string, title: string) => {
+      await awardAchievement(userid, title);
+    };
+
     const readListener = supabase
       .channel("update-read-status")
       .on(
@@ -160,12 +175,18 @@ export default function EReader() {
           filter: `user_id=eq.${userid}`,
         },
         (payload) => {
-          console.log("Read status changed:", payload);
+          console.log("Profile status change", payload);
           const currentReadExtracts = payload.new.readExtracts || [];
           const isRead = currentReadExtracts.some(
             (item: ExtractType) => item.id === extract.id
           );
           setRead(isRead);
+
+          if (payload.new.readCount !== payload.old.readCount) {
+            if (payload.new.readCount === 1) {
+              addAchievementToProfile(userid, "Good Job Little Buddy");
+            }
+          }
         }
       )
       .subscribe();
