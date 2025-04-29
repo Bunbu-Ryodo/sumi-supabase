@@ -16,11 +16,16 @@ const { data, error } = await supabase
 }
 
 export async function lookUpUserProfile(user_id){
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('user_id', user_id)
     .single();
+
+  if(error){
+    console.error('Error fetching user profile:', error.message);
+    return null;
+  }
 
   return data;
 }

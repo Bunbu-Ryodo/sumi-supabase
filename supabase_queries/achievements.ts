@@ -53,5 +53,19 @@ export async function awardAchievement(userId: string, title: string){
             }
         }
     }
+}
 
+export async function fetchProfileAchievements(userId: string){
+    const { data: profileData, error } = await supabase
+    .from("profiles")
+    .select("readertag, achievements, achievementScore")
+    .eq("user_id", userId)
+    .single();
+
+    if (error) {
+        console.error("Error fetching profile data:", error);
+        return null;
+    } else {
+        return profileData || null
+    }
 }
