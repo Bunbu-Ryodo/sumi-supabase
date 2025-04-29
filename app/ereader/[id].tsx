@@ -185,6 +185,80 @@ export default function EReader() {
           if (payload.new.readCount !== payload.old.readCount) {
             if (payload.new.readCount === 1) {
               addAchievementToProfile(userid, "Good Job Little Buddy");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'Good Job Little Buddy: Read 1 text' 20000 xp points"
+              );
+            } else if (payload.new.readCount === 10) {
+              addAchievementToProfile(userid, "Bookworm");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'Bookworm: Read 10 texts' 100 xp points"
+              );
+            } else if (payload.new.readCount === 25) {
+              addAchievementToProfile(userid, "Bibliophile");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'Bibliophile: Read 25 texts' 250 xp points"
+              );
+            } else if (payload.new.readCount === 50) {
+              addAchievementToProfile(userid, "Book Enjoyer");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'Book Enjoyer: Read 50 texts' 500 xp points"
+              );
+            } else if (payload.new.readCount === 100) {
+              addAchievementToProfile(userid, "Voracious Reader");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'Voracious Reader: Read 100 texts' 1000 xp points"
+              );
+            } else if (payload.new.readCount === 200) {
+              addAchievementToProfile(userid, "We are not the same");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'We Are Not the Same: Read 200 texts' 2000 xp points"
+              );
+            }
+          }
+
+          if (payload.new.subscribedCount !== payload.old.subscribedCount) {
+            if (payload.new.subscribedCount === 1) {
+              addAchievementToProfile(userid, "This looks nice");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "This looks nice: Subscribe to 1 series' 20000 xp points"
+              );
+            } else if (payload.new.subscribedCount === 10) {
+              addAchievementToProfile(userid, "Magpie");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "Magpie: Subscribe to 10 series' 100 xp points"
+              );
+            } else if (payload.new.subscribedCount === 25) {
+              addAchievementToProfile(userid, "Collector");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "Collector: Subscribe to 25 series' 250 xp points"
+              );
+            } else if (payload.new.subscribedCount === 50) {
+              addAchievementToProfile(userid, "Archivist");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "Archivist: Subscribe to 50 series' 500 xp points"
+              );
+            } else if (payload.new.subscribedCount === 100) {
+              addAchievementToProfile(userid, "Book Otaku");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "Book Otaku: Subscribe to 100 series' 1000 xp points"
+              );
+            } else if (payload.new.subscribedCount === 200) {
+              addAchievementToProfile(userid, "Hoarder");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "Book Otaku: Subscribe to 200 series' 2000 xp points"
+              );
             }
           }
         }
