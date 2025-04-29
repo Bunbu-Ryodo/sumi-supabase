@@ -17,7 +17,7 @@ export default function SharedText() {
   let { id } = useLocalSearchParams();
 
   const [extract, setExtract] = useState<ExtractType>({
-    id: "",
+    id: 0,
     title: "",
     author: "",
     chapter: 0,
@@ -26,7 +26,7 @@ export default function SharedText() {
     fulltext: "",
     portrait: "",
     coverart: "",
-    textid: "",
+    textid: 0,
     subscribeart: "",
   });
 
