@@ -2,14 +2,14 @@ import supabase from '../lib/supabase';
 import { SubscriptionType, InstalmentType } from '../types/types';
 
 export async function createSubscription(userId: string, textId: number, chapter: number, due: number, subscribeart: string)
-: Promise<{ data: SubscriptionType[] | null; error: any }>{
+: Promise<{ data: SubscriptionType | null; error: any }>{
   if (!userId || !textId || !chapter || !due) {
     throw new Error("Missing required parameters");
   }
 
   const { data, error } = await supabase
   .from('subscriptions')
-  .insert({ userid: userId, textid: textId, chapter: chapter, due: due, subscribeart: subscribeart }).select();
+  .insert({ userid: userId, textid: textId, chapter: chapter, due: due, subscribeart: subscribeart }).select().single()
 
   if (error) {
     throw new Error(`Error inserting new subscription: ${error.message}`);
@@ -18,40 +18,86 @@ export async function createSubscription(userId: string, textId: number, chapter
   return { data, error};  
 }
 
-export async function deleteSubscription(userId: string, textId: number)
-: Promise<{ data: SubscriptionType[] | null; deleteError: any }>{
-  const { data, error: deleteError } = await supabase
-  .from('subscriptions')
-  .delete()
-  .match({ userid: userId, textid: textId })
-  .select();
+// export async function deleteSubscription(userId: string, textId: number)
+// : Promise<{ data: SubscriptionType[] | null; deleteError: any }>{
+//   const { data, error: deleteError } = await supabase
+//   .from('subscriptions')
+//   .delete()
+//   .match({ userid: userId, textid: textId })
+//   .select();
 
   
-if (deleteError) {
-  throw new Error(`Error deleting existing subscription: ${deleteError.message}`);
-}
+// if (deleteError) {
+//   throw new Error(`Error deleting existing subscription: ${deleteError.message}`);
+// }
 
-return { data, deleteError }
+// return { data, deleteError }
 
+// }
 
-}
-
-export async function activateSubscription(id: number, chapter: number)
+export async function activateSubscription(id: number, chapter: number, userId: string)
 : Promise<{ data: SubscriptionType[] | null; error: any }>{
   const { data, error } = await supabase.from('subscriptions').update({active: true, chapter: chapter, due: new Date().getTime()}).eq('id', id).select();
+
+  const { data: profileData, error: profileFetchError } = await supabase
+  .from('profiles')
+  .select('subscribedCount')
+  .eq('user_id', userId)
+  .select()
+  .single();
+
+  if(profileFetchError){
+    console.error("Error fetching profile data:", profileFetchError);
+  } else {
+    const currentCount = profileData.subscribedCount || 0;
+    const newCount = currentCount + 1;
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ subscribedCount: newCount })
+      .eq('user_id', userId);
+    
+    if(updateError){
+      console.error("Error updating subscription count:", updateError);
+    }
+  }
+
 
   return { data, error };
 }
 
-export async function deactivateSubscription(id: number)
+export async function deactivateSubscription(id: number, userId: string)
 : Promise<{ data: SubscriptionType[] | null; error: any }>{
   const { data, error } = await supabase.from('subscriptions').update({active: false}).eq('id', id).select();
+
+  const { data: profileData, error: profileFetchError } = await supabase
+  .from('profiles')
+  .select('subscribedCount')
+  .eq('user_id', userId)
+  .select()
+  .single();
+
+  if(profileFetchError){
+    console.error("Error fetching profile data:", profileFetchError);
+  } else {
+    const currentCount = profileData.subscribedCount || 0;
+    const newCount = currentCount - 1;
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ subscribedCount: newCount })
+      .eq('user_id', userId);
+    
+    if(updateError){
+      console.error("Error updating subscription count:", updateError);
+    }
+  }
 
   return { data, error };
 }
 
 export async function checkForSubscription(userId: string, textId: number)
-: Promise<{ data: SubscriptionType[] | null; error: any }> {
+: Promise<{ data: SubscriptionType | null; error: any }> {
     if (!userId || !textId) {
         throw new Error("Missing required parameters");
     }
@@ -60,7 +106,8 @@ export async function checkForSubscription(userId: string, textId: number)
         .from('subscriptions')
         .select()
         .match({ userid: userId, textid: textId })
-        .select();
+        .select()
+        .single();
 
     if(error){
       console.error("Error fetching subscription:", error.message);

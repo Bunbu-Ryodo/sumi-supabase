@@ -27,6 +27,8 @@ export default function Subscriptions() {
         }
         if (data && data.length > 0) {
           populateInstalments(data);
+        } else {
+          setLoading(false);
         }
       }
     };

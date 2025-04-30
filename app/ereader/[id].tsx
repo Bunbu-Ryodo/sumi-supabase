@@ -22,6 +22,12 @@ import {
   activateSubscription,
   deactivateSubscription,
 } from "../../supabase_queries/subscriptions";
+import { awardAchievement } from "../../supabase_queries/achievements";
+import {
+  markAsRead,
+  markAsUnread,
+  checkReadStatus,
+} from "../../supabase_queries/profiles";
 import { getUserSession } from "../../supabase_queries/auth.js";
 import supabase from "../../lib/supabase.js";
 
@@ -46,6 +52,8 @@ export default function EReader() {
   const [like, setLike] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [subid, setSubid] = useState(0);
+  const [read, setRead] = useState(false);
+  const [userid, setUserid] = useState("");
 
   const copyToClipboard = async () => {
     const link = `http://localhost:8081/share_text/${extract.id}`;
@@ -59,9 +67,17 @@ export default function EReader() {
 
   async function subscribe() {
     if (subscribed) {
-      deactivateSubscription(subid);
+      deactivateSubscription(subid, userid);
     } else {
-      activateSubscription(subid, extract.chapter + 1);
+      activateSubscription(subid, extract.chapter + 1, userid);
+    }
+  }
+
+  async function toggleReadStatus() {
+    if (read) {
+      await markAsUnread(userid, extract);
+    } else {
+      await markAsRead(userid, extract);
     }
   }
 
@@ -70,24 +86,25 @@ export default function EReader() {
   const fetchExtract = async () => {
     const user = await getUserSession();
     if (user) {
+      setUserid(user.id);
       const { data: extract, error } = await getExtract(id);
 
       if (extract) {
         setExtract(extract);
 
-        const subscriptionData = await checkForSubscription(
+        const { data: existingSubscriptionData } = await checkForSubscription(
           user.id,
           extract.textid
         );
 
-        if (subscriptionData.data && subscriptionData.data.length > 0) {
+        if (existingSubscriptionData) {
           if (
-            subscriptionData.data[0].active &&
-            subscriptionData.data[0].textid === extract.textid
+            existingSubscriptionData.active &&
+            existingSubscriptionData.textid === extract.textid
           ) {
             setSubscribed(true);
           }
-          setSubid(subscriptionData.data[0].id);
+          setSubid(existingSubscriptionData.id);
         } else {
           const { data: insertData, error: insertError } =
             await createSubscription(
@@ -101,11 +118,17 @@ export default function EReader() {
           console.log("Insert data:", insertData);
 
           if (insertData) {
-            console.log("Subscription created successfully:", insertData[0]);
-            setSubid(insertData[0].id);
+            console.log("Subscription created successfully:", insertData);
+            setSubid(insertData.id);
           } else if (insertError) {
             console.error("Error creating subscription:", insertError);
           }
+        }
+
+        const readStatus = await checkReadStatus(user.id, extract.id);
+
+        if (readStatus) {
+          setRead(true);
         }
       } else {
         console.error("Error fetching extract:", error);
@@ -137,8 +160,114 @@ export default function EReader() {
       )
       .subscribe();
 
+    const addAchievementToProfile = async (userid: string, title: string) => {
+      await awardAchievement(userid, title);
+    };
+
+    const readListener = supabase
+      .channel("update-read-status")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "profiles",
+          filter: `user_id=eq.${userid}`,
+        },
+        (payload) => {
+          console.log("Profile status change", payload);
+          const currentReadExtracts = payload.new.readExtracts || [];
+          const isRead = currentReadExtracts.some(
+            (item: ExtractType) => item.id === extract.id
+          );
+          setRead(isRead);
+
+          if (payload.new.readCount !== payload.old.readCount) {
+            if (payload.new.readCount === 1) {
+              addAchievementToProfile(userid, "Good Job Little Buddy");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'Good Job Little Buddy: Read 1 text' 20000 xp points"
+              );
+            } else if (payload.new.readCount === 10) {
+              addAchievementToProfile(userid, "Bookworm");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'Bookworm: Read 10 texts' 100 xp points"
+              );
+            } else if (payload.new.readCount === 25) {
+              addAchievementToProfile(userid, "Bibliophile");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'Bibliophile: Read 25 texts' 250 xp points"
+              );
+            } else if (payload.new.readCount === 50) {
+              addAchievementToProfile(userid, "Book Enjoyer");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'Book Enjoyer: Read 50 texts' 500 xp points"
+              );
+            } else if (payload.new.readCount === 100) {
+              addAchievementToProfile(userid, "Voracious Reader");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'Voracious Reader: Read 100 texts' 1000 xp points"
+              );
+            } else if (payload.new.readCount === 200) {
+              addAchievementToProfile(userid, "We are not the same");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "You've Earned 'We Are Not the Same: Read 200 texts' 2000 xp points"
+              );
+            }
+          }
+
+          if (payload.new.subscribedCount !== payload.old.subscribedCount) {
+            if (payload.new.subscribedCount === 1) {
+              addAchievementToProfile(userid, "This looks nice");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "This looks nice: Subscribe to 1 series' 20000 xp points"
+              );
+            } else if (payload.new.subscribedCount === 10) {
+              addAchievementToProfile(userid, "Magpie");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "Magpie: Subscribe to 10 series' 100 xp points"
+              );
+            } else if (payload.new.subscribedCount === 25) {
+              addAchievementToProfile(userid, "Collector");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "Collector: Subscribe to 25 series' 250 xp points"
+              );
+            } else if (payload.new.subscribedCount === 50) {
+              addAchievementToProfile(userid, "Archivist");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "Archivist: Subscribe to 50 series' 500 xp points"
+              );
+            } else if (payload.new.subscribedCount === 100) {
+              addAchievementToProfile(userid, "Book Otaku");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "Book Otaku: Subscribe to 100 series' 1000 xp points"
+              );
+            } else if (payload.new.subscribedCount === 200) {
+              addAchievementToProfile(userid, "Hoarder");
+              Alert.alert(
+                "Achievement Unlocked!",
+                "Book Otaku: Subscribe to 200 series' 2000 xp points"
+              );
+            }
+          }
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(updateListener);
+      supabase.removeChannel(readListener);
     };
   }, [subid]);
 
@@ -155,6 +284,18 @@ export default function EReader() {
                 <Text style={styles.chapter}>{extract.chapter}</Text>
               </View>
               <Text style={styles.extractText}>{extract.fulltext}</Text>
+            </View>
+            <View style={styles.markAsReadContainer}>
+              <TouchableOpacity
+                style={!read ? styles.buttonPrimary : styles.markAsUnread}
+                onPress={toggleReadStatus}
+              >
+                {read ? (
+                  <Text style={styles.markAsUnreadText}>Mark as Unread</Text>
+                ) : (
+                  <Text style={styles.markAsReadText}>Mark as Read</Text>
+                )}
+              </TouchableOpacity>
             </View>
             <View style={styles.engagementButtons}>
               <TouchableOpacity onPress={toggleLike}>
@@ -190,7 +331,7 @@ export default function EReader() {
             </View>
             <Link style={styles.returnAnchor} href="/feed" asChild>
               <View>
-                <TouchableOpacity style={styles.returnContainer}>
+                <TouchableOpacity>
                   <Ionicons name="arrow-back" size={24} color="#8980F5" />
                 </TouchableOpacity>
                 <Text style={styles.shoppingText}>Return to Feed</Text>
@@ -250,6 +391,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     maxWidth: 120,
   },
+  markAsReadContainer: {
+    alignItems: "center",
+    color: "#F6F7EB",
+  },
   shoppingContainer: {
     alignItems: "center",
     maxWidth: 120,
@@ -283,7 +428,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
   },
-  submitCommentText: {
+  markAsReadText: {
     color: "#F6F7EB",
     fontFamily: "QuicksandReg",
     fontSize: 16,
@@ -291,5 +436,30 @@ const styles = StyleSheet.create({
   returnAnchor: {
     alignItems: "center",
   },
-  returnContainer: {},
+  buttonPrimary: {
+    marginTop: 8,
+    padding: 16,
+    borderColor: "#F6F7EB",
+    borderWidth: 1,
+    backgroundColor: "#393E41",
+    borderRadius: 8,
+    alignItems: "center",
+    fontFamily: "QuicksandReg",
+    width: "100%",
+  },
+  markAsUnread: {
+    marginTop: 8,
+    padding: 16,
+    borderColor: "#393E41",
+    borderWidth: 1,
+    borderRadius: 8,
+    alignItems: "center",
+    fontFamily: "QuicksandReg",
+    width: "100%",
+  },
+  markAsUnreadText: {
+    color: "#393E41",
+    fontFamily: "QuicksandReg",
+    fontSize: 16,
+  },
 });

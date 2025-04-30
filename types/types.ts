@@ -32,5 +32,31 @@ export type InstalmentType = {
     subscribeart: string;
 }
 
+export type AchievementType = {
+    id: number;
+    title: string;
+    description: string;
+    score: number;
+    icon: string;
+}
+
+export type AchievementTypeClient = {
+    id: number;
+    title: string;
+    description: string;
+    score: number;
+    icon: string;
+    date: string;
+}
+
+export type PendingAchievementType = {
+    id: number;
+    title: string;
+    description: string;
+    score: number;
+    icon: string;
+    achievementProgress: number;
+}
+
 
 
