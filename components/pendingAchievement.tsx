@@ -1,22 +1,22 @@
-import { AchievementTypeClient } from "../types/types";
 import { View, Text, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { PendingAchievementType } from "../types/types";
 
-export default function Achievement({
+export default function PendingAchievement({
   id,
   title,
   description,
   score,
   icon,
-  date,
-}: AchievementTypeClient) {
+  achievementProgress,
+}: PendingAchievementType) {
   return (
     <View style={styles.achievementsRow}>
       <View style={styles.achievementIcon}>
         <Ionicons
           name={icon as keyof typeof Ionicons.glyphMap}
           size={24}
-          color={"#F6F7EB"}
+          color={"#393E41"}
         ></Ionicons>
       </View>
       <View style={styles.achievementDetails}>
@@ -24,17 +24,14 @@ export default function Achievement({
         <Text style={styles.achievementDescription}>
           {description} +{score}
         </Text>
-        <Text style={styles.achievementDescription}>
-          Achieved on:{" "}
-          {new Date(date).toLocaleDateString("en-GB", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </Text>
-        <View style={styles.achievementProgressBar}></View>
+        <View style={styles.progressBarContainer}>
+          <View
+            style={[
+              styles.achievementProgressBar,
+              { width: achievementProgress * 2 }, // Dynamic width based on achievementProgress
+            ]}
+          ></View>
+        </View>
       </View>
     </View>
   );
@@ -49,7 +46,9 @@ const styles = StyleSheet.create({
     height: 48,
     width: 48,
     borderRadius: 8,
-    backgroundColor: "#393E41",
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#393E41",
     marginRight: 16,
     alignItems: "center",
     justifyContent: "center",
@@ -75,15 +74,18 @@ const styles = StyleSheet.create({
   readerScoreContainer: {
     flexDirection: "row",
   },
-  achievementProgressBar: {
+  progressBarContainer: {
     marginTop: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FE7F2D",
-    borderRadius: 40,
-    height: 14,
     borderWidth: 1,
     borderColor: "#393E41",
+    borderRadius: 40,
+    height: 14,
+    width: 200,
+  },
+  achievementProgressBar: {
+    backgroundColor: "#8980F5",
+    borderRadius: 40,
+    height: 12,
   },
   achievementDetails: {
     minWidth: 200,
@@ -91,7 +93,7 @@ const styles = StyleSheet.create({
   scoreContainer: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 8,
+    padding: 16,
   },
   score: {
     fontSize: 24,

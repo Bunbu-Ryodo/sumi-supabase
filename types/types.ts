@@ -40,5 +40,23 @@ export type AchievementType = {
     icon: string;
 }
 
+export type AchievementTypeClient = {
+    id: number;
+    title: string;
+    description: string;
+    score: number;
+    icon: string;
+    date: string;
+}
+
+export type PendingAchievementType = {
+    id: number;
+    title: string;
+    description: string;
+    score: number;
+    icon: string;
+    achievementProgress: number;
+}
+
 
 

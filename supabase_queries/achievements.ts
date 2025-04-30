@@ -69,3 +69,18 @@ export async function fetchProfileAchievements(userId: string){
         return profileData || null
     }
 }
+
+export async function fetchAchievementByDescription(desc: string){
+    const { data: achievement, error } = await supabase
+    .from("achievements")
+    .select("*")
+    .eq("description", desc)
+    .single();
+
+    if (error) {
+        console.error("Error fetching achievement:", error);
+        return null;
+    } else {
+        return achievement || null
+    }
+}
