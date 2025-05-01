@@ -28,7 +28,7 @@ export default function PendingAchievement({
           <View
             style={[
               styles.achievementProgressBar,
-              { width: achievementProgress * 2 }, // Dynamic width based on achievementProgress
+              { width: achievementProgress * 2 },
             ]}
           ></View>
         </View>

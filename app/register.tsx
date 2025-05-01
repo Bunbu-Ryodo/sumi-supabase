@@ -4,12 +4,10 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Alert,
 } from "react-native";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { useState } from "react";
 import supabase from "../lib/supabase.js";
-import { createNewProfile } from "../supabase_queries/auth";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -57,7 +55,7 @@ export default function Register() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.registerWrapper}>
       <View style={styles.logoBook}>
         <View style={styles.logoTitle}></View>
       </View>
@@ -84,12 +82,12 @@ export default function Register() {
           onChangeText={setConfirmPassword}
           style={[styles.formInput, passwordError ? styles.errorInput : null]}
         ></TextInput>
-        <TouchableOpacity style={styles.buttonPrimary} onPress={signUpNewUser}>
-          <Text style={styles.primaryButtonText}>Register</Text>
+        <TouchableOpacity style={styles.registerButton} onPress={signUpNewUser}>
+          <Text style={styles.registerButtonText}>Register</Text>
         </TouchableOpacity>
         <Link href="/" asChild>
-          <TouchableOpacity style={styles.buttonSecondary} onPress={() => {}}>
-            <Text style={styles.secondaryButtonText}>Back to Sign In</Text>
+          <TouchableOpacity style={styles.backButton} onPress={() => {}}>
+            <Text style={styles.backButtonText}>Back to Sign In</Text>
           </TouchableOpacity>
         </Link>
         {registerError ? (
@@ -101,7 +99,7 @@ export default function Register() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  registerWrapper: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -162,7 +160,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 12,
   },
-  buttonPrimary: {
+  registerButton: {
     marginTop: 8,
     padding: 16,
     backgroundColor: "#F6F7EB",
@@ -171,12 +169,12 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
     width: "100%",
   },
-  primaryButtonText: {
+  registerButtonText: {
     color: "#393E41",
     fontFamily: "QuicksandReg",
     fontSize: 16,
   },
-  buttonSecondary: {
+  backButton: {
     marginTop: 16,
     padding: 16,
     backgroundColor: "transparent",
@@ -188,7 +186,7 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
     width: "100%",
   },
-  secondaryButtonText: {
+  backButtonText: {
     color: "#F6F7EB",
     fontFamily: "QuicksandReg",
     fontSize: 16,

@@ -1,7 +1,6 @@
 import {
   Text,
   TextInput,
-  Button,
   View,
   StyleSheet,
   TouchableOpacity,
@@ -45,15 +44,12 @@ export default function Settings() {
   };
 
   const updateReaderTag = async () => {
-    try {
-      const { data, error } = await updateUsername(readerTag);
-      if (data && !error) {
-        setReaderTagChangeSuccess("ReaderTag changed successfully");
-      } else {
-        setReaderTagChangeSuccess("");
-      }
-    } catch (error) {
-      console.error(error);
+    const updateReaderTag = await updateUsername(readerTag);
+    if (updateReaderTag) {
+      console.log("ReaderTag updated successfully:", updateReaderTag);
+      setReaderTagChangeSuccess("ReaderTag changed successfully");
+    } else {
+      setReaderTagChangeSuccess("");
     }
   };
 
@@ -62,22 +58,18 @@ export default function Settings() {
       setPasswordChangeError("Passwords do not match");
       return;
     }
-    try {
-      const { data, error } = await updatePassword(newPassword);
-      if (data && !error) {
-        setPasswordChangeSuccess("Password changed successfully");
-        setPasswordChangeError("");
-      } else {
-        setPasswordChangeError("Error changing password");
-        setPasswordChangeSuccess("");
-      }
-    } catch (error) {
-      console.error(error);
+    const passwordUpdated = await updatePassword(newPassword);
+    if (passwordUpdated) {
+      setPasswordChangeSuccess("Password changed successfully");
+      setPasswordChangeError("");
+    } else {
+      setPasswordChangeError("Error changing password");
+      setPasswordChangeSuccess("");
     }
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.settingsWrapper}>
       <View style={styles.form}>
         <Text style={styles.formLabel}>Change ReaderTag</Text>
         <TextInput
@@ -89,10 +81,10 @@ export default function Settings() {
           onChangeText={setReaderTag}
         ></TextInput>
         <TouchableOpacity
-          style={styles.changeLoginButton}
+          style={styles.changeReaderTagButton}
           onPress={updateReaderTag}
         >
-          <Text style={styles.primaryButtonText}>Change ReaderTag</Text>
+          <Text style={styles.changeReaderTagButtonText}>Change ReaderTag</Text>
         </TouchableOpacity>
         {readerTagChangeSuccess ? (
           <Text style={styles.successText}>{readerTagChangeSuccess}</Text>
@@ -123,8 +115,11 @@ export default function Settings() {
           ]}
           onChangeText={setConfirmNewPassword}
         ></TextInput>
-        <TouchableOpacity style={styles.buttonPrimary} onPress={changePassword}>
-          <Text style={styles.primaryButtonText}>Change Password</Text>
+        <TouchableOpacity
+          style={styles.changePasswordButton}
+          onPress={changePassword}
+        >
+          <Text style={styles.changePasswordButtonText}>Change Password</Text>
         </TouchableOpacity>
         {passwordChangeError ? (
           <Text style={styles.errorPasswordText}>{passwordChangeError}</Text>
@@ -142,7 +137,7 @@ export default function Settings() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  settingsWrapper: {
     flex: 1,
     backgroundColor: "#393E41",
     width: "100%",
@@ -214,7 +209,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 16,
   },
-  changeLoginButton: {
+  changePasswordButton: {
+    paddingVertical: 16,
+    backgroundColor: "#F6F7EB",
+    borderRadius: 8,
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 16,
+    marginTop: 16,
+  },
+  changeReaderTagButton: {
     paddingVertical: 16,
     backgroundColor: "#F6F7EB",
     borderRadius: 8,
@@ -232,6 +236,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#8980F5",
   },
   primaryButtonText: {
+    color: "#393E41",
+    fontFamily: "QuicksandReg",
+    fontSize: 16,
+  },
+  changePasswordButtonText: {
+    color: "#393E41",
+    fontFamily: "QuicksandReg",
+    fontSize: 16,
+  },
+  changeReaderTagButtonText: {
     color: "#393E41",
     fontFamily: "QuicksandReg",
     fontSize: 16,

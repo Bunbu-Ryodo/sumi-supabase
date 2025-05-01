@@ -21,7 +21,7 @@ export async function markAsRead(userId: string, extract: ExtractType){
 
     const updatedReadExtracts = [...currentReadExtractsArray, extract];
 
-    const { data: updatedProfile, error: updateError } = await supabase
+    const { error: updateError } = await supabase
       .from("profiles")
       .update({ readExtracts: updatedReadExtracts, readCount: currentReadExtracts.readCount + 1 })
       .eq("user_id", userId)
@@ -30,7 +30,7 @@ export async function markAsRead(userId: string, extract: ExtractType){
     if (updateError) {
       console.error("Error updating read extracts:", updateError);
     } else {
-      console.log("Successfully marked extract as read:", updatedProfile);
+      console.log("Successfully marked extract as read.");
     }
    }
 }
@@ -50,7 +50,7 @@ export async function markAsUnread(userId: string, extract: ExtractType){
     
      const updatedReadExtracts = currentReadExtractsArray.filter((item: ExtractType) => item.id !== extract.id);
     
-     const { data: updatedProfile, error: updateError } = await supabase
+     const { error: updateError } = await supabase
         .from("profiles")
         .update({ readExtracts: updatedReadExtracts, readCount: currentReadExtracts.readCount - 1 })
         .eq("user_id", userId)
@@ -59,7 +59,7 @@ export async function markAsUnread(userId: string, extract: ExtractType){
      if (updateError) {
         console.error("Error updating read extracts:", updateError);
      } else {
-        console.log("Successfully marked extract as unread:", updatedProfile);
+        console.log("Successfully marked extract as unread");
      }
     }
 }

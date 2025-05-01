@@ -12,7 +12,6 @@ import {
   getExtractByTextIdChapter,
   createInstalment,
   updateSubscription,
-  getAllInstalments,
 } from "../../supabase_queries/subscriptions";
 import { ExtractType } from "../../types/types.js";
 import Extract from "../../components/extract";
@@ -20,7 +19,6 @@ import Extract from "../../components/extract";
 export default function FeedScreen() {
   const router = useRouter();
   const [extracts, setExtracts] = useState([] as ExtractType[]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkUserAuthenticated = async function () {
@@ -29,86 +27,74 @@ export default function FeedScreen() {
       if (!user) {
         router.push("/");
       } else if (user) {
-        const userProfile = await lookUpUserProfile(user.id);
-        if (!userProfile) {
-          await createNewProfile(user.id, new Date());
-        }
+        checkUserProfileStatus(user.id);
         await fetchExtracts();
-        const { data: subscriptionData, error } = await getAllDueSubscriptions(
-          user.id
-        );
-        console.log("Subscriptions:", subscriptionData);
-        if (subscriptionData) {
-          for (let i = 0; i < subscriptionData.length; i++) {
-            console.log("textid", subscriptionData[i].textid);
-            console.log("chapter", subscriptionData[i].chapter);
-            const { data: extract, error } = await getExtractByTextIdChapter(
-              subscriptionData[i].textid,
-              subscriptionData[i].chapter
-            );
-            console.log("Extract:", extract);
-            console.log("index", i);
-
-            if (extract && extract.length > 0) {
-              const { data: instalmentData, error } = await createInstalment(
-                user.id,
-                extract[0].id,
-                extract[0].chapter,
-                extract[0].title,
-                extract[0].author,
-                subscriptionData[i].id,
-                subscriptionData[i].subscribeart
-              );
-
-              if (error) {
-                console.error("Error creating instalment:", error.message);
-              } else {
-                console.log("Instalment created successfully:", instalmentData);
-                const { data, error: updateError } = await updateSubscription(
-                  subscriptionData[i].id,
-                  subscriptionData[i].chapter + 1
-                );
-
-                if (updateError) {
-                  console.error(
-                    "Error updating subscription:",
-                    updateError.message
-                  );
-                } else {
-                  console.log("Subscription updated successfully:", data);
-                }
-              }
-            }
-          }
-        } else if (error) {
-          console.log("Error", error);
-        }
-        const { data, error: fetchInstalmentError } = await getAllInstalments(
-          user.id
-        );
-        console.log("Instalments:", data);
+        await processSubscriptions(user.id);
       }
     };
     checkUserAuthenticated();
   }, []);
 
-  const fetchExtracts = async function () {
-    const { data, error } = await getExtracts();
-    if (error) {
-      console.error("Error fetching extracts:", error);
-    } else {
-      if (data) {
-        setExtracts(data);
-      } else {
-        setExtracts([]);
+  const checkUserProfileStatus = async function (userId: string) {
+    const userProfile = await lookUpUserProfile(userId);
+    if (!userProfile) {
+      const userProfile = await createNewProfile(userId, new Date());
+    }
+  };
+
+  const processSubscriptions = async function (userId: string) {
+    const subscriptions = await getAllDueSubscriptions(userId);
+    if (subscriptions) {
+      for (let i = 0; i < subscriptions.length; i++) {
+        const extract = await getExtractByTextIdChapter(
+          subscriptions[i].textid,
+          subscriptions[i].chapter
+        );
+
+        if (extract) {
+          const newInstalment = await createInstalment(
+            userId,
+            extract.id,
+            extract.chapter,
+            extract.title,
+            extract.author,
+            subscriptions[i].id,
+            subscriptions[i].subscribeart
+          );
+
+          if (newInstalment) {
+            console.log("Instalment created successfully:", newInstalment);
+            const updatedSubscription = await updateSubscription(
+              subscriptions[i].id,
+              subscriptions[i].chapter + 1
+            );
+
+            if (updatedSubscription) {
+              console.log(
+                "Subscription updated successfully:",
+                updatedSubscription
+              );
+            }
+          }
+        }
       }
-      setLoading(false);
+    } else {
+      console.log("Subscriptions up to date");
+    }
+  };
+
+  const fetchExtracts = async function () {
+    const extracts = await getExtracts();
+    if (extracts) {
+      setExtracts(extracts);
+    } else {
+      setExtracts([]);
     }
   };
 
   return (
     <ScrollView
-      contentContainerStyle={styles.contentContainer}
+      contentContainerStyle={styles.feedWrapper}
       style={styles.container}
     >
       {extracts &&
@@ -133,9 +119,9 @@ export default function FeedScreen() {
 }
 
 const styles = StyleSheet.create({
-  contentContainer: {
-    alignItems: "center", // Center the Extract components horizontally
-    paddingVertical: 24, // Add some vertical padding if needed
+  feedWrapper: {
+    alignItems: "center",
+    paddingVertical: 24,
   },
   container: {
     backgroundColor: "#393E41",

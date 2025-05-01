@@ -21,7 +21,7 @@ export default function PasswordReset() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.passwordResetWrapper}>
       <View style={styles.form}>
         <Text style={styles.formLabel}>Confirm Email</Text>
         <TextInput style={styles.formInput} onChangeText={setEmail}></TextInput>
@@ -40,7 +40,7 @@ export default function PasswordReset() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  passwordResetWrapper: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",

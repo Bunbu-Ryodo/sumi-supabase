@@ -29,7 +29,7 @@ export default function ChangePassword() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.changePasswordWrapper}>
       <View style={styles.form}>
         <Text style={styles.formLabel}>Create new password</Text>
         <TextInput
@@ -42,10 +42,10 @@ export default function ChangePassword() {
           onChangeText={setConfirmPassword}
         ></TextInput>
         <TouchableOpacity
-          style={styles.buttonPrimary}
+          style={styles.passwordResetButton}
           onPress={handlePasswordReset}
         >
-          <Text style={styles.primaryButtonText}>Send Reset Link</Text>
+          <Text style={styles.passwordResetButtonText}>Send Reset Link</Text>
         </TouchableOpacity>
       </View>
       {errorMessage ? (
@@ -56,7 +56,7 @@ export default function ChangePassword() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  changePasswordWrapper: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: "transparent",
   },
-  buttonPrimary: {
+  passwordResetButton: {
     marginTop: 8,
     padding: 16,
     backgroundColor: "#F6F7EB",
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
     width: "100%",
   },
-  primaryButtonText: {
+  passwordResetButtonText: {
     color: "#393E41",
     fontFamily: "QuicksandReg",
     fontSize: 16,

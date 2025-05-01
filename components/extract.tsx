@@ -24,7 +24,6 @@ export default function Extract({
   textid,
 }: ExtractType) {
   const [like, setLike] = useState(false);
-  const [subscribe, setSubscribe] = useState(false);
 
   function toggleLike() {
     setLike(!like);
@@ -72,13 +71,6 @@ export default function Extract({
             color="#D64045"
           />
         </TouchableOpacity>
-        {/* <TouchableOpacity style={styles.icon}>
-          <Ionicons
-            name={subscribe ? "bookmark" : "bookmark-outline"}
-            size={24}
-            color="#FE7F2D"
-          />
-        </TouchableOpacity> */}
         <TouchableOpacity style={styles.icon} onPress={copyToClipboard}>
           <Ionicons name="clipboard-outline" size={24} color="#8980F5" />
         </TouchableOpacity>
@@ -97,8 +89,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderRadius: 8,
     padding: 16,
-    alignItems: "center", // Center horizontally
-    justifyContent: "center", // Center vertically
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
     borderColor: "#393E41",
   },
