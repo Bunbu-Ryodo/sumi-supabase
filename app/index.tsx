@@ -21,7 +21,7 @@ export default function Index() {
         email: email,
         password: password,
       })
-      .then(({ data, error }) => {
+      .then(({ error }) => {
         if (error) {
           console.error("Sign in error:", error.message);
           setSigninError(error.message);
@@ -36,7 +36,7 @@ export default function Index() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.indexWrapper}>
       <View style={styles.logoBook}>
         <View style={styles.logoTitle}></View>
       </View>
@@ -54,12 +54,12 @@ export default function Index() {
           onChangeText={setPassword}
         ></TextInput>
 
-        <TouchableOpacity style={styles.buttonPrimary} onPress={signInUser}>
-          <Text style={styles.primaryButtonText}>Sign In</Text>
+        <TouchableOpacity style={styles.signInButton} onPress={signInUser}>
+          <Text style={styles.signInButtonText}>Sign In</Text>
         </TouchableOpacity>
         <Link href="../register" asChild>
-          <TouchableOpacity style={styles.buttonSecondary}>
-            <Text style={styles.secondaryButtonText}>Register</Text>
+          <TouchableOpacity style={styles.registerButton}>
+            <Text style={styles.registerButtonText}>Register</Text>
           </TouchableOpacity>
         </Link>
         {signinError ? (
@@ -76,7 +76,7 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  indexWrapper: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F7EB",
     borderRadius: 8,
   },
-  buttonPrimary: {
+  signInButton: {
     marginTop: 8,
     padding: 16,
     backgroundColor: "#F6F7EB",
@@ -146,17 +146,17 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
     width: "100%",
   },
-  primaryButtonText: {
+  signInButtonText: {
     color: "#393E41",
     fontFamily: "QuicksandReg",
     fontSize: 16,
   },
-  secondaryButtonText: {
+  registerButtonText: {
     color: "#F6F7EB",
     fontFamily: "QuicksandReg",
     fontSize: 16,
   },
-  buttonSecondary: {
+  registerButton: {
     marginTop: 16,
     padding: 16,
     backgroundColor: "transparent",
