@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -12,7 +11,7 @@ import Subscription from "../../components/subscription";
 import { useEffect, useState } from "react";
 import { getUserSession } from "../../supabase_queries/auth.js";
 import { getAllInstalments } from "../../supabase_queries/subscriptions";
-import { InstalmentType, SubscriptionType } from "../../types/types";
+import { InstalmentType } from "../../types/types";
 
 export default function Subscriptions() {
   useEffect(() => {
@@ -20,13 +19,10 @@ export default function Subscriptions() {
       const user = await getUserSession();
 
       if (user) {
-        const { data, error } = await getAllInstalments(user.id);
+        const instalments = await getAllInstalments(user.id);
 
-        if (error) {
-          console.error("Error fetching instalments:", error);
-        }
-        if (data && data.length > 0) {
-          populateInstalments(data);
+        if (instalments && instalments.length > 0) {
+          populateInstalments(instalments);
         } else {
           setLoading(false);
         }
@@ -43,10 +39,10 @@ export default function Subscriptions() {
   }
 
   const [instalments, setInstalments] = useState<InstalmentType[]>([]);
-  const [loading, setLoading] = useState(true); // Add a loading state
+  const [loading, setLoading] = useState(true);
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.extractContainer}>
+      <View style={styles.extractWrapper}>
         <View style={styles.subscriptionsHeader}>
           <Text style={styles.newInstallmentsHeader}>Your Instalments</Text>
           <View style={styles.headerIconContainer}>
@@ -55,7 +51,15 @@ export default function Subscriptions() {
         </View>
         <View style={styles.subscriptionSection}>
           {loading ? (
-            <ActivityIndicator size="large" color="#393E41" />
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ActivityIndicator size="large" color="#393E41" />
+            </View>
           ) : instalments.length > 0 ? (
             instalments.map((instalment, index) => (
               <Subscription
@@ -100,7 +104,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginLeft: 8,
   },
-  extractContainer: {
+  extractWrapper: {
     padding: 16,
     marginTop: 24,
     width: "90%",
