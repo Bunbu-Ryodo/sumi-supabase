@@ -1,7 +1,6 @@
 import {
   Text,
   TextInput,
-  Button,
   View,
   StyleSheet,
   TouchableOpacity,
@@ -46,8 +45,9 @@ export default function Settings() {
 
   const updateReaderTag = async () => {
     try {
-      const { data, error } = await updateUsername(readerTag);
-      if (data && !error) {
+      const updateReaderTag = await updateUsername(readerTag);
+      if (updateReaderTag) {
+        console.log("ReaderTag updated successfully:", updateReaderTag);
         setReaderTagChangeSuccess("ReaderTag changed successfully");
       } else {
         setReaderTagChangeSuccess("");
@@ -63,8 +63,8 @@ export default function Settings() {
       return;
     }
     try {
-      const { data, error } = await updatePassword(newPassword);
-      if (data && !error) {
+      const passwordUpdated = await updatePassword(newPassword);
+      if (passwordUpdated) {
         setPasswordChangeSuccess("Password changed successfully");
         setPasswordChangeError("");
       } else {
@@ -77,7 +77,7 @@ export default function Settings() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.settingsWrapper}>
       <View style={styles.form}>
         <Text style={styles.formLabel}>Change ReaderTag</Text>
         <TextInput
@@ -89,10 +89,10 @@ export default function Settings() {
           onChangeText={setReaderTag}
         ></TextInput>
         <TouchableOpacity
-          style={styles.changeLoginButton}
+          style={styles.changeReaderTagButton}
           onPress={updateReaderTag}
         >
-          <Text style={styles.primaryButtonText}>Change ReaderTag</Text>
+          <Text style={styles.changeReaderTagButtonText}>Change ReaderTag</Text>
         </TouchableOpacity>
         {readerTagChangeSuccess ? (
           <Text style={styles.successText}>{readerTagChangeSuccess}</Text>
@@ -142,7 +142,7 @@ export default function Settings() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  settingsWrapper: {
     flex: 1,
     backgroundColor: "#393E41",
     width: "100%",
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 16,
   },
-  changeLoginButton: {
+  changeReaderTagButton: {
     paddingVertical: 16,
     backgroundColor: "#F6F7EB",
     borderRadius: 8,
@@ -232,6 +232,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#8980F5",
   },
   primaryButtonText: {
+    color: "#393E41",
+    fontFamily: "QuicksandReg",
+    fontSize: 16,
+  },
+  changeReaderTagButtonText: {
     color: "#393E41",
     fontFamily: "QuicksandReg",
     fontSize: 16,

@@ -1,5 +1,5 @@
 import supabase from '../lib/supabase';
-import { SubscriptionType, InstalmentType } from '../types/types';
+import { SubscriptionType, InstalmentType, ExtractType } from '../types/types';
 
 export async function createSubscription(userId: string, textId: number, chapter: number, due: number, subscribeart: string)
 : Promise<{ data: SubscriptionType | null; error: any }>{
@@ -117,71 +117,97 @@ export async function checkForSubscription(userId: string, textId: number)
     return { data, error: null };
 }
 
-export async function getAllDueSubscriptions(userId: string) : Promise<{ data: SubscriptionType[] | null; error: any }> {
+export async function getAllDueSubscriptions(userId: string) {
   if(!userId){
     throw new Error("Missing required parameters");
   }
 
-  const { data, error } = await supabase
+  const { data: subscriptions, error } = await supabase
     .from('subscriptions')
     .select()
     .match({ userid: userId, active: true })
     .lt('due', new Date().getTime())
     .select();
 
-    return { data, error };
+    if(error){
+      console.error("Error fetching due subscriptions:", error.message);
+      return null;
+    }
+    return subscriptions;
 }
 
-export async function getExtractByTextIdChapter(textId: number, chapter: number) : Promise<{ data: any[] | null; error: any }> {
+export async function getExtractByTextIdChapter(textId: number, chapter: number){
   if(!textId){
     throw new Error("Missing required parameters");
   }
 
-  const { data, error } = await supabase
+  const { data: extract, error } = await supabase
     .from('extracts')
     .select()
     .match({ textid: textId, chapter: chapter })
+    .single();
 
-    return { data, error };
+    if(error){
+      console.error("Error fetching extract:", error);
+      return null;
+    }
+    return extract;
 }
 
-export async function createInstalment(userId: string, extractId: number, chapter: number, title: string, author: string, subscriptionId: number, subscribeart: string) : Promise<{ data: any[] | null; error: any }>{
+export async function createInstalment(userId: string, extractId: number, chapter: number, title: string, author: string, subscriptionId: number, subscribeart: string){
   if(!userId || !extractId || !chapter || !title || !author){
     throw new Error("Missing required parameters");
   }
 
-  const { data, error } = await supabase
+  const { data: instalment, error } = await supabase
     .from('instalments')
     .insert({ userid: userId, extractid: extractId, chapter: chapter, title: title, author: author, subscriptionid: subscriptionId, subscribeart: subscribeart })
-    .select();
+    .select()
+    .single();
 
-    return { data, error };
+    if(error){
+      console.error("Error creating instalment:", error);
+      return null;
+
+    }
+
+    return instalment;
 }
 
-export async function updateSubscription(subscriptionId: number, chapter: number) : Promise<{ data: SubscriptionType[] | null; error: any }>{
+export async function updateSubscription(subscriptionId: number, chapter: number){
   if(!subscriptionId){
     throw new Error("Missing required parameters");
   }
 
-  const { data, error } = await supabase
+  const { data: updatedSubscription, error } = await supabase
     .from('subscriptions')
     .update({chapter: chapter, due: new Date().getTime() + 604800000}) // 7 days in milliseconds
     .eq('id', subscriptionId)
     .select();
 
-    return { data, error };
+  if(error){
+    console.error("Error updating subscription:", error);
+    return null;
+  }
+
+    return updatedSubscription;
 }
 
-export async function getAllInstalments(userId: string) : Promise<{ data: InstalmentType[] | null; error: any }>{
+export async function getAllInstalments(userId: string){
   if(!userId){
     throw new Error("Missing required parameters");
   }
 
-  const { data, error } = await supabase
+  const { data: instalments, error } = await supabase
     .from('instalments')
     .select()
     .match({ userid: userId })
     .select();
 
-    return { data, error };
+    if(error){
+      console.error("Error fetching instalments:", error);
+      return null;
+    }
+
+    return instalments;
 }
