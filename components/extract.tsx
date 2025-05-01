@@ -24,7 +24,6 @@ export default function Extract({
   textid,
 }: ExtractType) {
   const [like, setLike] = useState(false);
-  const [subscribe, setSubscribe] = useState(false);
 
   function toggleLike() {
     setLike(!like);
