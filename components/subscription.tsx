@@ -19,7 +19,7 @@ export default function Subscription({
   subscribeArt,
 }: instalmentProps) {
   return (
-    <View style={styles.container}>
+    <View style={styles.subscriptionWrapper}>
       <Link
         href={{ pathname: "/ereader/[id]", params: { id: extractId } }}
         asChild
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  container: {
+  subscriptionWrapper: {
     padding: 8,
     margin: 8,
   },

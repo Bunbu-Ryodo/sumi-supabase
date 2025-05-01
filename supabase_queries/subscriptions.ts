@@ -1,5 +1,4 @@
 import supabase from '../lib/supabase';
-import { SubscriptionType, InstalmentType, ExtractType } from '../types/types';
 
 export async function createSubscription(userId: string, textId: number, chapter: number, due: number, subscribeart: string){
   if (!userId || !textId || !chapter || !due) {
@@ -18,9 +17,13 @@ export async function createSubscription(userId: string, textId: number, chapter
   return newSubscription;
 }
 
-export async function activateSubscription(id: number, chapter: number, userId: string)
-: Promise<{ data: SubscriptionType[] | null; error: any }>{
-  const { data, error } = await supabase.from('subscriptions').update({active: true, chapter: chapter, due: new Date().getTime()}).eq('id', id).select();
+export async function activateSubscription(id: number, chapter: number, userId: string){
+  const { data: profile, error: subscriptionUpdateError } = await supabase.from('subscriptions').update({active: true, chapter: chapter, due: new Date().getTime()}).eq('id', id).select();
+
+  if(subscriptionUpdateError){
+    console.error("Error activating subscription:", subscriptionUpdateError);
+    return null;
+  }
 
   const { data: profileData, error: profileFetchError } = await supabase
   .from('profiles')
@@ -42,16 +45,18 @@ export async function activateSubscription(id: number, chapter: number, userId: 
     
     if(updateError){
       console.error("Error updating subscription count:", updateError);
+      return null;
     }
   }
-
-
-  return { data, error };
 }
 
-export async function deactivateSubscription(id: number, userId: string)
-: Promise<{ data: SubscriptionType[] | null; error: any }>{
-  const { data, error } = await supabase.from('subscriptions').update({active: false}).eq('id', id).select();
+export async function deactivateSubscription(id: number, userId: string){
+  const { error: subscriptionDeactivateError } = await supabase.from('subscriptions').update({active: false}).eq('id', id).select();
+
+  if(subscriptionDeactivateError){
+    console.error("Error deactivating subscription:", subscriptionDeactivateError);
+    return null;
+  }
 
   const { data: profileData, error: profileFetchError } = await supabase
   .from('profiles')
@@ -73,10 +78,9 @@ export async function deactivateSubscription(id: number, userId: string)
     
     if(updateError){
       console.error("Error updating subscription count:", updateError);
+      return null;
     }
   }
-
-  return { data, error };
 }
 
 export async function checkForSubscription(userId: string, textId: number){

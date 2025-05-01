@@ -38,7 +38,7 @@ export default function FeedScreen() {
   const checkUserProfileStatus = async function (userId: string) {
     const userProfile = await lookUpUserProfile(userId);
     if (!userProfile) {
-      await createNewProfile(userId, new Date());
+      const userProfile = await createNewProfile(userId, new Date());
     }
   };
 
@@ -84,15 +84,11 @@ export default function FeedScreen() {
   };
 
   const fetchExtracts = async function () {
-    const { data, error } = await getExtracts();
-    if (error) {
-      console.error("Error fetching extracts:", error);
+    const extracts = await getExtracts();
+    if (extracts) {
+      setExtracts(extracts);
     } else {
-      if (data) {
-        setExtracts(data);
-      } else {
-        setExtracts([]);
-      }
+      setExtracts([]);
     }
   };
 

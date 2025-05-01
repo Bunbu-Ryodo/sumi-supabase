@@ -2,6 +2,10 @@ import supabase from "../lib/supabase";
 import { AchievementType } from "../types/types";
 
 export async function awardAchievement(userId: string, title: string){
+    if(!userId || !title){
+        throw new Error("Missing required parameters");
+    }
+
     const { data: achievement, error } = await supabase
     .from("achievements")
     .select("*")
@@ -34,16 +38,13 @@ export async function awardAchievement(userId: string, title: string){
 
             const updatedAchievements = [...currentAchievements, achievement];
 
-            console.log("Updated Achievements:", updatedAchievements);
-            console.log("Achievement Score:", profileData.achievementScore + achievement.score);
-
             const { data: updatedProfile, error: updateError } = await supabase
             .from("profiles")
             .update({ achievements: updatedAchievements, achievementScore: profileData.achievementScore + achievement.score })
             .eq("user_id", userId)
             .single();
 
-            console.log("Updated Profile:", updatedProfile);
+            console.log("Updated Profile");
 
             if (updateError) {
                 console.error("Error updating profile with new achievement:", updateError);
@@ -56,6 +57,10 @@ export async function awardAchievement(userId: string, title: string){
 }
 
 export async function fetchProfileAchievements(userId: string){
+    if(!userId){
+        throw new Error("Missing userId parameter");
+    }
+
     const { data: profileData, error } = await supabase
     .from("profiles")
     .select("readertag, achievements, achievementScore")
@@ -71,6 +76,9 @@ export async function fetchProfileAchievements(userId: string){
 }
 
 export async function fetchAchievementByDescription(desc: string){
+    if(!desc){
+        throw new Error("Missing description parameter");
+    }
     const { data: achievement, error } = await supabase
     .from("achievements")
     .select("*")
@@ -81,6 +89,6 @@ export async function fetchAchievementByDescription(desc: string){
         console.error("Error fetching achievement:", error);
         return null;
     } else {
-        return achievement || null
+        return achievement;
     }
 }

@@ -130,9 +130,9 @@ export default function EReader() {
 
   async function subscribe() {
     if (subscribed) {
-      deactivateSubscription(subid, userid);
+      await deactivateSubscription(subid, userid);
     } else {
-      activateSubscription(subid, extract.chapter + 1, userid);
+      await activateSubscription(subid, extract.chapter + 1, userid);
     }
   }
 
@@ -179,7 +179,6 @@ export default function EReader() {
           filter: `user_id=eq.${userid}`,
         },
         (payload) => {
-          console.log("Profile status change", payload);
           const currentReadExtracts = payload.new.readExtracts || [];
           const isRead = currentReadExtracts.some(
             (item: ExtractType) => item.id === extract.id

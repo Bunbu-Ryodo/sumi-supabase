@@ -4,15 +4,10 @@ export async function updatePassword(password){
     const { data: passwordUpdated, error } = await supabase.auth.updateUser({ password: password })
 
     if(error){
-        console.error('Error updating password:', error.message);
+        console.error('Error updating password:', error);
         return null;
     }
     return passwordUpdated;
-}
-
-export async function updateEmail(email){
-    const { data, error } = await supabase.auth.updateUser({ email: email })
-    return { data, error } 
 }
 
 export async function updateUsername(username){
@@ -38,7 +33,7 @@ export async function updateUsername(username){
             .single();
 
         if (updateError) {
-            console.error('Error updating profile:', updateError.message);
+            console.error('Error updating profile:', updateError);
             return null;
         }
         return updatedProfile;

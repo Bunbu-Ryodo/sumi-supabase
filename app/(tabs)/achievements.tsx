@@ -37,7 +37,6 @@ export default function Achievements() {
       if (user) {
         const userProfile = await lookUpUserProfile(user.id);
         if (userProfile) {
-          console.log(userProfile, "Retrieved user profile data");
           setAchievements(userProfile.achievements || []);
           setAchievementScore(userProfile.achievementScore || 0);
           setReaderTag(userProfile.username || "");

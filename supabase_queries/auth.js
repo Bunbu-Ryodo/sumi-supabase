@@ -6,17 +6,22 @@ export async function getUserSession(){
 }
 
 export async function createNewProfile(user_id, created_at){
-const { data, error } = await supabase
+const { data: userProfile, error } = await supabase
   .from('profiles')
   .insert([
     { user_id: user_id, created_at: created_at },
   ])
   .select()
-   return { data, error }
+
+  if(error){
+    console.error('Error creating new profile:', error.message);
+    return null;
+  }
+  return userProfile;
 }
 
 export async function lookUpUserProfile(user_id){
-  const { data, error } = await supabase
+  const { data: userProfile, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('user_id', user_id)
@@ -27,7 +32,7 @@ export async function lookUpUserProfile(user_id){
     return null;
   }
 
-  return data;
+  return userProfile;
 }
 
 export async function resetPassword(email){
