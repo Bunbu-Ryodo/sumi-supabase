@@ -2,7 +2,6 @@ import * as Clipboard from "expo-clipboard";
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -55,6 +54,70 @@ export default function EReader() {
   const [read, setRead] = useState(false);
   const [userid, setUserid] = useState("");
 
+  const router = useRouter();
+
+  const checkForActiveSubscription = async (
+    userId: string,
+    extract: ExtractType
+  ) => {
+    const existingSubscription = await checkForSubscription(
+      userId,
+      extract.textid
+    );
+
+    if (existingSubscription) {
+      if (
+        existingSubscription.active &&
+        existingSubscription.textid === extract.textid
+      ) {
+        setSubscribed(true);
+      }
+      setSubid(existingSubscription.id);
+    } else {
+      const newSubscription = await createSubscription(
+        userId,
+        extract.textid,
+        extract.chapter + 1,
+        new Date().getTime(),
+        extract.subscribeart
+      );
+
+      if (newSubscription) {
+        console.log("Subscription created successfully:", newSubscription);
+        setSubid(newSubscription.id);
+      }
+    }
+  };
+
+  const setInitialReadStatus = async (userId: string, extract: ExtractType) => {
+    await checkForActiveSubscription(userId, extract);
+
+    const readStatus = await checkReadStatus(userId, extract.id);
+
+    if (readStatus) {
+      setRead(true);
+    }
+  };
+
+  const fetchExtract = async () => {
+    const user = await getUserSession();
+    if (user) {
+      setUserid(user.id);
+      const extract = await getExtract(id);
+
+      if (extract) {
+        setExtract(extract);
+
+        await checkForActiveSubscription(user.id, extract);
+        await setInitialReadStatus(user.id, extract);
+      } else {
+        router.push("/");
+      }
+
+      setLoading(false);
+    }
+  };
+
   const copyToClipboard = async () => {
     const link = `http://localhost:8081/share_text/${extract.id}`;
     await Clipboard.setStringAsync(link);
@@ -81,65 +144,6 @@ export default function EReader() {
     }
   }
 
-  const router = useRouter();
-
-  const fetchExtract = async () => {
-    const user = await getUserSession();
-    if (user) {
-      setUserid(user.id);
-      const { data: extract, error } = await getExtract(id);
-
-      if (extract) {
-        setExtract(extract);
-
-        const { data: existingSubscriptionData } = await checkForSubscription(
-          user.id,
-          extract.textid
-        );
-
-        if (existingSubscriptionData) {
-          if (
-            existingSubscriptionData.active &&
-            existingSubscriptionData.textid === extract.textid
-          ) {
-            setSubscribed(true);
-          }
-          setSubid(existingSubscriptionData.id);
-        } else {
-          const { data: insertData, error: insertError } =
-            await createSubscription(
-              user.id,
-              extract.textid,
-              extract.chapter + 1,
-              new Date().getTime(),
-              extract.subscribeart
-            );
-
-          console.log("Insert data:", insertData);
-
-          if (insertData) {
-            console.log("Subscription created successfully:", insertData);
-            setSubid(insertData.id);
-          } else if (insertError) {
-            console.error("Error creating subscription:", insertError);
-          }
-        }
-
-        const readStatus = await checkReadStatus(user.id, extract.id);
-
-        if (readStatus) {
-          setRead(true);
-        }
-      } else {
-        console.error("Error fetching extract:", error);
-      }
-    } else {
-      router.push("/");
-    }
-
-    setLoading(false);
-  };
-
   useEffect(() => {
     fetchExtract();
 
@@ -154,7 +158,7 @@ export default function EReader() {
           filter: `id=eq.${subid}`,
         },
         (payload) => {
-          console.log("Insert event:", payload);
+          console.log("Subscription active status changed:", payload);
           setSubscribed((subscribed) => !subscribed);
         }
       )

@@ -1,39 +1,22 @@
 import supabase from '../lib/supabase';
 import { SubscriptionType, InstalmentType, ExtractType } from '../types/types';
 
-export async function createSubscription(userId: string, textId: number, chapter: number, due: number, subscribeart: string)
-: Promise<{ data: SubscriptionType | null; error: any }>{
+export async function createSubscription(userId: string, textId: number, chapter: number, due: number, subscribeart: string){
   if (!userId || !textId || !chapter || !due) {
     throw new Error("Missing required parameters");
   }
 
-  const { data, error } = await supabase
+  const { data: newSubscription, error } = await supabase
   .from('subscriptions')
   .insert({ userid: userId, textid: textId, chapter: chapter, due: due, subscribeart: subscribeart }).select().single()
 
   if (error) {
-    throw new Error(`Error inserting new subscription: ${error.message}`);
+    console.error("Error creating subscription:", error);
+    return null;
   }
 
-  return { data, error};  
+  return newSubscription;
 }
-
-// export async function deleteSubscription(userId: string, textId: number)
-// : Promise<{ data: SubscriptionType[] | null; deleteError: any }>{
-//   const { data, error: deleteError } = await supabase
-//   .from('subscriptions')
-//   .delete()
-//   .match({ userid: userId, textid: textId })
-//   .select();
-
-  
-// if (deleteError) {
-//   throw new Error(`Error deleting existing subscription: ${deleteError.message}`);
-// }
-
-// return { data, deleteError }
-
-// }
 
 export async function activateSubscription(id: number, chapter: number, userId: string)
 : Promise<{ data: SubscriptionType[] | null; error: any }>{
@@ -96,13 +79,12 @@ export async function deactivateSubscription(id: number, userId: string)
   return { data, error };
 }
 
-export async function checkForSubscription(userId: string, textId: number)
-: Promise<{ data: SubscriptionType | null; error: any }> {
+export async function checkForSubscription(userId: string, textId: number){
     if (!userId || !textId) {
         throw new Error("Missing required parameters");
     }
 
-    const { data, error } = await supabase
+    const { data: existingSubscription, error } = await supabase
         .from('subscriptions')
         .select()
         .match({ userid: userId, textid: textId })
@@ -110,11 +92,11 @@ export async function checkForSubscription(userId: string, textId: number)
         .single();
 
     if(error){
-      console.error("Error fetching subscription:", error.message);
-      return { data: null, error: error.message };
+      console.error("Error fetching subscription:", error);
+      return null;
     }
 
-    return { data, error: null };
+    return existingSubscription;
 }
 
 export async function getAllDueSubscriptions(userId: string) {
