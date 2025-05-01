@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -33,12 +32,10 @@ export default function SharedText() {
   const [loading, setLoading] = useState(true);
 
   const fetchExtract = async () => {
-    const { data, error } = await getExtract(id);
+    const extract = await getExtract(id);
 
-    if (data) {
-      setExtract(data);
-    } else {
-      console.error("Error fetching extract:", error);
+    if (extract) {
+      setExtract(extract);
     }
     setLoading(false);
   };
