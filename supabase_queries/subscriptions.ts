@@ -116,7 +116,7 @@ export async function getAllDueSubscriptions(userId: string) {
     .select();
 
     if(error){
-      console.error("Error fetching due subscriptions:", error.message);
+      console.error("Error fetching due subscriptions:", error);
       return null;
     }
     return subscriptions;
