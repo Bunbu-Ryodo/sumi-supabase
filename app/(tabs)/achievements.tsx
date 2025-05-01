@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -38,7 +37,7 @@ export default function Achievements() {
       if (user) {
         const userProfile = await lookUpUserProfile(user.id);
         if (userProfile) {
-          console.log(userProfile, "User Profile Data");
+          console.log(userProfile, "Retrieved user profile data");
           setAchievements(userProfile.achievements || []);
           setAchievementScore(userProfile.achievementScore || 0);
           setReaderTag(userProfile.username || "");
@@ -54,42 +53,38 @@ export default function Achievements() {
 
   const calculateInProgressAchievements = async () => {
     let inProgressAchievements = [];
+    let inProgress;
 
     if (readCount < 10) {
       const progress = (readCount / 10) * 100;
       const achievement = await fetchAchievementByDescription(
         "Read 10 extracts"
       );
-      const inProgress = { ...achievement, achievementProgress: progress };
-      inProgressAchievements.push(inProgress);
+      inProgress = { ...achievement, achievementProgress: progress };
     } else if (readCount < 25) {
       const progress = (readCount / 25) * 100;
       const achievement = await fetchAchievementByDescription(
         "Read 25 extracts"
       );
-      const inProgress = { ...achievement, progress };
-      inProgressAchievements.push(inProgress);
+      inProgress = { ...achievement, progress };
     } else if (readCount < 50) {
       const progress = (readCount / 50) * 100;
       const achievement = await fetchAchievementByDescription(
         "Read 50 extracts"
       );
-      const inProgress = { ...achievement, achievementProgress: progress };
-      inProgressAchievements.push(inProgress);
+      inProgress = { ...achievement, achievementProgress: progress };
     } else if (readCount < 100) {
       const progress = readCount;
       const achievement = await fetchAchievementByDescription(
         "Read 100 extracts"
       );
-      const inProgress = { ...achievement, achievementProgress: progress };
-      inProgressAchievements.push(inProgress);
+      inProgress = { ...achievement, achievementProgress: progress };
     } else if (readCount < 200) {
       const progress = (readCount / 200) * 100;
       const achievement = await fetchAchievementByDescription(
         "Read 200 extracts"
       );
-      const inProgress = { ...achievement, achievementProgress: progress };
-      inProgressAchievements.push(inProgress);
+      inProgress = { ...achievement, achievementProgress: progress };
     }
 
     if (subscribedCount < 10) {
@@ -97,41 +92,36 @@ export default function Achievements() {
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 10 series"
       );
-      const inProgress = { ...achievement, achievementProgress: progress };
-      inProgressAchievements.push(inProgress);
+      inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 25) {
       const progress = (readCount / 25) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 25 series"
       );
-      const inProgress = { ...achievement, achievementProgress: progress };
-      inProgressAchievements.push(inProgress);
+      inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 50) {
       const progress = (readCount / 50) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 50 series"
       );
-      const inProgress = { ...achievement, achievementProgress: progress };
-      inProgressAchievements.push(inProgress);
+      inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 100) {
       const progress = readCount;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 100 series"
       );
-      const inProgress = { ...achievement, achievementProgress: progress };
-      inProgressAchievements.push(inProgress);
+      inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 200) {
       const progress = (readCount / 200) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 200 series"
       );
-      const inProgress = { ...achievement, achievementProgress: progress };
-      inProgressAchievements.push(inProgress);
+      inProgress = { ...achievement, achievementProgress: progress };
     }
 
-    console.log("Read Count", readCount);
-    console.log("Subscribed Count", subscribedCount);
-    console.log("In Progress Achievements", inProgressAchievements);
+    if (inProgress) {
+      inProgressAchievements.push(inProgress);
+    }
     setPendingAchievements(inProgressAchievements);
   };
 
@@ -142,7 +132,7 @@ export default function Achievements() {
       {loading ? (
         <ActivityIndicator size="large" color="#393E41" />
       ) : (
-        <View style={styles.mainBodyContainer}>
+        <View style={styles.achievementsWrapper}>
           <View style={styles.nameAndScoreContainer}>
             <Text style={styles.nameAndScore}>ReaderTag: {readerTag}</Text>
             <View style={styles.scoreContainer}>
@@ -175,10 +165,10 @@ export default function Achievements() {
               <Text>Read Some Book</Text>
             )}
           </View>
-          <Text style={styles.completedAchievementsHeader}>
+          <Text style={styles.pendingAchievementsHeader}>
             Pending Achievements
           </Text>
-          <View style={styles.completedAchievementsContainer}>
+          <View style={styles.pendingAchievementsContainer}>
             {pendingAchievements.length > 0 ? (
               pendingAchievements.map((row: PendingAchievementType) => (
                 <PendingAchievement
@@ -251,7 +241,23 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
     fontSize: 16,
   },
-  mainBodyContainer: {
+  pendingAchievementsContainer: {
+    marginTop: 12,
+    width: "90%",
+    maxWidth: 368,
+    borderWidth: 1,
+    borderColor: "#393E41",
+    borderRadius: 8,
+    padding: 16,
+    justifyContent: "space-evenly",
+  },
+  pendingAchievementsHeader: {
+    marginTop: 16,
+    textDecorationLine: "underline",
+    fontFamily: "QuicksandReg",
+    fontSize: 16,
+  },
+  achievementsWrapper: {
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
