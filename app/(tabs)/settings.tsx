@@ -44,16 +44,12 @@ export default function Settings() {
   };
 
   const updateReaderTag = async () => {
-    try {
-      const updateReaderTag = await updateUsername(readerTag);
-      if (updateReaderTag) {
-        console.log("ReaderTag updated successfully:", updateReaderTag);
-        setReaderTagChangeSuccess("ReaderTag changed successfully");
-      } else {
-        setReaderTagChangeSuccess("");
-      }
-    } catch (error) {
-      console.error(error);
+    const updateReaderTag = await updateUsername(readerTag);
+    if (updateReaderTag) {
+      console.log("ReaderTag updated successfully:", updateReaderTag);
+      setReaderTagChangeSuccess("ReaderTag changed successfully");
+    } else {
+      setReaderTagChangeSuccess("");
     }
   };
 
@@ -62,17 +58,13 @@ export default function Settings() {
       setPasswordChangeError("Passwords do not match");
       return;
     }
-    try {
-      const passwordUpdated = await updatePassword(newPassword);
-      if (passwordUpdated) {
-        setPasswordChangeSuccess("Password changed successfully");
-        setPasswordChangeError("");
-      } else {
-        setPasswordChangeError("Error changing password");
-        setPasswordChangeSuccess("");
-      }
-    } catch (error) {
-      console.error(error);
+    const passwordUpdated = await updatePassword(newPassword);
+    if (passwordUpdated) {
+      setPasswordChangeSuccess("Password changed successfully");
+      setPasswordChangeError("");
+    } else {
+      setPasswordChangeError("Error changing password");
+      setPasswordChangeSuccess("");
     }
   };
 
@@ -123,8 +115,11 @@ export default function Settings() {
           ]}
           onChangeText={setConfirmNewPassword}
         ></TextInput>
-        <TouchableOpacity style={styles.buttonPrimary} onPress={changePassword}>
-          <Text style={styles.primaryButtonText}>Change Password</Text>
+        <TouchableOpacity
+          style={styles.changePasswordButton}
+          onPress={changePassword}
+        >
+          <Text style={styles.changePasswordButtonText}>Change Password</Text>
         </TouchableOpacity>
         {passwordChangeError ? (
           <Text style={styles.errorPasswordText}>{passwordChangeError}</Text>
@@ -214,6 +209,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 16,
   },
+  changePasswordButton: {
+    paddingVertical: 16,
+    backgroundColor: "#F6F7EB",
+    borderRadius: 8,
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 16,
+    marginTop: 16,
+  },
   changeReaderTagButton: {
     paddingVertical: 16,
     backgroundColor: "#F6F7EB",
@@ -232,6 +236,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#8980F5",
   },
   primaryButtonText: {
+    color: "#393E41",
+    fontFamily: "QuicksandReg",
+    fontSize: 16,
+  },
+  changePasswordButtonText: {
     color: "#393E41",
     fontFamily: "QuicksandReg",
     fontSize: 16,
