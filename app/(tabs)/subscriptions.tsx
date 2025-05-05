@@ -41,7 +41,10 @@ export default function Subscriptions() {
   const [instalments, setInstalments] = useState<InstalmentType[]>([]);
   const [loading, setLoading] = useState(true);
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.subscriptionWrapper}
+      style={styles.container}
+    >
       <View style={styles.extractWrapper}>
         <View style={styles.subscriptionsHeader}>
           <Text style={styles.newInstallmentsHeader}>Your Instalments</Text>
@@ -84,11 +87,14 @@ export default function Subscriptions() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    height: "100%",
+  subscriptionWrapper: {
     width: "100%",
-    backgroundColor: "#F6F7EB",
     alignItems: "center",
+    backgroundColor: "#F6F7EB",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#F6F7EB",
   },
   subscriptionsHeader: {
     flexDirection: "row",
@@ -107,13 +113,15 @@ const styles = StyleSheet.create({
   extractWrapper: {
     padding: 16,
     marginTop: 24,
-    width: "90%",
+    width: "80%",
+    flex: 1,
+    alignItems: "center",
   },
   subscriptionSection: {
     marginTop: 12,
     flexDirection: "row",
     padding: 8,
-    width: "100%",
+    width: "60%",
     flexWrap: "wrap",
   },
   noInstalmentsText: {

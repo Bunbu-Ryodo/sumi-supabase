@@ -11,6 +11,7 @@ import { Link } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState, useEffect } from "react";
 import { ExtractType } from "../types/types.js";
+import { useRouter } from "expo-router";
 
 export default function Extract({
   id,
@@ -24,6 +25,7 @@ export default function Extract({
   textid,
 }: ExtractType) {
   const [like, setLike] = useState(false);
+  const router = useRouter();
 
   function toggleLike() {
     setLike(!like);
@@ -35,34 +37,39 @@ export default function Extract({
     Alert.alert("Link to extract copied to clipboard!");
   };
 
+  const handleNavigation = () => {
+    router.push({
+      pathname: "/ereader/[id]",
+      params: { id },
+    });
+  };
+
   useEffect(() => {}, []);
 
   return (
     <View style={styles.extract}>
       <View style={styles.header}>
-        <Link href={{ pathname: "/ereader/[id]", params: { id } }} asChild>
+        <TouchableOpacity onPress={handleNavigation}>
           <Image source={{ uri: portrait }} style={styles.portrait}></Image>
-        </Link>
-        <Link href={{ pathname: "/ereader/[id]", params: { id } }} asChild>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleNavigation}>
           <View style={styles.headerContainer}>
             <Text style={styles.headerTextTitle}>{title}</Text>
             <Text style={styles.headerText}>Chapter {chapter}</Text>
             <Text style={styles.headerText}>{author}</Text>
             <Text style={styles.headerText}>({year})</Text>
           </View>
-        </Link>
+        </TouchableOpacity>
       </View>
-      <Link href={{ pathname: "/ereader/[id]", params: { id } }} asChild>
+      <TouchableOpacity onPress={handleNavigation}>
         <View style={styles.previewText}>
           <Text style={styles.text}>{previewtext}</Text>
         </View>
-      </Link>
-      <Link href={{ pathname: "/ereader/[id]", params: { id } }} asChild>
-        <View style={styles.thumbnail}>
-          <Image source={{ uri: coverart }} style={styles.thumbnail} />
-        </View>
-      </Link>
+      </TouchableOpacity>
 
+      <TouchableOpacity onPress={handleNavigation} style={styles.thumbnail}>
+        <Image source={{ uri: coverart }} style={styles.thumbnail} />
+      </TouchableOpacity>
       <View style={styles.engagementButtons}>
         <TouchableOpacity style={styles.icon} onPress={toggleLike}>
           <Ionicons

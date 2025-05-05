@@ -56,6 +56,12 @@ export default function EReader() {
 
   const router = useRouter();
 
+  const backToFeed = () => {
+    router.push({
+      pathname: "/feed",
+    });
+  };
+
   const checkForActiveSubscription = async (
     userId: string,
     extract: ExtractType
@@ -332,14 +338,15 @@ export default function EReader() {
                 <Ionicons name="clipboard-outline" size={24} color="#8980F5" />
               </TouchableOpacity>
             </View>
-            <Link style={styles.returnAnchor} href="/feed" asChild>
-              <View>
-                <TouchableOpacity>
-                  <Ionicons name="arrow-back" size={24} color="#8980F5" />
-                </TouchableOpacity>
+            <View>
+              <TouchableOpacity
+                style={styles.returnAnchor}
+                onPress={backToFeed}
+              >
+                <Ionicons name="arrow-back" size={24} color="#8980F5" />
                 <Text style={styles.shoppingText}>Return to Feed</Text>
-              </View>
-            </Link>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </ScrollView>
