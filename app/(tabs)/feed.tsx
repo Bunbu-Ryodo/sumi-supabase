@@ -52,28 +52,30 @@ export default function FeedScreen() {
         );
 
         if (extract) {
-          const newInstalment = await createInstalment(
-            userId,
-            extract.id,
-            extract.chapter,
-            extract.title,
-            extract.author,
+          const updatedSubscription = await updateSubscription(
             subscriptions[i].id,
-            subscriptions[i].subscribeart
+            subscriptions[i].chapter + 1
           );
 
-          if (newInstalment) {
-            console.log("Instalment created successfully:", newInstalment);
-            const updatedSubscription = await updateSubscription(
-              subscriptions[i].id,
-              subscriptions[i].chapter + 1
+          if (updatedSubscription) {
+            console.log(
+              "Subscription updated successfully:",
+              updatedSubscription
             );
 
-            if (updatedSubscription) {
-              console.log(
-                "Subscription updated successfully:",
-                updatedSubscription
-              );
+            const newInstalment = await createInstalment(
+              userId,
+              extract.id,
+              extract.chapter,
+              extract.title,
+              extract.author,
+              updatedSubscription[i].id,
+              updatedSubscription[i].subscribeart,
+              updatedSubscription[i].due
+            );
+
+            if (newInstalment) {
+              console.log("Instalment created successfully:", newInstalment);
             }
           }
         }

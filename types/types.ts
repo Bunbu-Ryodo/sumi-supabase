@@ -30,6 +30,17 @@ export type InstalmentType = {
     chapter: string;
     subscriptionid: number;   
     subscribeart: string;
+    sequeldue: number;
+}
+
+export type InstalmentTypeClient = {
+    id: number;
+    extractid: number;
+    title: string;   
+    author: string;
+    chapter: string;
+    subscribeart: string;
+    sequeldue: number;
 }
 
 export type AchievementType = {

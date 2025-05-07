@@ -68,11 +68,12 @@ export default function Subscriptions() {
               <Subscription
                 key={index}
                 id={instalment.id}
-                extractId={instalment.extractid}
+                extractid={instalment.extractid}
                 title={instalment.title}
                 author={instalment.author}
                 chapter={instalment.chapter}
-                subscribeArt={instalment.subscribeart}
+                subscribeart={instalment.subscribeart}
+                sequeldue={instalment.sequeldue}
               />
             ))
           ) : (
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
   extractWrapper: {
     padding: 16,
     marginTop: 24,
-    width: "80%",
+    width: "100%",
     flex: 1,
     alignItems: "center",
   },
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     flexDirection: "row",
     padding: 8,
-    width: "60%",
+    width: "100%",
     flexWrap: "wrap",
   },
   noInstalmentsText: {

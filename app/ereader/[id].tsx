@@ -136,7 +136,7 @@ export default function EReader() {
 
   async function subscribe() {
     if (subscribed) {
-      await deactivateSubscription(subid, userid);
+      await deactivateSubscription(subid, userid, extract.chapter);
     } else {
       await activateSubscription(subid, extract.chapter + 1, userid);
     }

@@ -50,8 +50,8 @@ export async function activateSubscription(id: number, chapter: number, userId: 
   }
 }
 
-export async function deactivateSubscription(id: number, userId: string){
-  const { error: subscriptionDeactivateError } = await supabase.from('subscriptions').update({active: false}).eq('id', id).select();
+export async function deactivateSubscription(id: number, userId: string, chapter: number){
+  const { error: subscriptionDeactivateError } = await supabase.from('subscriptions').update({active: false, chapter: chapter}).eq('id', id).select();
 
   if(subscriptionDeactivateError){
     console.error("Error deactivating subscription:", subscriptionDeactivateError);
@@ -78,6 +78,13 @@ export async function deactivateSubscription(id: number, userId: string){
     
     if(updateError){
       console.error("Error updating subscription count:", updateError);
+      return null;
+    }
+
+    const { error: instalmentDeleteError } = await supabase.from('instalments').delete().match({userid: userId, subscriptionid: id}).select();
+
+    if(instalmentDeleteError){
+      console.error("Error deleting instalments:", instalmentDeleteError);
       return null;
     }
   }
@@ -140,14 +147,14 @@ export async function getExtractByTextIdChapter(textId: number, chapter: number)
     return extract;
 }
 
-export async function createInstalment(userId: string, extractId: number, chapter: number, title: string, author: string, subscriptionId: number, subscribeart: string){
+export async function createInstalment(userId: string, extractId: number, chapter: number, title: string, author: string, subscriptionId: number, subscribeart: string, sequeldue: number){
   if(!userId || !extractId || !chapter || !title || !author){
     throw new Error("Missing required parameters");
   }
 
   const { data: instalment, error } = await supabase
     .from('instalments')
-    .insert({ userid: userId, extractid: extractId, chapter: chapter, title: title, author: author, subscriptionid: subscriptionId, subscribeart: subscribeart })
+    .insert({ userid: userId, extractid: extractId, chapter: chapter, title: title, author: author, subscriptionid: subscriptionId, subscribeart: subscribeart, sequeldue: sequeldue })
     .select()
     .single();
 
