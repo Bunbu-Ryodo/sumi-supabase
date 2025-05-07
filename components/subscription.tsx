@@ -39,7 +39,7 @@ export default function Subscription({
             <Text style={styles.daysuntil}>
               Available for {daysUntilNextInstalment} days
             </Text>
-            <Text style={styles.date}>Next chapter arrives:</Text>
+            <Text style={styles.date}>Next chapter arrives</Text>
             <Text style={styles.date2}>{nextInstalmentDate}</Text>
           </View>
         </TouchableOpacity>
@@ -90,16 +90,19 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
     fontSize: 16,
     marginRight: 12,
+    color: "#D64045",
   },
   date: {
     fontFamily: "QuicksandReg",
     fontSize: 16,
     marginRight: 12,
+    color: "#8980F5",
   },
   date2: {
     fontFamily: "QuicksandReg",
     fontSize: 16,
     marginRight: 12,
     marginBottom: 8,
+    color: "#8980F5",
   },
 });
