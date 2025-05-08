@@ -15,9 +15,20 @@ export type ExtractType = {
 export type SubscriptionType = {
     id: number;
     textid: number;
+    title: string;
+    author: string;
     chapter: number;
     due: number;
     active: boolean;
+    subscribeart: string;
+}
+
+export type SubscriptionTypeClient = {
+    id: number;
+    title: string;
+    author: string;
+    chapter: number;
+    due: number;
     subscribeart: string;
 }
 

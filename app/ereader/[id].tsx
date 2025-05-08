@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Link } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
@@ -84,8 +83,10 @@ export default function EReader() {
         userId,
         extract.textid,
         extract.chapter + 1,
-        new Date().getTime(),
-        extract.subscribeart
+        new Date().getTime() + 604800000,
+        extract.subscribeart,
+        extract.title,
+        extract.author
       );
 
       if (newSubscription) {

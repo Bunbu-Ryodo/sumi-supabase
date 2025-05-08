@@ -42,13 +42,20 @@ export default function Achievements() {
           setReaderTag(userProfile.username || "");
           setReadCount(userProfile.readCount);
           setSubscribedCount(userProfile.subscribedCount);
-          calculateInProgressAchievements();
+          await calculateInProgressAchievements();
           setLoading(false);
         }
       }
     };
     getProfileData();
   }, []);
+
+  useEffect(() => {
+    const calculateAchievements = async () => {
+      await calculateInProgressAchievements();
+    };
+    calculateAchievements();
+  }, [achievements, achievementScore, readCount, subscribedCount]);
 
   const calculateInProgressAchievements = async () => {
     let inProgressAchievements = [];

@@ -1,7 +1,7 @@
 import supabase from '../lib/supabase';
 
-export async function createSubscription(userId: string, textId: number, chapter: number, due: number, subscribeart: string){
-  if (!userId || !textId || !chapter || !due) {
+export async function createSubscription(userId: string, textId: number, chapter: number, due: number, subscribeart: string, title: string, author: string){
+  if (!userId || !textId || !chapter || !due || !title || !author) {
     throw new Error("Missing required parameters");
   }
 
@@ -18,7 +18,7 @@ export async function createSubscription(userId: string, textId: number, chapter
 }
 
 export async function activateSubscription(id: number, chapter: number, userId: string){
-  const { data: profile, error: subscriptionUpdateError } = await supabase.from('subscriptions').update({active: true, chapter: chapter, due: new Date().getTime()}).eq('id', id).select();
+  const { data: profile, error: subscriptionUpdateError } = await supabase.from('subscriptions').update({active: true, chapter: chapter }).eq('id', id).select();
 
   if(subscriptionUpdateError){
     console.error("Error activating subscription:", subscriptionUpdateError);
@@ -127,6 +127,26 @@ export async function getAllDueSubscriptions(userId: string) {
       return null;
     }
     return subscriptions;
+}
+
+export async function getAllUpcomingSubscriptions(userId: string){
+  if(!userId){
+    throw new Error("Missing required parameters");
+  }
+
+  const { data: subscriptions, error } = await supabase
+    .from('subscriptions')
+    .select()
+    .match({ userid: userId, active: true })
+    .gt('due', new Date().getTime())
+    .select();
+
+    if(error){
+      console.error("Error fetching active subscriptions:", error);
+      return null;
+    }
+    return subscriptions;
+
 }
 
 export async function getExtractByTextIdChapter(textId: number, chapter: number){

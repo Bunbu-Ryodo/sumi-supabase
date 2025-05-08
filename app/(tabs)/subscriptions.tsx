@@ -10,8 +10,12 @@ import Subscription from "../../components/subscription";
 
 import { useEffect, useState } from "react";
 import { getUserSession } from "../../supabase_queries/auth.js";
-import { getAllInstalments } from "../../supabase_queries/subscriptions";
-import { InstalmentType } from "../../types/types";
+import {
+  getAllInstalments,
+  getAllUpcomingSubscriptions,
+} from "../../supabase_queries/subscriptions";
+import { InstalmentType, SubscriptionType } from "../../types/types";
+import PendingSubscription from "../../components/pendingSubscription";
 
 export default function Subscriptions() {
   useEffect(() => {
@@ -28,7 +32,27 @@ export default function Subscriptions() {
         }
       }
     };
+
+    const fetchSubscriptions = async () => {
+      const user = await getUserSession();
+
+      if (user) {
+        const upcomingSubscriptions = await getAllUpcomingSubscriptions(
+          user.id
+        );
+
+        console.log("upcomingSubscriptions", upcomingSubscriptions);
+
+        if (upcomingSubscriptions && upcomingSubscriptions.length > 0) {
+          console.log("upcomingSubscriptions", upcomingSubscriptions);
+          populateSubscriptions(upcomingSubscriptions);
+        } else {
+          setLoading(false);
+        }
+      }
+    };
     fetchInstalments();
+    fetchSubscriptions();
   }, []);
 
   async function populateInstalments(instalments: InstalmentType[]) {
@@ -38,8 +62,18 @@ export default function Subscriptions() {
     });
   }
 
+  async function populateSubscriptions(subscriptions: SubscriptionType[]) {
+    setActiveSubscriptions(() => {
+      setLoading(false);
+      return subscriptions || [];
+    });
+  }
+
   const [instalments, setInstalments] = useState<InstalmentType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeSubscriptions, setActiveSubscriptions] = useState<
+    SubscriptionType[]
+  >([]);
   return (
     <ScrollView
       contentContainerStyle={styles.subscriptionWrapper}
@@ -76,10 +110,20 @@ export default function Subscriptions() {
                 sequeldue={instalment.sequeldue}
               />
             ))
+          ) : activeSubscriptions.length > 0 ? (
+            activeSubscriptions.map((subscription, index) => (
+              <PendingSubscription
+                key={index}
+                id={subscription.id}
+                title={subscription.title}
+                author={subscription.author}
+                chapter={subscription.chapter}
+                subscribeart={subscription.subscribeart}
+                due={subscription.due}
+              />
+            ))
           ) : (
-            <Text style={styles.noInstalmentsText}>
-              No instalments available
-            </Text>
+            <Text style={styles.noInstalmentsText}>Subscribe to a series!</Text>
           )}
         </View>
       </View>
