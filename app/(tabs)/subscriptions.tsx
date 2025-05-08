@@ -10,8 +10,12 @@ import Subscription from "../../components/subscription";
 
 import { useEffect, useState } from "react";
 import { getUserSession } from "../../supabase_queries/auth.js";
-import { getAllInstalments } from "../../supabase_queries/subscriptions";
-import { InstalmentType } from "../../types/types";
+import {
+  getAllInstalments,
+  getAllUpcomingSubscriptions,
+} from "../../supabase_queries/subscriptions";
+import { InstalmentType, SubscriptionType } from "../../types/types";
+import PendingSubscription from "../../components/pendingSubscription";
 
 export default function Subscriptions() {
   useEffect(() => {
@@ -28,7 +32,27 @@ export default function Subscriptions() {
         }
       }
     };
+
+    const fetchSubscriptions = async () => {
+      const user = await getUserSession();
+
+      if (user) {
+        const upcomingSubscriptions = await getAllUpcomingSubscriptions(
+          user.id
+        );
+
+        console.log("upcomingSubscriptions", upcomingSubscriptions);
+
+        if (upcomingSubscriptions && upcomingSubscriptions.length > 0) {
+          console.log("upcomingSubscriptions", upcomingSubscriptions);
+          populateSubscriptions(upcomingSubscriptions);
+        } else {
+          setLoading(false);
+        }
+      }
+    };
     fetchInstalments();
+    fetchSubscriptions();
   }, []);
 
   async function populateInstalments(instalments: InstalmentType[]) {
@@ -38,10 +62,23 @@ export default function Subscriptions() {
     });
   }
 
+  async function populateSubscriptions(subscriptions: SubscriptionType[]) {
+    setActiveSubscriptions(() => {
+      setLoading(false);
+      return subscriptions || [];
+    });
+  }
+
   const [instalments, setInstalments] = useState<InstalmentType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeSubscriptions, setActiveSubscriptions] = useState<
+    SubscriptionType[]
+  >([]);
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.subscriptionWrapper}
+      style={styles.container}
+    >
       <View style={styles.extractWrapper}>
         <View style={styles.subscriptionsHeader}>
           <Text style={styles.newInstallmentsHeader}>Your Instalments</Text>
@@ -65,17 +102,28 @@ export default function Subscriptions() {
               <Subscription
                 key={index}
                 id={instalment.id}
-                extractId={instalment.extractid}
+                extractid={instalment.extractid}
                 title={instalment.title}
                 author={instalment.author}
                 chapter={instalment.chapter}
-                subscribeArt={instalment.subscribeart}
+                subscribeart={instalment.subscribeart}
+                sequeldue={instalment.sequeldue}
+              />
+            ))
+          ) : activeSubscriptions.length > 0 ? (
+            activeSubscriptions.map((subscription, index) => (
+              <PendingSubscription
+                key={index}
+                id={subscription.id}
+                title={subscription.title}
+                author={subscription.author}
+                chapter={subscription.chapter}
+                subscribeart={subscription.subscribeart}
+                due={subscription.due}
               />
             ))
           ) : (
-            <Text style={styles.noInstalmentsText}>
-              No instalments available
-            </Text>
+            <Text style={styles.noInstalmentsText}>Subscribe to a series!</Text>
           )}
         </View>
       </View>
@@ -84,11 +132,14 @@ export default function Subscriptions() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    height: "100%",
+  subscriptionWrapper: {
     width: "100%",
-    backgroundColor: "#F6F7EB",
     alignItems: "center",
+    backgroundColor: "#F6F7EB",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#F6F7EB",
   },
   subscriptionsHeader: {
     flexDirection: "row",
@@ -107,7 +158,9 @@ const styles = StyleSheet.create({
   extractWrapper: {
     padding: 16,
     marginTop: 24,
-    width: "90%",
+    width: "100%",
+    flex: 1,
+    alignItems: "center",
   },
   subscriptionSection: {
     marginTop: 12,

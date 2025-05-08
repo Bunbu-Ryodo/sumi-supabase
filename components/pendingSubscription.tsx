@@ -1,23 +1,15 @@
-import { View, Image, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Link } from "expo-router";
-import { InstalmentTypeClient } from "../types/types.js";
+import { View, Image, Text, StyleSheet } from "react-native";
+import { SubscriptionTypeClient } from "../types/types.js";
 
-export default function Subscription({
+export default function PendingSubscription({
   id,
-  extractid,
   title,
   author,
   chapter,
+  due,
   subscribeart,
-  sequeldue,
-}: InstalmentTypeClient) {
-  const nextInstalmentDue =
-    new Date(sequeldue).getTime() - new Date().getTime();
-  const daysUntilNextInstalment = Math.floor(
-    nextInstalmentDue / (1000 * 60 * 60 * 24)
-  );
-
-  const nextInstalmentDate = new Date(sequeldue).toLocaleDateString("en-GB", {
+}: SubscriptionTypeClient) {
+  const nextInstalmentDate = new Date(due).toLocaleDateString("en-GB", {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
@@ -26,24 +18,17 @@ export default function Subscription({
 
   return (
     <View style={styles.subscriptionWrapper}>
-      <Link
-        href={{ pathname: "/ereader/[id]", params: { id: extractid } }}
-        asChild
-      >
-        <TouchableOpacity key={id} style={styles.subscriptionButton}>
-          <Image style={styles.imageIcons} source={{ uri: subscribeart }} />
-          <View>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.author}>{author}</Text>
-            <Text style={styles.chapter}>Chapter {chapter}</Text>
-            <Text style={styles.daysuntil}>
-              Available for {daysUntilNextInstalment} days
-            </Text>
-            <Text style={styles.date}>Next chapter arrives</Text>
-            <Text style={styles.date2}>{nextInstalmentDate}</Text>
-          </View>
-        </TouchableOpacity>
-      </Link>
+      <View key={id} style={styles.subscriptionButton}>
+        <Image style={styles.imageIcons} source={{ uri: subscribeart }} />
+        <View>
+          <Text style={styles.upcoming}>Upcoming Instalment</Text>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.author}>{author}</Text>
+          <Text style={styles.chapter}>Chapter {chapter}</Text>
+          <Text style={styles.date}>Next chapter arrives</Text>
+          <Text style={styles.date2}>{nextInstalmentDate}</Text>
+        </View>
+      </View>
     </View>
   );
 }
@@ -75,6 +60,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 8,
     marginRight: 12,
+  },
+  upcoming: {
+    fontFamily: "QuicksandReg",
+    fontSize: 16,
+    marginTop: 8,
+    marginRight: 12,
+    color: "#FE7F2D",
   },
   author: {
     fontFamily: "QuicksandReg",

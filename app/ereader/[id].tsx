@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Link } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
@@ -56,6 +55,12 @@ export default function EReader() {
 
   const router = useRouter();
 
+  const backToFeed = () => {
+    router.push({
+      pathname: "/feed",
+    });
+  };
+
   const checkForActiveSubscription = async (
     userId: string,
     extract: ExtractType
@@ -78,8 +83,10 @@ export default function EReader() {
         userId,
         extract.textid,
         extract.chapter + 1,
-        new Date().getTime(),
-        extract.subscribeart
+        new Date().getTime() + 604800000,
+        extract.subscribeart,
+        extract.title,
+        extract.author
       );
 
       if (newSubscription) {
@@ -130,7 +137,7 @@ export default function EReader() {
 
   async function subscribe() {
     if (subscribed) {
-      await deactivateSubscription(subid, userid);
+      await deactivateSubscription(subid, userid, extract.chapter);
     } else {
       await activateSubscription(subid, extract.chapter + 1, userid);
     }
@@ -332,14 +339,15 @@ export default function EReader() {
                 <Ionicons name="clipboard-outline" size={24} color="#8980F5" />
               </TouchableOpacity>
             </View>
-            <Link style={styles.returnAnchor} href="/feed" asChild>
-              <View>
-                <TouchableOpacity>
-                  <Ionicons name="arrow-back" size={24} color="#8980F5" />
-                </TouchableOpacity>
+            <View>
+              <TouchableOpacity
+                style={styles.returnAnchor}
+                onPress={backToFeed}
+              >
+                <Ionicons name="arrow-back" size={24} color="#8980F5" />
                 <Text style={styles.shoppingText}>Return to Feed</Text>
-              </View>
-            </Link>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </ScrollView>

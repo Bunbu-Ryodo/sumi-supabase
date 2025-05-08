@@ -42,13 +42,20 @@ export default function Achievements() {
           setReaderTag(userProfile.username || "");
           setReadCount(userProfile.readCount);
           setSubscribedCount(userProfile.subscribedCount);
-          calculateInProgressAchievements();
+          await calculateInProgressAchievements();
           setLoading(false);
         }
       }
     };
     getProfileData();
   }, []);
+
+  useEffect(() => {
+    const calculateAchievements = async () => {
+      await calculateInProgressAchievements();
+    };
+    calculateAchievements();
+  }, [achievements, achievementScore, readCount, subscribedCount]);
 
   const calculateInProgressAchievements = async () => {
     let inProgressAchievements = [];
@@ -125,7 +132,10 @@ export default function Achievements() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.achievementsContentContainer}
+      style={styles.container}
+    >
       <Text style={styles.header}>Sumi</Text>
       <Text style={styles.tagline}>Just One More Chapter</Text>
       {loading ? (
@@ -191,13 +201,14 @@ export default function Achievements() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  achievementsContentContainer: {
     alignItems: "center",
-    backgroundColor: "#F6F7EB",
     width: "100%",
-    height: "100%",
     padding: 16,
+  },
+  container: {
+    backgroundColor: "#F6F7EB",
+    flex: 1,
   },
   header: {
     fontSize: 36,

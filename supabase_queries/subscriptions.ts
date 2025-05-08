@@ -1,7 +1,7 @@
 import supabase from '../lib/supabase';
 
-export async function createSubscription(userId: string, textId: number, chapter: number, due: number, subscribeart: string){
-  if (!userId || !textId || !chapter || !due) {
+export async function createSubscription(userId: string, textId: number, chapter: number, due: number, subscribeart: string, title: string, author: string){
+  if (!userId || !textId || !chapter || !due || !title || !author) {
     throw new Error("Missing required parameters");
   }
 
@@ -18,7 +18,7 @@ export async function createSubscription(userId: string, textId: number, chapter
 }
 
 export async function activateSubscription(id: number, chapter: number, userId: string){
-  const { data: profile, error: subscriptionUpdateError } = await supabase.from('subscriptions').update({active: true, chapter: chapter, due: new Date().getTime()}).eq('id', id).select();
+  const { data: profile, error: subscriptionUpdateError } = await supabase.from('subscriptions').update({active: true, chapter: chapter }).eq('id', id).select();
 
   if(subscriptionUpdateError){
     console.error("Error activating subscription:", subscriptionUpdateError);
@@ -50,8 +50,8 @@ export async function activateSubscription(id: number, chapter: number, userId: 
   }
 }
 
-export async function deactivateSubscription(id: number, userId: string){
-  const { error: subscriptionDeactivateError } = await supabase.from('subscriptions').update({active: false}).eq('id', id).select();
+export async function deactivateSubscription(id: number, userId: string, chapter: number){
+  const { error: subscriptionDeactivateError } = await supabase.from('subscriptions').update({active: false, chapter: chapter}).eq('id', id).select();
 
   if(subscriptionDeactivateError){
     console.error("Error deactivating subscription:", subscriptionDeactivateError);
@@ -78,6 +78,13 @@ export async function deactivateSubscription(id: number, userId: string){
     
     if(updateError){
       console.error("Error updating subscription count:", updateError);
+      return null;
+    }
+
+    const { error: instalmentDeleteError } = await supabase.from('instalments').delete().match({userid: userId, subscriptionid: id}).select();
+
+    if(instalmentDeleteError){
+      console.error("Error deleting instalments:", instalmentDeleteError);
       return null;
     }
   }
@@ -122,6 +129,26 @@ export async function getAllDueSubscriptions(userId: string) {
     return subscriptions;
 }
 
+export async function getAllUpcomingSubscriptions(userId: string){
+  if(!userId){
+    throw new Error("Missing required parameters");
+  }
+
+  const { data: subscriptions, error } = await supabase
+    .from('subscriptions')
+    .select()
+    .match({ userid: userId, active: true })
+    .gt('due', new Date().getTime())
+    .select();
+
+    if(error){
+      console.error("Error fetching active subscriptions:", error);
+      return null;
+    }
+    return subscriptions;
+
+}
+
 export async function getExtractByTextIdChapter(textId: number, chapter: number){
   if(!textId){
     throw new Error("Missing required parameters");
@@ -140,14 +167,14 @@ export async function getExtractByTextIdChapter(textId: number, chapter: number)
     return extract;
 }
 
-export async function createInstalment(userId: string, extractId: number, chapter: number, title: string, author: string, subscriptionId: number, subscribeart: string){
+export async function createInstalment(userId: string, extractId: number, chapter: number, title: string, author: string, subscriptionId: number, subscribeart: string, sequeldue: number){
   if(!userId || !extractId || !chapter || !title || !author){
     throw new Error("Missing required parameters");
   }
 
   const { data: instalment, error } = await supabase
     .from('instalments')
-    .insert({ userid: userId, extractid: extractId, chapter: chapter, title: title, author: author, subscriptionid: subscriptionId, subscribeart: subscribeart })
+    .insert({ userid: userId, extractid: extractId, chapter: chapter, title: title, author: author, subscriptionid: subscriptionId, subscribeart: subscribeart, sequeldue: sequeldue })
     .select()
     .single();
 

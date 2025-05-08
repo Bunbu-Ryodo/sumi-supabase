@@ -15,9 +15,20 @@ export type ExtractType = {
 export type SubscriptionType = {
     id: number;
     textid: number;
+    title: string;
+    author: string;
     chapter: number;
     due: number;
     active: boolean;
+    subscribeart: string;
+}
+
+export type SubscriptionTypeClient = {
+    id: number;
+    title: string;
+    author: string;
+    chapter: number;
+    due: number;
     subscribeart: string;
 }
 
@@ -30,6 +41,17 @@ export type InstalmentType = {
     chapter: string;
     subscriptionid: number;   
     subscribeart: string;
+    sequeldue: number;
+}
+
+export type InstalmentTypeClient = {
+    id: number;
+    extractid: number;
+    title: string;   
+    author: string;
+    chapter: string;
+    subscribeart: string;
+    sequeldue: number;
 }
 
 export type AchievementType = {
