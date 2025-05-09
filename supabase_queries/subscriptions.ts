@@ -187,14 +187,14 @@ export async function createInstalment(userId: string, extractId: number, chapte
     return instalment;
 }
 
-export async function updateSubscription(subscriptionId: number, chapter: number){
+export async function updateSubscription(subscriptionId: number, chapter: number, due: number){
   if(!subscriptionId){
     throw new Error("Missing required parameters");
   }
 
   const { data: updatedSubscription, error } = await supabase
     .from('subscriptions')
-    .update({chapter: chapter, due: new Date().getTime() + 604800000}) // 7 days in milliseconds
+    .update({chapter: chapter, due: due}) 
     .eq('id', subscriptionId)
     .select();
 

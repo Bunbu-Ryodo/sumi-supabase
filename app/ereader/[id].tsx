@@ -28,6 +28,7 @@ import {
 } from "../../supabase_queries/profiles";
 import { getUserSession } from "../../supabase_queries/auth.js";
 import supabase from "../../lib/supabase.js";
+import { lookUpUserProfile } from "../../supabase_queries/auth";
 
 export default function EReader() {
   let { id } = useLocalSearchParams();
@@ -70,6 +71,17 @@ export default function EReader() {
       extract.textid
     );
 
+    const profile = await lookUpUserProfile(userId);
+
+    let interval = new Date().getTime() + 604800000;
+
+    if (profile) {
+      if (profile.subscriptioninterval) {
+        interval =
+          new Date().getTime() + profile.subscriptioninterval * 86400000;
+      }
+    }
+
     if (existingSubscription) {
       if (
         existingSubscription.active &&
@@ -83,7 +95,7 @@ export default function EReader() {
         userId,
         extract.textid,
         extract.chapter + 1,
-        new Date().getTime() + 604800000,
+        interval,
         extract.subscribeart,
         extract.title,
         extract.author

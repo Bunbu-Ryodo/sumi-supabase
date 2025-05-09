@@ -51,10 +51,20 @@ export default function FeedScreen() {
           subscriptions[i].chapter
         );
 
+        const userProfile = await lookUpUserProfile(userId);
+        let interval;
+        if (userProfile.subscriptioninterval) {
+          interval =
+            new Date().getTime() + userProfile.subscriptioninterval * 86400000;
+        } else {
+          interval = new Date().getTime() + 7 * 86400000;
+        }
+
         if (extract) {
           const updatedSubscription = await updateSubscription(
             subscriptions[i].id,
-            subscriptions[i].chapter + 1
+            subscriptions[i].chapter + 1,
+            interval
           );
 
           if (updatedSubscription) {
