@@ -4,6 +4,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import supabase from "../lib/supabase";
 import { createContext, useContext } from "react";
+import { StatusBar } from "react-native";
 
 const SupabaseContext = createContext(supabase);
 
@@ -34,33 +35,39 @@ export default function RootLayout() {
 
   return (
     <SupabaseContext.Provider value={supabase}>
-      <Stack>
-        <Stack.Screen
-          name="index"
-          options={{ headerShown: false }}
-        ></Stack.Screen>
-        <Stack.Screen
-          name="register"
-          options={{ headerShown: false }}
-        ></Stack.Screen>
-        <Stack.Screen
-          name="passwordreset"
-          options={{ headerShown: false }}
-        ></Stack.Screen>
-        <Stack.Screen
-          name="changepassword"
-          options={{ headerShown: false }}
-        ></Stack.Screen>
-        <Stack.Screen
-          name="ereader/[id]"
-          options={{ headerShown: false }}
-        ></Stack.Screen>
-        <Stack.Screen
-          name="share_text/[id]"
-          options={{ headerShown: false }}
-        ></Stack.Screen>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
+      <>
+        <StatusBar
+          backgroundColor="#393E41" // Match the header background color
+          barStyle="light-content" // Light icons for dark background
+        />
+        <Stack>
+          <Stack.Screen
+            name="index"
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="register"
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="passwordreset"
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="changepassword"
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="ereader/[id]"
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="share_text/[id]"
+            options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </>
     </SupabaseContext.Provider>
   );
 }
