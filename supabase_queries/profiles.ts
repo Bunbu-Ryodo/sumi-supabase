@@ -80,3 +80,17 @@ export async function checkReadStatus(userId: string, extract: number) {
     return currentReadExtractsArray.some((item: ExtractType) => item.id === extract);
   }
 }
+
+export async function updateSubscriptionInterval(userId: string, interval: number){
+  const { error: fetchError } = await supabase
+    .from("profiles")
+    .update({subscriptioninterval: interval})
+    .eq("user_id", userId)
+
+  if(fetchError){
+    console.error("Error fetching profile:", fetchError);
+    return false;
+  } else {
+    console.log("Updated subscription interval")
+  }
+}

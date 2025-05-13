@@ -1,12 +1,5 @@
 import * as Clipboard from "expo-clipboard";
-import {
-  Text,
-  View,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState, useEffect } from "react";
@@ -34,7 +27,6 @@ export default function Extract({
   const copyToClipboard = async () => {
     const link = `http://localhost:8081/share_text/${id}`;
     await Clipboard.setStringAsync(link);
-    Alert.alert("Link to extract copied to clipboard!");
   };
 
   const handleNavigation = () => {

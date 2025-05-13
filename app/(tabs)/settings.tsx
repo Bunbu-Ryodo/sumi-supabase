@@ -12,7 +12,9 @@ import {
   updateUsername,
 } from "../../supabase_queries/settings";
 import { getUsername } from "../../supabase_queries/settings";
+import { getUserSession } from "../../supabase_queries/auth";
 import supabase from "../../lib/supabase.js";
+import { updateSubscriptionInterval } from "../../supabase_queries/profiles";
 
 export default function Settings() {
   const router = useRouter();
@@ -38,6 +40,16 @@ export default function Settings() {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    const changeSubscriptionInterval = async () => {
+      const user = await getUserSession();
+      if (user) {
+        await updateSubscriptionInterval(user.id, interval);
+      }
+    };
+    changeSubscriptionInterval();
+  }, [interval]);
 
   const Logout = async function () {
     await supabase.auth.signOut();
@@ -135,6 +147,9 @@ export default function Settings() {
             {passwordChangeSuccess}
           </Text>
         ) : null}
+        <Text style={styles.subscriptionFrequencyLabel}>
+          Set Subscription Frequency
+        </Text>
         <View style={styles.intervalDropdown}>
           {intervals.map((option) => (
             <TouchableOpacity
@@ -352,5 +367,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     color: "#393E41",
+  },
+  subscriptionFrequencyLabel: {
+    fontSize: 16,
+    fontFamily: "QuicksandReg",
+    color: "#F6F7EB",
+    marginBottom: 8,
   },
 });
