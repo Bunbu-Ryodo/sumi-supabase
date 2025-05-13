@@ -12,7 +12,9 @@ import {
   updateUsername,
 } from "../../supabase_queries/settings";
 import { getUsername } from "../../supabase_queries/settings";
+import { getUserSession } from "../../supabase_queries/auth";
 import supabase from "../../lib/supabase.js";
+import { updateSubscriptionInterval } from "../../supabase_queries/profiles";
 
 export default function Settings() {
   const router = useRouter();
@@ -24,6 +26,7 @@ export default function Settings() {
   const [passwordChangeError, setPasswordChangeError] = useState("");
   const [readerTagChangeSuccess, setReaderTagChangeSuccess] = useState("");
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState("");
+  const [interval, setInterval] = useState(0);
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -37,6 +40,16 @@ export default function Settings() {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    const changeSubscriptionInterval = async () => {
+      const user = await getUserSession();
+      if (user) {
+        await updateSubscriptionInterval(user.id, interval);
+      }
+    };
+    changeSubscriptionInterval();
+  }, [interval]);
 
   const Logout = async function () {
     await supabase.auth.signOut();
@@ -67,6 +80,12 @@ export default function Settings() {
       setPasswordChangeSuccess("");
     }
   };
+
+  const intervals = [
+    { label: "Every few days", value: 3 },
+    { label: "Every week", value: 7 },
+    { label: "Bi-weekly", value: 14 },
+  ];
 
   return (
     <View style={styles.settingsWrapper}>
@@ -128,6 +147,27 @@ export default function Settings() {
             {passwordChangeSuccess}
           </Text>
         ) : null}
+        <Text style={styles.subscriptionFrequencyLabel}>
+          Set Subscription Frequency
+        </Text>
+        <View style={styles.intervalDropdown}>
+          {intervals.map((option) => (
+            <TouchableOpacity
+              key={option.value}
+              style={styles.radioButtonContainer}
+              onPress={() => setInterval(option.value)}
+            >
+              <View
+                style={[
+                  styles.radioButton,
+                  interval === option.value && styles.radioButtonSelected,
+                ]}
+              />
+              <Text style={styles.radioButtonLabel}>{option.label}</Text>
+            </TouchableOpacity>
+          ))}
+          <Text style={styles.selectedText}>Selected: {interval}</Text>
+        </View>
         <TouchableOpacity style={styles.buttonPrimary} onPress={Logout}>
           <Text style={styles.primaryButtonText}>Logout</Text>
         </TouchableOpacity>
@@ -295,5 +335,43 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
     alignSelf: "center",
     marginBottom: 12,
+  },
+  intervalDropdown: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  radioButtonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  radioButton: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#F6F7EB",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8,
+  },
+  radioButtonSelected: {
+    backgroundColor: "#F6F7EB",
+  },
+  radioButtonLabel: {
+    fontSize: 16,
+    color: "#F6F7EB",
+    fontFamily: "QuicksandReg",
+  },
+  selectedText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: "#393E41",
+  },
+  subscriptionFrequencyLabel: {
+    fontSize: 16,
+    fontFamily: "QuicksandReg",
+    color: "#F6F7EB",
+    marginBottom: 8,
   },
 });

@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -28,6 +27,7 @@ import {
 } from "../../supabase_queries/profiles";
 import { getUserSession } from "../../supabase_queries/auth.js";
 import supabase from "../../lib/supabase.js";
+import { lookUpUserProfile } from "../../supabase_queries/auth";
 
 export default function EReader() {
   let { id } = useLocalSearchParams();
@@ -70,6 +70,17 @@ export default function EReader() {
       extract.textid
     );
 
+    const profile = await lookUpUserProfile(userId);
+
+    let interval = new Date().getTime() + 604800000;
+
+    if (profile) {
+      if (profile.subscriptioninterval) {
+        interval =
+          new Date().getTime() + profile.subscriptioninterval * 86400000;
+      }
+    }
+
     if (existingSubscription) {
       if (
         existingSubscription.active &&
@@ -83,7 +94,7 @@ export default function EReader() {
         userId,
         extract.textid,
         extract.chapter + 1,
-        new Date().getTime() + 604800000,
+        interval,
         extract.subscribeart,
         extract.title,
         extract.author
@@ -128,7 +139,6 @@ export default function EReader() {
   const copyToClipboard = async () => {
     const link = `http://localhost:8081/share_text/${extract.id}`;
     await Clipboard.setStringAsync(link);
-    Alert.alert("Link to extract copied to clipboard!");
   };
 
   function toggleLike() {
@@ -195,80 +205,32 @@ export default function EReader() {
           if (payload.new.readCount !== payload.old.readCount) {
             if (payload.new.readCount === 1) {
               addAchievementToProfile(userid, "Good Job Little Buddy");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "You've Earned 'Good Job Little Buddy: Read 1 text' 20000 xp points"
-              );
             } else if (payload.new.readCount === 10) {
               addAchievementToProfile(userid, "Bookworm");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "You've Earned 'Bookworm: Read 10 texts' 100 xp points"
-              );
             } else if (payload.new.readCount === 25) {
               addAchievementToProfile(userid, "Bibliophile");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "You've Earned 'Bibliophile: Read 25 texts' 250 xp points"
-              );
             } else if (payload.new.readCount === 50) {
               addAchievementToProfile(userid, "Book Enjoyer");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "You've Earned 'Book Enjoyer: Read 50 texts' 500 xp points"
-              );
             } else if (payload.new.readCount === 100) {
               addAchievementToProfile(userid, "Voracious Reader");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "You've Earned 'Voracious Reader: Read 100 texts' 1000 xp points"
-              );
             } else if (payload.new.readCount === 200) {
               addAchievementToProfile(userid, "We are not the same");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "You've Earned 'We Are Not the Same: Read 200 texts' 2000 xp points"
-              );
             }
           }
 
           if (payload.new.subscribedCount !== payload.old.subscribedCount) {
             if (payload.new.subscribedCount === 1) {
               addAchievementToProfile(userid, "This looks nice");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "This looks nice: Subscribe to 1 series' 20000 xp points"
-              );
             } else if (payload.new.subscribedCount === 10) {
               addAchievementToProfile(userid, "Magpie");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "Magpie: Subscribe to 10 series' 100 xp points"
-              );
             } else if (payload.new.subscribedCount === 25) {
               addAchievementToProfile(userid, "Collector");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "Collector: Subscribe to 25 series' 250 xp points"
-              );
             } else if (payload.new.subscribedCount === 50) {
               addAchievementToProfile(userid, "Archivist");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "Archivist: Subscribe to 50 series' 500 xp points"
-              );
             } else if (payload.new.subscribedCount === 100) {
               addAchievementToProfile(userid, "Book Otaku");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "Book Otaku: Subscribe to 100 series' 1000 xp points"
-              );
             } else if (payload.new.subscribedCount === 200) {
               addAchievementToProfile(userid, "Hoarder");
-              Alert.alert(
-                "Achievement Unlocked!",
-                "Book Otaku: Subscribe to 200 series' 2000 xp points"
-              );
             }
           }
         }
