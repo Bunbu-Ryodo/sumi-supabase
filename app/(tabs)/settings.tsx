@@ -338,12 +338,16 @@ const styles = StyleSheet.create({
   },
   intervalDropdown: {
     flex: 1,
+    alignItems: "flex-start",
     justifyContent: "center",
+    marginTop: 16,
+    minHeight: 100,
   },
   radioButtonContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
+    minHeight: 20,
   },
   radioButton: {
     height: 20,

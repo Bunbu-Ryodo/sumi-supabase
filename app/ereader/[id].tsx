@@ -1,4 +1,5 @@
 import * as Clipboard from "expo-clipboard";
+import { Platform } from "react-native";
 import {
   View,
   Text,
@@ -28,9 +29,20 @@ import {
 import { getUserSession } from "../../supabase_queries/auth.js";
 import supabase from "../../lib/supabase.js";
 import { lookUpUserProfile } from "../../supabase_queries/auth";
+import * as Notifications from "expo-notifications";
 
 export default function EReader() {
   let { id } = useLocalSearchParams();
+
+  if (Platform.OS === "android") {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+      }),
+    });
+  }
 
   const [extract, setExtract] = useState<ExtractType>({
     id: 0,
@@ -202,35 +214,151 @@ export default function EReader() {
           );
           setRead(isRead);
 
+          Notifications.scheduleNotificationAsync({
+            content: {
+              title: "Achievement Unlocked",
+              body: "Good Job Little Buddy! +20000 xp",
+            },
+            trigger: null,
+          });
+
           if (payload.new.readCount !== payload.old.readCount) {
             if (payload.new.readCount === 1) {
               addAchievementToProfile(userid, "Good Job Little Buddy");
+              if (Platform.OS === "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "Good Job Little Buddy! +20000 xp",
+                  },
+                  trigger: null,
+                });
+              }
             } else if (payload.new.readCount === 10) {
               addAchievementToProfile(userid, "Bookworm");
+              if (Platform.OS === "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "Bookworm +100 xp",
+                  },
+                  trigger: null,
+                });
+              }
             } else if (payload.new.readCount === 25) {
               addAchievementToProfile(userid, "Bibliophile");
+              if (Platform.OS === "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "Bibliophile +250 xp",
+                  },
+                  trigger: null,
+                });
+              }
             } else if (payload.new.readCount === 50) {
               addAchievementToProfile(userid, "Book Enjoyer");
+              if (Platform.OS === "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "Book Enjoyer +500 xp",
+                  },
+                  trigger: null,
+                });
+              }
             } else if (payload.new.readCount === 100) {
               addAchievementToProfile(userid, "Voracious Reader");
+              if (Platform.OS === "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "Voracious Reader +1000 xp",
+                  },
+                  trigger: null,
+                });
+              }
             } else if (payload.new.readCount === 200) {
               addAchievementToProfile(userid, "We are not the same");
+              if (Platform.OS == "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "We Are Not The Same +2000 xp",
+                  },
+                  trigger: null,
+                });
+              }
             }
           }
 
           if (payload.new.subscribedCount !== payload.old.subscribedCount) {
             if (payload.new.subscribedCount === 1) {
               addAchievementToProfile(userid, "This looks nice");
+              if (Platform.OS == "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "This Looks Nice +20000 xp",
+                  },
+                  trigger: null,
+                });
+              }
             } else if (payload.new.subscribedCount === 10) {
               addAchievementToProfile(userid, "Magpie");
+              if (Platform.OS == "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "This Looks Nice +100 xp",
+                  },
+                  trigger: null,
+                });
+              }
             } else if (payload.new.subscribedCount === 25) {
               addAchievementToProfile(userid, "Collector");
+              if (Platform.OS == "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "This Looks Nice +250 xp",
+                  },
+                  trigger: null,
+                });
+              }
             } else if (payload.new.subscribedCount === 50) {
               addAchievementToProfile(userid, "Archivist");
+              if (Platform.OS == "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "Archivist +500 xp",
+                  },
+                  trigger: null,
+                });
+              }
             } else if (payload.new.subscribedCount === 100) {
               addAchievementToProfile(userid, "Book Otaku");
+              if (Platform.OS == "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "Book Otaku +1000 xp",
+                  },
+                  trigger: null,
+                });
+              }
             } else if (payload.new.subscribedCount === 200) {
               addAchievementToProfile(userid, "Hoarder");
+              if (Platform.OS == "android") {
+                Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Achievement Unlocked",
+                    body: "Hoarder +2000 xp",
+                  },
+                  trigger: null,
+                });
+              }
             }
           }
         }
