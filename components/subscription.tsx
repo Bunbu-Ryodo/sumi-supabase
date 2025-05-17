@@ -32,15 +32,15 @@ export default function Subscription({
       >
         <TouchableOpacity key={id} style={styles.subscriptionButton}>
           <Image style={styles.imageIcons} source={{ uri: subscribeart }} />
-          <View>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.author}>{author}</Text>
-            <Text style={styles.chapter}>Chapter {chapter}</Text>
-            <Text style={styles.daysuntil}>
+          <View style={styles.detailsPanel}>
+            <Text style={styles.details}>{title}</Text>
+            <Text style={styles.details}>{author}</Text>
+            <Text style={styles.details}>Chapter {chapter}</Text>
+            <Text style={[styles.details, styles.daysLeft]}>
               Available for {daysUntilNextInstalment} days
             </Text>
-            <Text style={styles.date}>Next chapter arrives</Text>
-            <Text style={styles.date2}>{nextInstalmentDate}</Text>
+            <Text style={styles.details}>Next chapter arrives</Text>
+            <Text style={styles.details}>{nextInstalmentDate}</Text>
           </View>
         </TouchableOpacity>
       </Link>
@@ -70,39 +70,14 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
     fontSize: 16,
   },
-  title: {
+  details: {
     fontFamily: "QuicksandReg",
-    fontSize: 16,
-    marginTop: 8,
-    marginRight: 12,
+    fontSize: 12,
   },
-  author: {
-    fontFamily: "QuicksandReg",
-    fontSize: 16,
-    marginRight: 12,
-  },
-  chapter: {
-    fontFamily: "QuicksandReg",
-    fontSize: 16,
-    marginRight: 12,
-  },
-  daysuntil: {
-    fontFamily: "QuicksandReg",
-    fontSize: 16,
-    marginRight: 12,
+  daysLeft: {
     color: "#D64045",
   },
-  date: {
-    fontFamily: "QuicksandReg",
-    fontSize: 16,
-    marginRight: 12,
-    color: "#8980F5",
-  },
-  date2: {
-    fontFamily: "QuicksandReg",
-    fontSize: 16,
-    marginRight: 12,
-    marginBottom: 8,
-    color: "#8980F5",
+  detailsPanel: {
+    padding: 8,
   },
 });

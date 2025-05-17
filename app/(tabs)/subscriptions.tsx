@@ -164,10 +164,10 @@ const styles = StyleSheet.create({
   },
   subscriptionSection: {
     marginTop: 12,
-    flexDirection: "row",
     padding: 8,
     width: "100%",
     flexWrap: "wrap",
+    alignItems: "center",
   },
   noInstalmentsText: {
     fontFamily: "QuicksandReg",
