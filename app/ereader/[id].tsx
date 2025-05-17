@@ -214,14 +214,6 @@ export default function EReader() {
           );
           setRead(isRead);
 
-          Notifications.scheduleNotificationAsync({
-            content: {
-              title: "Achievement Unlocked",
-              body: "Good Job Little Buddy! +20000 xp",
-            },
-            trigger: null,
-          });
-
           if (payload.new.readCount !== payload.old.readCount) {
             if (payload.new.readCount === 1) {
               addAchievementToProfile(userid, "Good Job Little Buddy");
