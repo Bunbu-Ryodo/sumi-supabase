@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Subscription from "../../components/subscription";
+import Instalment from "../../components/instalment";
 
 import { useEffect, useState } from "react";
 import { getUserSession } from "../../supabase_queries/auth.js";
@@ -15,7 +15,7 @@ import {
   getAllUpcomingSubscriptions,
 } from "../../supabase_queries/subscriptions";
 import { InstalmentType, SubscriptionType } from "../../types/types";
-import PendingSubscription from "../../components/pendingSubscription";
+import PendingInstalment from "../../components/pendingInstalment";
 
 export default function Subscriptions() {
   useEffect(() => {
@@ -99,7 +99,7 @@ export default function Subscriptions() {
             </View>
           ) : instalments.length > 0 ? (
             instalments.map((instalment, index) => (
-              <Subscription
+              <Instalment
                 key={index}
                 id={instalment.id}
                 extractid={instalment.extractid}
@@ -112,7 +112,7 @@ export default function Subscriptions() {
             ))
           ) : activeSubscriptions.length > 0 ? (
             activeSubscriptions.map((subscription, index) => (
-              <PendingSubscription
+              <PendingInstalment
                 key={index}
                 id={subscription.id}
                 title={subscription.title}

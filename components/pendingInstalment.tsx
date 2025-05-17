@@ -1,7 +1,7 @@
 import { View, Image, Text, StyleSheet } from "react-native";
 import { SubscriptionTypeClient } from "../types/types.js";
 
-export default function PendingSubscription({
+export default function PendingInstalment({
   id,
   title,
   author,

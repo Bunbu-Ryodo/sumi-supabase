@@ -2,7 +2,7 @@ import { View, Image, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
 import { InstalmentTypeClient } from "../types/types.js";
 
-export default function Subscription({
+export default function Instalment({
   id,
   extractid,
   title,
