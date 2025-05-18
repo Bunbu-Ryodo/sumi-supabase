@@ -18,7 +18,6 @@ export const useSupabase = () => {
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    GoudyBookletter: require("../assets/fonts/GoudyBookletter1911-Regular.ttf"),
     QuicksandReg: require("../assets/fonts/Quicksand-Regular.ttf"),
     EBGaramond: require("../assets/fonts/EBGaramondVariable.ttf"),
     EBGaramondItalic: require("../assets/fonts/EBGaramondItalic.ttf"),
