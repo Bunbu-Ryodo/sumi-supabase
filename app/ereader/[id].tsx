@@ -67,6 +67,8 @@ export default function EReader() {
   const [userid, setUserid] = useState("");
   const [showTooltip, setShowTooltip] = useState(false);
   const tooltipTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [fontSize, setFontSize] = useState(18);
+  const [warmth, setWarmth] = useState(0);
 
   const router = useRouter();
 
@@ -75,6 +77,34 @@ export default function EReader() {
       pathname: "/feed",
     });
   };
+
+  const fontUp = () => {
+    setFontSize((prevFont) => {
+      if (prevFont + 4 > 32) {
+        return prevFont;
+      }
+      return prevFont + 4;
+    });
+  };
+
+  const fontDown = () => {
+    setFontSize((prevFont) => {
+      if (prevFont - 4 < 18) {
+        return prevFont;
+      }
+      return prevFont - 4;
+    });
+  };
+
+  const adjustBrightness = () => {
+    setWarmth((prevWarmth) => {
+      if (prevWarmth < 4) {
+        return prevWarmth + 1;
+      } else return 0;
+    });
+  };
+
+  const brightnessHex = ["#F6F7EB", "#FEECD1", "#FEE4BD", "#FFDAA3", "#393E41"];
 
   const checkForActiveSubscription = async (
     userId: string,
@@ -370,28 +400,109 @@ export default function EReader() {
   }, [subid]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <ScrollView style={styles.paper}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        warmth === 4 && { backgroundColor: "#F6F7EB" },
+      ]}
+    >
+      <ScrollView
+        style={[styles.paper, { backgroundColor: brightnessHex[warmth] }]}
+      >
         {loading ? (
           <ActivityIndicator size="large" color="#F6F7EB" />
         ) : (
           <View>
             <View>
-              <View style={styles.titleBar}>
-                <Text style={styles.title}>{extract.title}</Text>
-                <Text style={styles.chapter}>{extract.chapter}</Text>
+              <View style={styles.adjustFontSize}>
+                <TouchableOpacity
+                  style={[
+                    styles.fontUp,
+                    warmth === 4 && { backgroundColor: "#F6F7EB" },
+                  ]}
+                  onPress={fontUp}
+                >
+                  <Ionicons name="text" size={24} color="#393E41"></Ionicons>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.fontDown,
+                    warmth === 4 && { backgroundColor: "#F6F7EB" },
+                  ]}
+                  onPress={fontDown}
+                >
+                  <Ionicons name="text" size={18} color="#393E41"></Ionicons>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.brightness,
+                    warmth === 4 && { backgroundColor: "#F6F7EB" },
+                  ]}
+                  onPress={adjustBrightness}
+                >
+                  <Ionicons
+                    name="sunny-outline"
+                    size={18}
+                    color="#393E41"
+                  ></Ionicons>
+                </TouchableOpacity>
               </View>
-              <Text style={styles.extractText}>{extract.fulltext}</Text>
+              <View style={styles.titleBar}>
+                <Text
+                  style={[styles.title, warmth === 4 && { color: "#F6F7EB" }]}
+                >
+                  {extract.title}
+                </Text>
+                <Text
+                  style={[styles.chapter, warmth === 4 && { color: "#F6F7EB" }]}
+                >
+                  {extract.chapter}
+                </Text>
+              </View>
+              <Text
+                style={[
+                  styles.extractText,
+                  { fontSize },
+                  warmth === 4 && {
+                    color: "#F6F7EB",
+                    borderBottomColor: "#F6F7EB",
+                  },
+                ]}
+              >
+                {extract.fulltext}
+              </Text>
             </View>
             <View style={styles.markAsReadContainer}>
               <TouchableOpacity
-                style={!read ? styles.buttonPrimary : styles.markAsUnread}
+                style={
+                  read
+                    ? warmth === 4
+                      ? styles.markAsUnreadDarkMode
+                      : styles.markAsUnread
+                    : warmth === 4
+                    ? styles.buttonPrimaryDarkMode
+                    : styles.buttonPrimary
+                }
                 onPress={toggleReadStatus}
               >
                 {read ? (
-                  <Text style={styles.markAsUnreadText}>Mark as Unread</Text>
+                  <Text
+                    style={[
+                      styles.markAsUnreadText,
+                      warmth === 4 && { color: "#F6F7EB" },
+                    ]}
+                  >
+                    Mark as Unread
+                  </Text>
                 ) : (
-                  <Text style={styles.markAsReadText}>Mark as Read</Text>
+                  <Text
+                    style={[
+                      styles.markAsReadText,
+                      warmth === 4 && { color: "#393E41" },
+                    ]}
+                  >
+                    Mark as Read
+                  </Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -411,7 +522,12 @@ export default function EReader() {
                     color="#FE7F2D"
                   />
                 </TouchableOpacity>
-                <Text style={styles.bookmarkText}>
+                <Text
+                  style={[
+                    styles.bookmarkText,
+                    warmth === 4 && { color: "#F6F7EB" },
+                  ]}
+                >
                   Subscribe: new chapter next week
                 </Text>
               </View>
@@ -419,7 +535,12 @@ export default function EReader() {
                 <TouchableOpacity>
                   <Ionicons name="cart-outline" size={24} color="#77966D" />
                 </TouchableOpacity>
-                <Text style={styles.shoppingText}>
+                <Text
+                  style={[
+                    styles.shoppingText,
+                    warmth === 4 && { color: "#F6F7EB" },
+                  ]}
+                >
                   Buy a high quality edition of the full text
                 </Text>
               </View>
@@ -438,7 +559,14 @@ export default function EReader() {
                 onPress={backToFeed}
               >
                 <Ionicons name="arrow-back" size={24} color="#8980F5" />
-                <Text style={styles.shoppingText}>Return to Feed</Text>
+                <Text
+                  style={[
+                    styles.shoppingText,
+                    warmth === 4 && { color: "#F6F7EB" },
+                  ]}
+                >
+                  Return to Feed
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -544,9 +672,18 @@ const styles = StyleSheet.create({
   buttonPrimary: {
     marginTop: 8,
     padding: 16,
-    borderColor: "#F6F7EB",
     borderWidth: 1,
     backgroundColor: "#393E41",
+    borderRadius: 8,
+    alignItems: "center",
+    fontFamily: "QuicksandReg",
+    width: "100%",
+  },
+  buttonPrimaryDarkMode: {
+    marginTop: 8,
+    padding: 16,
+    borderWidth: 1,
+    backgroundColor: "#F6F7EB",
     borderRadius: 8,
     alignItems: "center",
     fontFamily: "QuicksandReg",
@@ -556,6 +693,16 @@ const styles = StyleSheet.create({
     marginTop: 8,
     padding: 16,
     borderColor: "#393E41",
+    borderWidth: 1,
+    borderRadius: 8,
+    alignItems: "center",
+    fontFamily: "QuicksandReg",
+    width: "100%",
+  },
+  markAsUnreadDarkMode: {
+    marginTop: 8,
+    padding: 16,
+    borderColor: "#F6F7EB",
     borderWidth: 1,
     borderRadius: 8,
     alignItems: "center",
@@ -583,5 +730,40 @@ const styles = StyleSheet.create({
     color: "#F6F7EB",
     fontFamily: "QuicksandReg",
     fontSize: 14,
+  },
+  adjustFontSize: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+  },
+  fontUp: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 44,
+    width: 44,
+    borderWidth: 1,
+    borderColor: "#393E41",
+    borderRadius: 8,
+    marginHorizontal: 4,
+  },
+  fontDown: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 44,
+    width: 44,
+    borderWidth: 1,
+    borderColor: "#393E41",
+    marginHorizontal: 4,
+    borderRadius: 8,
+  },
+  brightness: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 44,
+    width: 44,
+    borderWidth: 1,
+    borderColor: "#393E41",
+    marginHorizontal: 4,
+    borderRadius: 8,
   },
 });
