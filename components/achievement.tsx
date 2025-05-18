@@ -95,6 +95,6 @@ const styles = StyleSheet.create({
   },
   score: {
     fontSize: 24,
-    fontFamily: "GoudyBookletter",
+    fontFamily: "EBGaramond",
   },
 });

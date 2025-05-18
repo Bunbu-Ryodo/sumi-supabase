@@ -100,12 +100,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontFamily: "GoudyBookletter",
+    fontFamily: "EBGaramond",
     fontSize: 24,
     marginBottom: 8,
   },
   chapter: {
-    fontFamily: "Merriweather",
+    fontFamily: "EBGaramond",
     fontSize: 18,
     marginBottom: 16,
   },
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   extractText: {
-    fontFamily: "Merriweather",
+    fontFamily: "EBGaramond",
     borderBottomWidth: 1,
     borderColor: "#393E41",
     paddingBottom: 16,
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 36,
-    fontFamily: "GoudyBookletter",
+    fontFamily: "EBGaramond",
     color: "#393E41",
   },
   tagline: {

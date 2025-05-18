@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 36,
-    fontFamily: "GoudyBookletter",
+    fontFamily: "EBGaramond",
     color: "#393E41",
   },
   tagline: {

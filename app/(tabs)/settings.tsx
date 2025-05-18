@@ -1,6 +1,7 @@
 import {
   Text,
   TextInput,
+  ScrollView,
   View,
   StyleSheet,
   TouchableOpacity,
@@ -88,7 +89,7 @@ export default function Settings() {
   ];
 
   return (
-    <View style={styles.settingsWrapper}>
+    <ScrollView style={styles.settingsWrapper}>
       <View style={styles.form}>
         <Text style={styles.formLabel}>Change ReaderTag</Text>
         <TextInput
@@ -172,15 +173,17 @@ export default function Settings() {
           <Text style={styles.primaryButtonText}>Logout</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   settingsWrapper: {
-    flex: 1,
     backgroundColor: "#393E41",
     width: "100%",
+  },
+  container: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -210,8 +213,9 @@ const styles = StyleSheet.create({
     color: "#F6F7EB",
   },
   form: {
-    width: "90%",
-    maxWidth: 368,
+    width: "100%",
+    padding: 16,
+    height: "100%",
   },
   formLabel: {
     marginTop: 8,

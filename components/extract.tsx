@@ -112,8 +112,8 @@ const styles = StyleSheet.create({
     cursor: "pointer",
   },
   text: {
-    fontFamily: "Merriweather",
-    fontSize: 16,
+    fontFamily: "EBGaramond",
+    fontSize: 18,
     cursor: "pointer",
   },
   header: {
@@ -132,19 +132,18 @@ const styles = StyleSheet.create({
   headerText: {
     marginLeft: 12,
     fontSize: 14,
-    fontFamily: "Merriweather",
+    fontFamily: "EBGaramond",
   },
   headerTextTitle: {
     marginLeft: 12,
-    fontStyle: "italic",
-    fontSize: 14,
-    fontFamily: "Merriweather",
+    fontSize: 16,
+    fontFamily: "EBGaramondItalic",
   },
   headerTextFrequency: {
     marginLeft: 12,
     fontWeight: 600,
     fontSize: 14,
-    fontFamily: "Merriweather",
+    fontFamily: "EBGaramond",
     color: "#D64045",
   },
   engagementButtons: {
@@ -161,7 +160,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   readFullText: {
-    fontFamily: "Merriweather",
+    fontFamily: "EBGaramond",
     fontSize: 14,
     color: "#393E41",
     textDecorationLine: "underline",
