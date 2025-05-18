@@ -65,6 +65,7 @@ export default function Subscriptions() {
   async function populateSubscriptions(subscriptions: SubscriptionType[]) {
     setActiveSubscriptions(() => {
       setLoading(false);
+      console.log(subscriptions, "Subscriptions");
       return subscriptions || [];
     });
   }

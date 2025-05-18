@@ -30,6 +30,7 @@ import { getUserSession } from "../../supabase_queries/auth.js";
 import supabase from "../../lib/supabase.js";
 import { lookUpUserProfile } from "../../supabase_queries/auth";
 import * as Notifications from "expo-notifications";
+import { useRef } from "react";
 
 export default function EReader() {
   let { id } = useLocalSearchParams();
@@ -64,6 +65,8 @@ export default function EReader() {
   const [subid, setSubid] = useState(0);
   const [read, setRead] = useState(false);
   const [userid, setUserid] = useState("");
+  const [showTooltip, setShowTooltip] = useState(false);
+  const tooltipTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const router = useRouter();
 
@@ -151,6 +154,9 @@ export default function EReader() {
   const copyToClipboard = async () => {
     const link = `http://localhost:8081/share_text/${extract.id}`;
     await Clipboard.setStringAsync(link);
+    setShowTooltip(true);
+    if (tooltipTimeout.current) clearTimeout(tooltipTimeout.current);
+    tooltipTimeout.current = setTimeout(() => setShowTooltip(false), 1500);
   };
 
   function toggleLike() {
@@ -420,6 +426,11 @@ export default function EReader() {
               <TouchableOpacity onPress={copyToClipboard}>
                 <Ionicons name="clipboard-outline" size={24} color="#8980F5" />
               </TouchableOpacity>
+              {showTooltip && (
+                <View style={styles.tooltip}>
+                  <Text style={styles.tooltipText}>Copied!</Text>
+                </View>
+              )}
             </View>
             <View>
               <TouchableOpacity
@@ -451,12 +462,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontFamily: "GoudyBookletter",
+    fontFamily: "EBGaramondItalic",
     fontSize: 24,
     marginBottom: 8,
   },
   chapter: {
-    fontFamily: "Merriweather",
+    fontFamily: "EBGaramond",
     fontSize: 18,
     marginBottom: 16,
   },
@@ -467,7 +478,8 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   extractText: {
-    fontFamily: "Merriweather",
+    fontFamily: "EBGaramond",
+    fontSize: 18,
     borderBottomWidth: 1,
     borderColor: "#393E41",
     paddingBottom: 16,
@@ -501,7 +513,7 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
   },
   discuss: {
-    fontFamily: "GoudyBookletter",
+    fontFamily: "EBGaramond",
     fontSize: 36,
     marginTop: 8,
   },
@@ -554,5 +566,22 @@ const styles = StyleSheet.create({
     color: "#393E41",
     fontFamily: "QuicksandReg",
     fontSize: 16,
+  },
+  tooltip: {
+    position: "absolute",
+    top: -30,
+    left: "90%",
+    transform: [{ translateX: -30 }],
+    backgroundColor: "#393E41",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 6,
+    zIndex: 10,
+    elevation: 10,
+  },
+  tooltipText: {
+    color: "#F6F7EB",
+    fontFamily: "QuicksandReg",
+    fontSize: 14,
   },
 });
