@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useState } from "react";
@@ -30,23 +31,25 @@ export default function Achievements() {
   >([]);
   const [loading, setLoading] = useState(true); // Add a loading state
 
-  useEffect(() => {
-    const getProfileData = async function () {
-      const user = await getUserSession();
+  const getProfileData = async function () {
+    setLoading(true);
+    const user = await getUserSession();
 
-      if (user) {
-        const userProfile = await lookUpUserProfile(user.id);
-        if (userProfile) {
-          setAchievements(userProfile.achievements || []);
-          setAchievementScore(userProfile.achievementScore || 0);
-          setReaderTag(userProfile.username || "");
-          setReadCount(userProfile.readCount);
-          setSubscribedCount(userProfile.subscribedCount);
-          await calculateInProgressAchievements();
-          setLoading(false);
-        }
+    if (user) {
+      const userProfile = await lookUpUserProfile(user.id);
+      if (userProfile) {
+        setAchievements(userProfile.achievements || []);
+        setAchievementScore(userProfile.achievementScore || 0);
+        setReaderTag(userProfile.username || "");
+        setReadCount(userProfile.readCount);
+        setSubscribedCount(userProfile.subscribedCount);
+        await calculateInProgressAchievements();
+        setLoading(false);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     getProfileData();
   }, []);
 
@@ -135,11 +138,23 @@ export default function Achievements() {
     <ScrollView
       contentContainerStyle={styles.achievementsContentContainer}
       style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={loading}
+          onRefresh={getProfileData}
+          tintColor="#F6F7EB"
+        />
+      }
     >
-      <Text style={styles.header}>Sumi</Text>
-      <Text style={styles.tagline}>Just One More Chapter</Text>
+      {!loading && (
+        <View style={styles.achievementHeader}>
+          <Text style={styles.header}>Sumi</Text>
+          <Text style={styles.tagline}>Just One More Chapter</Text>
+        </View>
+      )}
+
       {loading ? (
-        <ActivityIndicator size="large" color="#393E41" />
+        <></>
       ) : (
         <View style={styles.achievementsWrapper}>
           <View style={styles.nameAndScoreContainer}>
@@ -209,6 +224,10 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#F6F7EB",
     flex: 1,
+  },
+  achievementHeader: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
     fontSize: 36,
