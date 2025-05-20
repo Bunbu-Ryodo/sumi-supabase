@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     color: "#F6F7EB",
   },
   tagline: {
-    height: 18,
+    height: 24,
     fontSize: 18,
     fontFamily: "QuicksandReg",
     color: "#F6F7EB",
