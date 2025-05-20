@@ -81,9 +81,7 @@ export default function Extract({
 const styles = StyleSheet.create({
   extract: {
     backgroundColor: "#F6F7EB",
-    width: "90%",
-    minWidth: 250,
-    maxWidth: 768,
+    width: "100%",
     marginTop: 8,
     marginBottom: 8,
     borderRadius: 8,

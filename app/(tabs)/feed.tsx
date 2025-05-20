@@ -1,5 +1,18 @@
-import { StyleSheet, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  Text,
+  RefreshControl,
+  TouchableOpacity,
+} from "react-native";
 import { useEffect, useState } from "react";
+import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import Reanimated, {
+  SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+import Ionicons from "@expo/vector-icons/Ionicons";
+
 import { useRouter } from "expo-router";
 import {
   createNewProfile,
@@ -19,6 +32,7 @@ import Extract from "../../components/extract";
 export default function FeedScreen() {
   const router = useRouter();
   const [extracts, setExtracts] = useState([] as ExtractType[]);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const checkUserAuthenticated = async function () {
@@ -38,9 +52,17 @@ export default function FeedScreen() {
   const checkUserProfileStatus = async function (userId: string) {
     const userProfile = await lookUpUserProfile(userId);
     if (!userProfile) {
-      const userProfile = await createNewProfile(userId, new Date());
+      await createNewProfile(userId, new Date());
     }
   };
+
+  const handleDismiss = (id: number) => {
+    setExtracts((prev) => prev.filter((extract) => extract.id !== id));
+  };
+
+  function RightAction() {
+    return <Reanimated.View style={{ width: 250 }} />;
+  }
 
   const processSubscriptions = async function (userId: string) {
     const subscriptions = await getAllDueSubscriptions(userId);
@@ -96,36 +118,71 @@ export default function FeedScreen() {
   };
 
   const fetchExtracts = async function () {
+    setRefreshing(true);
+
+    const shuffle = (array: ExtractType[]) => {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    };
+
     const extracts = await getExtracts();
     if (extracts) {
-      setExtracts(extracts);
+      const shuffledExtracts = shuffle(extracts);
+      setExtracts(shuffledExtracts);
     } else {
       setExtracts([]);
     }
+    setRefreshing(false);
   };
 
   return (
     <ScrollView
       contentContainerStyle={styles.feedWrapper}
       style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={fetchExtracts}
+          tintColor="#F6F7EB"
+        />
+      }
     >
-      {extracts &&
+      {extracts && extracts.length > 0 ? (
         extracts.map((extract: ExtractType, index: number) => (
-          <Extract
-            key={index}
-            id={extract.id}
-            textid={extract.textid}
-            author={extract.author}
-            title={extract.title}
-            year={extract.year}
-            chapter={extract.chapter}
-            previewtext={extract.previewtext}
-            fulltext={extract.fulltext}
-            subscribeart={extract.subscribeart}
-            portrait={extract.portrait}
-            coverart={extract.coverart}
-          />
-        ))}
+          <ReanimatedSwipeable
+            key={extract.id}
+            friction={2}
+            containerStyle={styles.swipeable}
+            enableTrackpadTwoFingerGesture
+            rightThreshold={40}
+            renderRightActions={RightAction}
+            onSwipeableWillOpen={() => handleDismiss(extract.id)}
+          >
+            <Extract
+              key={index}
+              id={extract.id}
+              textid={extract.textid}
+              author={extract.author}
+              title={extract.title}
+              year={extract.year}
+              chapter={extract.chapter}
+              previewtext={extract.previewtext}
+              fulltext={extract.fulltext}
+              subscribeart={extract.subscribeart}
+              portrait={extract.portrait}
+              coverart={extract.coverart}
+            />
+          </ReanimatedSwipeable>
+        ))
+      ) : (
+        <TouchableOpacity style={styles.refresh} onPress={fetchExtracts}>
+          <Ionicons name="arrow-down" size={36} color="#F6F7EB"></Ionicons>
+          <Text style={styles.pulldown}>Pull to be served more extracts</Text>
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 }
@@ -158,5 +215,32 @@ const styles = StyleSheet.create({
     color: "#393E41",
     fontFamily: "QuicksandReg",
     fontSize: 16,
+  },
+  rightAction: {
+    backgroundColor: "#F6F7EB",
+    fontFamily: "QuicksandReg",
+    color: "#393E41",
+    fontSize: 16,
+    padding: 16,
+    borderRadius: 50,
+  },
+  separator: {
+    width: "100%",
+    borderTopWidth: 1,
+  },
+  swipeable: {
+    width: "90%",
+    minWidth: 250,
+    maxWidth: 768,
+  },
+  refresh: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  pulldown: {
+    fontFamily: "QuicksandReg",
+    fontSize: 18,
+    color: "#F6F7EB",
   },
 });
