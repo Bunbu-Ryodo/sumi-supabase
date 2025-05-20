@@ -8,12 +8,51 @@ import {
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import supabase from "../lib/supabase.js";
+import { useEffect } from "react";
 
 export default function Index() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signinError, setSigninError] = useState("");
+  const [taglineIndex, setTaglineIndex] = useState(0);
+  const [displayedTagline, setDisplayedTagline] = useState("");
+  const [typing, setTyping] = useState(true);
+
   const router = useRouter();
+
+  const taglines = [
+    "Just one more chapter",
+    "Guilt-free screen time",
+    "A virtuous cycle of scrolling",
+    "Smarter every break",
+  ];
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    const fullText = taglines[taglineIndex];
+
+    if (typing) {
+      if (displayedTagline.length < fullText.length) {
+        timeout = setTimeout(() => {
+          setDisplayedTagline(fullText.slice(0, displayedTagline.length + 1));
+        }, 60);
+      } else {
+        timeout = setTimeout(() => setTyping(false), 1200);
+      }
+    } else {
+      if (displayedTagline.length > 0) {
+        timeout = setTimeout(() => {
+          setDisplayedTagline(fullText.slice(0, displayedTagline.length - 1));
+        }, 30);
+      } else {
+        timeout = setTimeout(() => {
+          setTaglineIndex((prev) => (prev + 1) % taglines.length);
+          setTyping(true);
+        }, 400);
+      }
+    }
+    return () => clearTimeout(timeout);
+  }, [displayedTagline, typing, taglineIndex, taglines]);
 
   async function signInUser() {
     await supabase.auth
@@ -42,7 +81,7 @@ export default function Index() {
       </View>
       <View style={styles.titleTaglineContainer}>
         <Text style={styles.header}>Sumi</Text>
-        <Text style={styles.tagline}>Just One More Chapter</Text>
+        <Text style={styles.tagline}>{displayedTagline}</Text>
       </View>
       <View style={styles.form}>
         <Text style={styles.formLabel}>Email</Text>
@@ -107,6 +146,7 @@ const styles = StyleSheet.create({
     color: "#F6F7EB",
   },
   tagline: {
+    height: 18,
     fontSize: 18,
     fontFamily: "QuicksandReg",
     color: "#F6F7EB",
