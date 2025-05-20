@@ -5,6 +5,7 @@ import * as SplashScreen from "expo-splash-screen";
 import supabase from "../lib/supabase";
 import { createContext, useContext } from "react";
 import { StatusBar } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const SupabaseContext = createContext(supabase);
 
@@ -35,7 +36,7 @@ export default function RootLayout() {
 
   return (
     <SupabaseContext.Provider value={supabase}>
-      <>
+      <GestureHandlerRootView>
         <StatusBar
           backgroundColor="#393E41" // Match the header background color
           barStyle="light-content" // Light icons for dark background
@@ -67,7 +68,7 @@ export default function RootLayout() {
           ></Stack.Screen>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>
-      </>
+      </GestureHandlerRootView>
     </SupabaseContext.Provider>
   );
 }
