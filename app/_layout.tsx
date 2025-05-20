@@ -4,8 +4,11 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import supabase from "../lib/supabase";
 import { createContext, useContext } from "react";
+import { View, Text } from "react-native";
 import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Toast, { BaseToast } from "react-native-toast-message";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const SupabaseContext = createContext(supabase);
 
@@ -33,6 +36,62 @@ export default function RootLayout() {
   if (!loaded && !error) {
     return null;
   }
+
+  const toastConfig = {
+    achievementUnlocked: ({
+      text1,
+      text2,
+    }: {
+      text1?: string;
+      text2?: string;
+    }) => (
+      <View
+        style={{
+          width: "85%",
+          borderRadius: 8,
+          backgroundColor: "#F6F7EB",
+          borderWidth: 1,
+          borderColor: "#393E41",
+          padding: 12,
+          flexDirection: "row",
+        }}
+      >
+        <View
+          style={{
+            height: 44,
+            width: 44,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#393E41",
+            borderRadius: 8,
+            marginRight: 8,
+          }}
+        >
+          <Ionicons name="star" size={24} color="#F6F7EB"></Ionicons>
+        </View>
+        <View>
+          <Text
+            style={{
+              fontFamily: "QuicksandReg",
+              fontSize: 16,
+              color: "#393E41",
+            }}
+          >
+            {text1 ?? ""}
+          </Text>
+          <Text
+            style={{
+              fontFamily: "QuicksandReg",
+              fontSize: 12,
+              color: "#393E41",
+            }}
+          >
+            {text2 ?? ""}
+          </Text>
+        </View>
+      </View>
+    ),
+  };
 
   return (
     <SupabaseContext.Provider value={supabase}>
@@ -68,6 +127,7 @@ export default function RootLayout() {
           ></Stack.Screen>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>
+        <Toast config={toastConfig} />
       </GestureHandlerRootView>
     </SupabaseContext.Provider>
   );

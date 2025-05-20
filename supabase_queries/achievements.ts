@@ -38,7 +38,7 @@ export async function awardAchievement(userId: string, title: string){
 
             const updatedAchievements = [...currentAchievements, achievement];
 
-            const { data: updatedProfile, error: updateError } = await supabase
+            const { error: updateError } = await supabase
             .from("profiles")
             .update({ achievements: updatedAchievements, achievementScore: profileData.achievementScore + achievement.score })
             .eq("user_id", userId)
@@ -50,7 +50,7 @@ export async function awardAchievement(userId: string, title: string){
                 console.error("Error updating profile with new achievement:", updateError);
                 return null;
             } else {
-                return updatedProfile;
+                return true;
             }
         }
     }
