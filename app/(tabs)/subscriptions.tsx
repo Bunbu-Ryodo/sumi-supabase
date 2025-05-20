@@ -94,6 +94,7 @@ export default function Subscriptions() {
                 flex: 1,
                 justifyContent: "center",
                 alignItems: "center",
+                width: "100%",
               }}
             >
               <ActivityIndicator size="large" color="#393E41" />
@@ -167,7 +168,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     padding: 8,
     width: "100%",
-    flexWrap: "wrap",
     alignItems: "center",
   },
   noInstalmentsText: {
