@@ -64,7 +64,9 @@ export default function Achievements() {
     let inProgressAchievements = [];
     let inProgress;
 
-    if (readCount < 10) {
+    if (readCount === 0) {
+      console.log("Do nothing");
+    } else if (readCount < 10) {
       const progress = (readCount / 10) * 100;
       const achievement = await fetchAchievementByDescription(
         "Read 10 extracts"
@@ -96,32 +98,35 @@ export default function Achievements() {
       inProgress = { ...achievement, achievementProgress: progress };
     }
 
-    if (subscribedCount < 10) {
-      const progress = (readCount / 10) * 100;
+    if (subscribedCount === 0) {
+      console.log("Do nothing");
+    } else if (subscribedCount < 10) {
+      console.log("Do we end up here?");
+      const progress = (subscribedCount / 10) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 10 series"
       );
       inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 25) {
-      const progress = (readCount / 25) * 100;
+      const progress = (subscribedCount / 25) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 25 series"
       );
       inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 50) {
-      const progress = (readCount / 50) * 100;
+      const progress = (subscribedCount / 50) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 50 series"
       );
       inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 100) {
-      const progress = readCount;
+      const progress = subscribedCount;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 100 series"
       );
       inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 200) {
-      const progress = (readCount / 200) * 100;
+      const progress = (subscribedCount / 200) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 200 series"
       );
@@ -146,16 +151,14 @@ export default function Achievements() {
         />
       }
     >
-      {!loading && (
+      {loading ? null : (
         <View style={styles.achievementHeader}>
           <Text style={styles.header}>Sumi</Text>
           <Text style={styles.tagline}>Just One More Chapter</Text>
         </View>
       )}
 
-      {loading ? (
-        <></>
-      ) : (
+      {!loading && (
         <View style={styles.achievementsWrapper}>
           <View style={styles.nameAndScoreContainer}>
             <Text style={styles.nameAndScore}>ReaderTag: {readerTag}</Text>
@@ -173,7 +176,7 @@ export default function Achievements() {
             Completed Achievements
           </Text>
           <View style={styles.completedAchievementsContainer}>
-            {achievements ? (
+            {achievements.length > 0 ? (
               achievements.map((row: AchievementTypeClient) => (
                 <Achievement
                   id={row.id}
@@ -186,7 +189,7 @@ export default function Achievements() {
                 />
               ))
             ) : (
-              <Text>Read Some Book</Text>
+              <Text style={styles.nameAndScore}>No achievements unlocked</Text>
             )}
           </View>
           <Text style={styles.pendingAchievementsHeader}>

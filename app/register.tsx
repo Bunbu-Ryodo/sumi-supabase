@@ -35,6 +35,11 @@ export default function Register() {
     if (password !== confirmPassword) {
       setPasswordError("Passwords do not match");
     }
+
+    if (!validateEmail(email)) {
+      setEmailError("Invalid email address");
+      return;
+    }
     await supabase.auth
       .signUp({
         email: email,

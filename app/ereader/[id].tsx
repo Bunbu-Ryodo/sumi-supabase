@@ -7,10 +7,19 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Animated,
+  Easing,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import {} from "react";
+import React, {
+  useImperativeHandle,
+  forwardRef,
+  useRef,
+  useEffect,
+  useState,
+} from "react";
 import { useRouter } from "expo-router";
 import { getExtract } from "../../supabase_queries/extracts";
 import { ExtractType } from "../../types/types";
@@ -30,8 +39,50 @@ import { getUserSession } from "../../supabase_queries/auth.js";
 import supabase from "../../lib/supabase.js";
 import { lookUpUserProfile } from "../../supabase_queries/auth";
 import * as Notifications from "expo-notifications";
-import { useRef } from "react";
+import {
+  Gesture,
+  GestureDetector,
+  Directions,
+} from "react-native-gesture-handler";
+
 import Toast from "react-native-toast-message";
+import type { PropsWithChildren } from "react";
+import { runOnJS } from "react-native-reanimated";
+
+type BounceInProps = PropsWithChildren<{}>;
+
+const BounceView = forwardRef<any, BounceInProps>((props, ref) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useImperativeHandle(ref, () => ({
+    bounce: () => {
+      Animated.sequence([
+        Animated.timing(scale, {
+          toValue: 1.3333,
+          duration: 200,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scale, {
+          toValue: 1,
+          duration: 100,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]).start();
+    },
+  }));
+
+  return (
+    <Animated.View
+      style={{
+        transform: [{ scale }],
+      }}
+    >
+      {props.children}
+    </Animated.View>
+  );
+});
 
 export default function EReader() {
   let { id } = useLocalSearchParams();
@@ -96,6 +147,19 @@ export default function EReader() {
       return prevFont - 4;
     });
   };
+
+  const singleTap = Gesture.Tap()
+    .maxDuration(250)
+    .onEnd(() => {
+      runOnJS(fontUp)();
+    });
+
+  const doubleTap = Gesture.Tap()
+    .numberOfTaps(2)
+    .maxDuration(250)
+    .onEnd(() => {
+      runOnJS(fontDown)();
+    });
 
   const adjustBrightness = () => {
     setWarmth((prevWarmth) => {
@@ -183,6 +247,10 @@ export default function EReader() {
   };
 
   const copyToClipboard = async () => {
+    if (clipRef.current) {
+      clipRef.current.bounce();
+    }
+
     const link = `http://localhost:8081/share_text/${extract.id}`;
     await Clipboard.setStringAsync(link);
     setShowTooltip(true);
@@ -191,10 +259,29 @@ export default function EReader() {
   };
 
   function toggleLike() {
+    if (heartRef.current) {
+      heartRef.current.bounce();
+    }
+
     setLike(!like);
   }
 
+  function shop() {
+    if (cartRef.current) {
+      cartRef.current.bounce();
+    }
+  }
+
+  const bounceRef = useRef<any>(null);
+  const heartRef = useRef<any>(null);
+  const cartRef = useRef<any>(null);
+  const clipRef = useRef<any>(null);
+
   async function subscribe() {
+    if (bounceRef.current) {
+      bounceRef.current.bounce();
+    }
+
     if (subscribed) {
       await deactivateSubscription(subid, userid, extract.chapter);
     } else {
@@ -414,16 +501,25 @@ export default function EReader() {
 
   return (
     <ScrollView
+      style={{ flex: 1 }}
       contentContainerStyle={[
         styles.container,
         warmth === 4 && { backgroundColor: "#F6F7EB" },
       ]}
     >
       <ScrollView
-        style={[styles.paper, { backgroundColor: brightnessHex[warmth] }]}
+        style={[
+          styles.paper,
+          { backgroundColor: brightnessHex[warmth], flex: 1 },
+        ]}
+        contentContainerStyle={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
         {loading ? (
-          <ActivityIndicator size="large" color="#F6F7EB" />
+          <ActivityIndicator size="large" color="#393E41" />
         ) : (
           <View>
             <View>
@@ -472,18 +568,24 @@ export default function EReader() {
                   {extract.chapter}
                 </Text>
               </View>
-              <Text
-                style={[
-                  styles.extractText,
-                  { fontSize },
-                  warmth === 4 && {
-                    color: "#F6F7EB",
-                    borderBottomColor: "#F6F7EB",
-                  },
-                ]}
+              <GestureDetector
+                gesture={Gesture.Exclusive(doubleTap, singleTap)}
               >
-                {extract.fulltext}
-              </Text>
+                <TouchableOpacity onLongPress={adjustBrightness}>
+                  <Text
+                    style={[
+                      styles.extractText,
+                      { fontSize },
+                      warmth === 4 && {
+                        color: "#F6F7EB",
+                        borderBottomColor: "#F6F7EB",
+                      },
+                    ]}
+                  >
+                    {extract.fulltext}
+                  </Text>
+                </TouchableOpacity>
+              </GestureDetector>
             </View>
             <View style={styles.markAsReadContainer}>
               <TouchableOpacity
@@ -521,19 +623,23 @@ export default function EReader() {
             </View>
             <View style={styles.engagementButtons}>
               <TouchableOpacity onPress={toggleLike}>
-                <Ionicons
-                  name={like ? "heart" : "heart-outline"}
-                  size={24}
-                  color="#D64045"
-                />
+                <BounceView ref={heartRef}>
+                  <Ionicons
+                    name={like ? "heart" : "heart-outline"}
+                    size={24}
+                    color="#D64045"
+                  />
+                </BounceView>
               </TouchableOpacity>
               <View style={styles.subscribeContainer}>
                 <TouchableOpacity onPress={subscribe}>
-                  <Ionicons
-                    name={subscribed ? "bookmark" : "bookmark-outline"}
-                    size={24}
-                    color="#FE7F2D"
-                  />
+                  <BounceView ref={bounceRef}>
+                    <Ionicons
+                      name={subscribed ? "bookmark" : "bookmark-outline"}
+                      size={24}
+                      color="#FE7F2D"
+                    />
+                  </BounceView>
                 </TouchableOpacity>
                 <Text
                   style={[
@@ -545,9 +651,11 @@ export default function EReader() {
                 </Text>
               </View>
               <View style={styles.shoppingContainer}>
-                <TouchableOpacity>
-                  <Ionicons name="cart-outline" size={24} color="#77966D" />
-                </TouchableOpacity>
+                <BounceView ref={cartRef}>
+                  <TouchableOpacity onPress={shop}>
+                    <Ionicons name="cart" size={24} color="#77966D" />
+                  </TouchableOpacity>
+                </BounceView>
                 <Text
                   style={[
                     styles.shoppingText,
@@ -558,7 +666,9 @@ export default function EReader() {
                 </Text>
               </View>
               <TouchableOpacity onPress={copyToClipboard}>
-                <Ionicons name="clipboard-outline" size={24} color="#8980F5" />
+                <BounceView ref={clipRef}>
+                  <Ionicons name="clipboard" size={24} color="#8980F5" />
+                </BounceView>
               </TouchableOpacity>
               {showTooltip && (
                 <View style={styles.tooltip}>
@@ -616,7 +726,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F7EB",
     width: "90%",
     padding: 16,
-    height: "100%",
   },
   extractText: {
     fontFamily: "EBGaramond",

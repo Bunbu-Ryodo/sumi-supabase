@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Instalment from "../../components/instalment";
@@ -18,41 +19,45 @@ import { InstalmentType, SubscriptionType } from "../../types/types";
 import PendingInstalment from "../../components/pendingInstalment";
 
 export default function Subscriptions() {
-  useEffect(() => {
-    const fetchInstalments = async () => {
-      const user = await getUserSession();
+  const fetchInstalments = async () => {
+    const user = await getUserSession();
 
-      if (user) {
-        const instalments = await getAllInstalments(user.id);
+    if (user) {
+      const instalments = await getAllInstalments(user.id);
 
-        if (instalments && instalments.length > 0) {
-          populateInstalments(instalments);
-        } else {
-          setLoading(false);
-        }
+      if (instalments && instalments.length > 0) {
+        populateInstalments(instalments);
+      } else {
+        setLoading(false);
       }
-    };
+    }
+  };
 
-    const fetchSubscriptions = async () => {
-      const user = await getUserSession();
+  const fetchSubscriptions = async () => {
+    const user = await getUserSession();
 
-      if (user) {
-        const upcomingSubscriptions = await getAllUpcomingSubscriptions(
-          user.id
-        );
+    if (user) {
+      const upcomingSubscriptions = await getAllUpcomingSubscriptions(user.id);
 
+      console.log("upcomingSubscriptions", upcomingSubscriptions);
+
+      if (upcomingSubscriptions && upcomingSubscriptions.length > 0) {
         console.log("upcomingSubscriptions", upcomingSubscriptions);
-
-        if (upcomingSubscriptions && upcomingSubscriptions.length > 0) {
-          console.log("upcomingSubscriptions", upcomingSubscriptions);
-          populateSubscriptions(upcomingSubscriptions);
-        } else {
-          setLoading(false);
-        }
+        populateSubscriptions(upcomingSubscriptions);
+      } else {
+        setLoading(false);
       }
-    };
-    fetchInstalments();
-    fetchSubscriptions();
+    }
+  };
+  const fetchSubscriptionData = async () => {
+    setLoading(true);
+    await fetchInstalments();
+    await fetchSubscriptions();
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchSubscriptionData();
   }, []);
 
   async function populateInstalments(instalments: InstalmentType[]) {
@@ -79,56 +84,56 @@ export default function Subscriptions() {
     <ScrollView
       contentContainerStyle={styles.subscriptionWrapper}
       style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={loading}
+          onRefresh={fetchSubscriptionData}
+          tintColor="#F6F7EB"
+        />
+      }
     >
-      <View style={styles.extractWrapper}>
-        <View style={styles.subscriptionsHeader}>
-          <Text style={styles.newInstallmentsHeader}>Your Instalments</Text>
-          <View style={styles.headerIconContainer}>
-            <Ionicons name="mail-unread" size={24} color={"#393E41"}></Ionicons>
+      {!loading && (
+        <View style={styles.extractWrapper}>
+          <View style={styles.subscriptionsHeader}>
+            <Text style={styles.newInstallmentsHeader}>Your Instalments</Text>
+            <View style={styles.headerIconContainer}>
+              <Ionicons name="mail-unread" size={24} color={"#393E41"} />
+            </View>
+          </View>
+          <View style={styles.subscriptionSection}>
+            {instalments.length > 0 ? (
+              instalments.map((instalment, index) => (
+                <Instalment
+                  key={index}
+                  id={instalment.id}
+                  extractid={instalment.extractid}
+                  title={instalment.title}
+                  author={instalment.author}
+                  chapter={instalment.chapter}
+                  subscribeart={instalment.subscribeart}
+                  sequeldue={instalment.sequeldue}
+                />
+              ))
+            ) : activeSubscriptions.length > 0 ? (
+              activeSubscriptions.map((subscription, index) => (
+                <PendingInstalment
+                  key={index}
+                  id={subscription.id}
+                  title={subscription.title}
+                  author={subscription.author}
+                  chapter={subscription.chapter}
+                  subscribeart={subscription.subscribeart}
+                  due={subscription.due}
+                />
+              ))
+            ) : (
+              <Text style={styles.noInstalmentsText}>
+                Subscribe to a series!
+              </Text>
+            )}
           </View>
         </View>
-        <View style={styles.subscriptionSection}>
-          {loading ? (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <ActivityIndicator size="large" color="#393E41" />
-            </View>
-          ) : instalments.length > 0 ? (
-            instalments.map((instalment, index) => (
-              <Instalment
-                key={index}
-                id={instalment.id}
-                extractid={instalment.extractid}
-                title={instalment.title}
-                author={instalment.author}
-                chapter={instalment.chapter}
-                subscribeart={instalment.subscribeart}
-                sequeldue={instalment.sequeldue}
-              />
-            ))
-          ) : activeSubscriptions.length > 0 ? (
-            activeSubscriptions.map((subscription, index) => (
-              <PendingInstalment
-                key={index}
-                id={subscription.id}
-                title={subscription.title}
-                author={subscription.author}
-                chapter={subscription.chapter}
-                subscribeart={subscription.subscribeart}
-                due={subscription.due}
-              />
-            ))
-          ) : (
-            <Text style={styles.noInstalmentsText}>Subscribe to a series!</Text>
-          )}
-        </View>
-      </View>
+      )}
     </ScrollView>
   );
 }
