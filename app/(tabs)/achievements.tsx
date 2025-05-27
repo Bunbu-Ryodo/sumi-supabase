@@ -64,7 +64,8 @@ export default function Achievements() {
     let inProgressAchievements = [];
     let inProgress;
 
-    if (readCount < 10) {
+    if (readCount === 0) {
+    } else if (readCount < 10) {
       const progress = (readCount / 10) * 100;
       const achievement = await fetchAchievementByDescription(
         "Read 10 extracts"
@@ -96,32 +97,33 @@ export default function Achievements() {
       inProgress = { ...achievement, achievementProgress: progress };
     }
 
-    if (subscribedCount < 10) {
-      const progress = (readCount / 10) * 100;
+    if (subscribedCount === 0) {
+    } else if (subscribedCount < 10) {
+      const progress = (subscribedCount / 10) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 10 series"
       );
       inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 25) {
-      const progress = (readCount / 25) * 100;
+      const progress = (subscribedCount / 25) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 25 series"
       );
       inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 50) {
-      const progress = (readCount / 50) * 100;
+      const progress = (subscribedCount / 50) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 50 series"
       );
       inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 100) {
-      const progress = readCount;
+      const progress = subscribedCount;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 100 series"
       );
       inProgress = { ...achievement, achievementProgress: progress };
     } else if (subscribedCount < 200) {
-      const progress = (readCount / 200) * 100;
+      const progress = (subscribedCount / 200) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 200 series"
       );
@@ -146,34 +148,29 @@ export default function Achievements() {
         />
       }
     >
-      {!loading && (
+      {loading ? null : (
         <View style={styles.achievementHeader}>
           <Text style={styles.header}>Sumi</Text>
           <Text style={styles.tagline}>Just One More Chapter</Text>
         </View>
       )}
 
-      {loading ? (
-        <></>
-      ) : (
+      {!loading && (
         <View style={styles.achievementsWrapper}>
           <View style={styles.nameAndScoreContainer}>
-            <Text style={styles.nameAndScore}>ReaderTag: {readerTag}</Text>
+            <Text style={styles.readerTag}>ReaderTag: {readerTag}</Text>
             <View style={styles.scoreContainer}>
-              <Text style={styles.nameAndScore}>Score: {achievementScore}</Text>
-              <Ionicons
-                style={styles.trophy}
-                name="trophy"
-                size={16}
-                color="#393E41"
-              />
+              <Text style={styles.score}>Score: {achievementScore}</Text>
             </View>
           </View>
-          <Text style={styles.completedAchievementsHeader}>
-            Completed Achievements
-          </Text>
+          <View style={styles.completedAchievementsHeader}>
+            <Text style={styles.completedAchievementText}>
+              Completed Achievements
+            </Text>
+            <Ionicons name="trophy" size={20} color={"#393E41"} />
+          </View>
           <View style={styles.completedAchievementsContainer}>
-            {achievements ? (
+            {achievements.length > 0 ? (
               achievements.map((row: AchievementTypeClient) => (
                 <Achievement
                   id={row.id}
@@ -186,12 +183,15 @@ export default function Achievements() {
                 />
               ))
             ) : (
-              <Text>Read Some Book</Text>
+              <Text style={styles.score}>No achievements unlocked</Text>
             )}
           </View>
-          <Text style={styles.pendingAchievementsHeader}>
-            Pending Achievements
-          </Text>
+          <View style={styles.completedAchievementsHeader}>
+            <Text style={styles.completedAchievementText}>
+              Pending Achievements
+            </Text>
+            <Ionicons name="trophy-outline" size={20} color={"#393E41"} />
+          </View>
           <View style={styles.pendingAchievementsContainer}>
             {pendingAchievements.length > 0 ? (
               pendingAchievements.map((row: PendingAchievementType) => (
@@ -206,7 +206,7 @@ export default function Achievements() {
                 />
               ))
             ) : (
-              <Text style={styles.nameAndScore}>No pending achievements</Text>
+              <Text style={styles.score}>No pending achievements</Text>
             )}
           </View>
         </View>
@@ -241,18 +241,23 @@ const styles = StyleSheet.create({
   },
   nameAndScoreContainer: {
     marginTop: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  nameAndScore: {
-    fontSize: 16,
+  score: {
+    fontSize: 18,
+    fontFamily: "QuicksandReg",
+    color: "#393E41",
+    textAlign: "center",
+  },
+  readerTag: {
+    fontSize: 18,
     fontFamily: "QuicksandReg",
     color: "#393E41",
     textAlign: "center",
   },
   scoreContainer: {
     flexDirection: "row",
-  },
-  trophy: {
-    marginTop: 2,
   },
   completedAchievementsContainer: {
     marginTop: 12,
@@ -265,10 +270,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   completedAchievementsHeader: {
-    marginTop: 16,
-    textDecorationLine: "underline",
+    marginTop: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 30,
+    flexDirection: "row",
+  },
+  completedAchievementText: {
     fontFamily: "QuicksandReg",
-    fontSize: 16,
+    fontSize: 18,
+    color: "#393E41",
   },
   pendingAchievementsContainer: {
     marginTop: 12,

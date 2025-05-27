@@ -1,10 +1,60 @@
 import * as Clipboard from "expo-clipboard";
-import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Animated,
+  Easing,
+} from "react-native";
 import { Link } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useState, useEffect } from "react";
+import React, {
+  useImperativeHandle,
+  forwardRef,
+  useRef,
+  useEffect,
+  useState,
+} from "react";
+import type { PropsWithChildren } from "react";
 import { ExtractType } from "../types/types.js";
 import { useRouter } from "expo-router";
+
+type BounceInProps = PropsWithChildren<{}>;
+
+const BounceView = forwardRef<any, BounceInProps>((props, ref) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useImperativeHandle(ref, () => ({
+    bounce: () => {
+      Animated.sequence([
+        Animated.timing(scale, {
+          toValue: 1.3333,
+          duration: 200,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scale, {
+          toValue: 1,
+          duration: 100,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]).start();
+    },
+  }));
+
+  return (
+    <Animated.View
+      style={{
+        transform: [{ scale }],
+      }}
+    >
+      {props.children}
+    </Animated.View>
+  );
+});
 
 export default function Extract({
   id,
@@ -21,10 +71,16 @@ export default function Extract({
   const router = useRouter();
 
   function toggleLike() {
+    if (heartRef.current) {
+      heartRef.current.bounce();
+    }
     setLike(!like);
   }
 
   const copyToClipboard = async () => {
+    if (clipRef.current) {
+      clipRef.current.bounce();
+    }
     const link = `http://localhost:8081/share_text/${id}`;
     await Clipboard.setStringAsync(link);
   };
@@ -37,6 +93,9 @@ export default function Extract({
   };
 
   useEffect(() => {}, []);
+
+  const clipRef = useRef<any>(null);
+  const heartRef = useRef<any>(null);
 
   return (
     <View style={styles.extract}>
@@ -62,18 +121,22 @@ export default function Extract({
       <TouchableOpacity onPress={handleNavigation} style={styles.thumbnail}>
         <Image source={{ uri: coverart }} style={styles.thumbnail} />
       </TouchableOpacity>
-      <View style={styles.engagementButtons}>
+      {/* <View style={styles.engagementButtons}>
         <TouchableOpacity style={styles.icon} onPress={toggleLike}>
-          <Ionicons
-            name={like ? "heart" : "heart-outline"}
-            size={24}
-            color="#D64045"
-          />
+          <BounceView ref={heartRef}>
+            <Ionicons
+              name={like ? "heart" : "heart-outline"}
+              size={24}
+              color="#D64045"
+            />
+          </BounceView>
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon} onPress={copyToClipboard}>
-          <Ionicons name="clipboard-outline" size={24} color="#8980F5" />
+          <BounceView ref={clipRef}>
+            <Ionicons name="clipboard" size={24} color="#8980F5" />
+          </BounceView>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 }

@@ -167,10 +167,9 @@ export default function Settings() {
               <Text style={styles.radioButtonLabel}>{option.label}</Text>
             </TouchableOpacity>
           ))}
-          <Text style={styles.selectedText}>Selected: {interval}</Text>
         </View>
-        <TouchableOpacity style={styles.buttonPrimary} onPress={Logout}>
-          <Text style={styles.primaryButtonText}>Logout</Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={Logout}>
+          <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -344,7 +343,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "flex-start",
     justifyContent: "center",
-    marginTop: 16,
     minHeight: 100,
   },
   radioButtonContainer: {
@@ -381,5 +379,18 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
     color: "#F6F7EB",
     marginBottom: 8,
+  },
+  logoutButton: {
+    backgroundColor: "#D64045",
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    width: "100%",
+    marginTop: 12,
+  },
+  logoutButtonText: {
+    color: "#FFF",
+    fontFamily: "QuicksandReg",
+    fontSize: 16,
   },
 });

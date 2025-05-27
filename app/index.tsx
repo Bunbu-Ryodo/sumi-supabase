@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     height: 73,
     padding: 5,
     backgroundColor: "#F6F7EB",
-    borderRadius: 2,
+    borderRadius: 4,
   },
   logoTitle: {
     width: 12,
