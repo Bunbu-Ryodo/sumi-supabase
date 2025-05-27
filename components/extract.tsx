@@ -121,7 +121,7 @@ export default function Extract({
       <TouchableOpacity onPress={handleNavigation} style={styles.thumbnail}>
         <Image source={{ uri: coverart }} style={styles.thumbnail} />
       </TouchableOpacity>
-      <View style={styles.engagementButtons}>
+      {/* <View style={styles.engagementButtons}>
         <TouchableOpacity style={styles.icon} onPress={toggleLike}>
           <BounceView ref={heartRef}>
             <Ionicons
@@ -136,7 +136,7 @@ export default function Extract({
             <Ionicons name="clipboard" size={24} color="#8980F5" />
           </BounceView>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 }

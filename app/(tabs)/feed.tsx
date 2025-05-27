@@ -4,6 +4,7 @@ import {
   Text,
   RefreshControl,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useEffect, useState } from "react";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -33,6 +34,7 @@ export default function FeedScreen() {
   const router = useRouter();
   const [extracts, setExtracts] = useState([] as ExtractType[]);
   const [refreshing, setRefreshing] = useState(false);
+  const [allExtractsDismissed, setAllExtractsDismissed] = useState(false);
 
   useEffect(() => {
     const checkUserAuthenticated = async function () {
@@ -57,7 +59,13 @@ export default function FeedScreen() {
   };
 
   const handleDismiss = (id: number) => {
-    setExtracts((prev) => prev.filter((extract) => extract.id !== id));
+    setExtracts((prev) => {
+      if (extracts.length - 1 === 0) {
+        console.log("All extracts dismissed");
+        setAllExtractsDismissed(true);
+      }
+      return prev.filter((extract) => extract.id !== id);
+    });
   };
 
   function RightAction() {
@@ -119,6 +127,7 @@ export default function FeedScreen() {
 
   const fetchExtracts = async function () {
     setRefreshing(true);
+    setAllExtractsDismissed(false);
 
     const shuffle = (array: ExtractType[]) => {
       for (let i = array.length - 1; i > 0; i--) {
@@ -177,11 +186,13 @@ export default function FeedScreen() {
             />
           </ReanimatedSwipeable>
         ))
-      ) : (
+      ) : allExtractsDismissed ? (
         <TouchableOpacity style={styles.refresh} onPress={fetchExtracts}>
-          <Ionicons name="arrow-down" size={36} color="#F6F7EB"></Ionicons>
+          <Ionicons name="arrow-down" size={36} color="#F6F7EB" />
           <Text style={styles.pulldown}>Pull to be served more extracts</Text>
         </TouchableOpacity>
+      ) : (
+        <ActivityIndicator size="large" color="#393E41" />
       )}
     </ScrollView>
   );

@@ -155,7 +155,8 @@ const styles = StyleSheet.create({
   },
   newInstallmentsHeader: {
     fontFamily: "QuicksandReg",
-    fontSize: 24,
+    fontSize: 20,
+    color: "#393E41",
   },
   headerIconContainer: {
     alignItems: "center",
@@ -178,5 +179,6 @@ const styles = StyleSheet.create({
   noInstalmentsText: {
     fontFamily: "QuicksandReg",
     fontSize: 16,
+    color: "#393E41",
   },
 });

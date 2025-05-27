@@ -117,7 +117,6 @@ export default function EReader() {
   const [subid, setSubid] = useState(0);
   const [read, setRead] = useState(false);
   const [userid, setUserid] = useState("");
-  const [showTooltip, setShowTooltip] = useState(false);
   const tooltipTimeout = useRef<NodeJS.Timeout | null>(null);
   const [fontSize, setFontSize] = useState(18);
   const [warmth, setWarmth] = useState(0);
@@ -253,9 +252,6 @@ export default function EReader() {
 
     const link = `http://localhost:8081/share_text/${extract.id}`;
     await Clipboard.setStringAsync(link);
-    setShowTooltip(true);
-    if (tooltipTimeout.current) clearTimeout(tooltipTimeout.current);
-    tooltipTimeout.current = setTimeout(() => setShowTooltip(false), 1500);
   };
 
   function toggleLike() {
@@ -501,200 +497,173 @@ export default function EReader() {
 
   return (
     <ScrollView
-      style={{ flex: 1 }}
-      contentContainerStyle={[
-        styles.container,
-        warmth === 4 && { backgroundColor: "#F6F7EB" },
-      ]}
+      style={[styles.paper, { backgroundColor: brightnessHex[warmth] }]}
     >
-      <ScrollView
-        style={[
-          styles.paper,
-          { backgroundColor: brightnessHex[warmth], flex: 1 },
-        ]}
-        contentContainerStyle={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        {loading ? (
-          <ActivityIndicator size="large" color="#393E41" />
-        ) : (
+      {loading ? (
+        <ActivityIndicator size="large" color="#393E41" />
+      ) : (
+        <View>
           <View>
-            <View>
-              <View style={styles.adjustFontSize}>
-                <TouchableOpacity
-                  style={[
-                    styles.fontUp,
-                    warmth === 4 && { backgroundColor: "#F6F7EB" },
-                  ]}
-                  onPress={fontUp}
-                >
-                  <Ionicons name="text" size={24} color="#393E41"></Ionicons>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.fontDown,
-                    warmth === 4 && { backgroundColor: "#F6F7EB" },
-                  ]}
-                  onPress={fontDown}
-                >
-                  <Ionicons name="text" size={18} color="#393E41"></Ionicons>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.brightness,
-                    warmth === 4 && { backgroundColor: "#F6F7EB" },
-                  ]}
-                  onPress={adjustBrightness}
-                >
-                  <Ionicons
-                    name="sunny-outline"
-                    size={18}
-                    color="#393E41"
-                  ></Ionicons>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.titleBar}>
-                <Text
-                  style={[styles.title, warmth === 4 && { color: "#F6F7EB" }]}
-                >
-                  {extract.title}
-                </Text>
-                <Text
-                  style={[styles.chapter, warmth === 4 && { color: "#F6F7EB" }]}
-                >
-                  {extract.chapter}
-                </Text>
-              </View>
-              <GestureDetector
-                gesture={Gesture.Exclusive(doubleTap, singleTap)}
-              >
-                <TouchableOpacity onLongPress={adjustBrightness}>
-                  <Text
-                    style={[
-                      styles.extractText,
-                      { fontSize },
-                      warmth === 4 && {
-                        color: "#F6F7EB",
-                        borderBottomColor: "#F6F7EB",
-                      },
-                    ]}
-                  >
-                    {extract.fulltext}
-                  </Text>
-                </TouchableOpacity>
-              </GestureDetector>
-            </View>
-            <View style={styles.markAsReadContainer}>
+            <View style={styles.adjustFontSize}>
               <TouchableOpacity
-                style={
-                  read
-                    ? warmth === 4
-                      ? styles.markAsUnreadDarkMode
-                      : styles.markAsUnread
-                    : warmth === 4
-                    ? styles.buttonPrimaryDarkMode
-                    : styles.buttonPrimary
-                }
-                onPress={toggleReadStatus}
+                style={[
+                  styles.fontUp,
+                  warmth === 4 && { backgroundColor: "#F6F7EB" },
+                ]}
+                onPress={fontUp}
               >
-                {read ? (
-                  <Text
-                    style={[
-                      styles.markAsUnreadText,
-                      warmth === 4 && { color: "#F6F7EB" },
-                    ]}
-                  >
-                    Mark as Unread
-                  </Text>
-                ) : (
-                  <Text
-                    style={[
-                      styles.markAsReadText,
-                      warmth === 4 && { color: "#393E41" },
-                    ]}
-                  >
-                    Mark as Read
-                  </Text>
-                )}
+                <Ionicons name="text" size={24} color="#393E41"></Ionicons>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.fontDown,
+                  warmth === 4 && { backgroundColor: "#F6F7EB" },
+                ]}
+                onPress={fontDown}
+              >
+                <Ionicons name="text" size={18} color="#393E41"></Ionicons>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.brightness,
+                  warmth === 4 && { backgroundColor: "#F6F7EB" },
+                ]}
+                onPress={adjustBrightness}
+              >
+                <Ionicons
+                  name="sunny-outline"
+                  size={18}
+                  color="#393E41"
+                ></Ionicons>
               </TouchableOpacity>
             </View>
-            <View style={styles.engagementButtons}>
-              <TouchableOpacity onPress={toggleLike}>
-                <BounceView ref={heartRef}>
+            <View style={styles.titleBar}>
+              <Text
+                style={[styles.title, warmth === 4 && { color: "#F6F7EB" }]}
+              >
+                {extract.title}
+              </Text>
+              <Text
+                style={[styles.chapter, warmth === 4 && { color: "#F6F7EB" }]}
+              >
+                {extract.chapter}
+              </Text>
+            </View>
+            <GestureDetector gesture={Gesture.Exclusive(doubleTap, singleTap)}>
+              <TouchableOpacity onLongPress={adjustBrightness}>
+                <Text
+                  style={[
+                    styles.extractText,
+                    { fontSize },
+                    warmth === 4 && {
+                      color: "#F6F7EB",
+                      borderBottomColor: "#F6F7EB",
+                    },
+                  ]}
+                >
+                  {extract.fulltext}
+                </Text>
+              </TouchableOpacity>
+            </GestureDetector>
+          </View>
+          <View style={styles.markAsReadContainer}>
+            <TouchableOpacity
+              style={
+                read
+                  ? warmth === 4
+                    ? styles.markAsUnreadDarkMode
+                    : styles.markAsUnread
+                  : warmth === 4
+                  ? styles.buttonPrimaryDarkMode
+                  : styles.buttonPrimary
+              }
+              onPress={toggleReadStatus}
+            >
+              {read ? (
+                <Text
+                  style={[
+                    styles.markAsUnreadText,
+                    warmth === 4 && { color: "#F6F7EB" },
+                  ]}
+                >
+                  Mark as Unread
+                </Text>
+              ) : (
+                <Text
+                  style={[
+                    styles.markAsReadText,
+                    warmth === 4 && { color: "#393E41" },
+                  ]}
+                >
+                  Mark as Read
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+          <View style={styles.engagementButtons}>
+            {/* <TouchableOpacity onPress={toggleLike}>
+              <BounceView ref={heartRef}>
+                <Ionicons
+                  name={like ? "heart" : "heart-outline"}
+                  size={24}
+                  color="#D64045"
+                />
+              </BounceView>
+            </TouchableOpacity> */}
+            <TouchableOpacity style={styles.returnAnchor} onPress={backToFeed}>
+              <Ionicons name="arrow-back" size={24} color="#8980F5" />
+              <Text
+                style={[
+                  styles.shoppingText,
+                  warmth === 4 && { color: "#F6F7EB" },
+                ]}
+              >
+                Return to Feed
+              </Text>
+            </TouchableOpacity>
+            <View style={styles.subscribeContainer}>
+              <TouchableOpacity onPress={subscribe}>
+                <BounceView ref={bounceRef}>
                   <Ionicons
-                    name={like ? "heart" : "heart-outline"}
+                    name={subscribed ? "bookmark" : "bookmark-outline"}
                     size={24}
-                    color="#D64045"
+                    color="#FE7F2D"
                   />
                 </BounceView>
               </TouchableOpacity>
-              <View style={styles.subscribeContainer}>
-                <TouchableOpacity onPress={subscribe}>
-                  <BounceView ref={bounceRef}>
-                    <Ionicons
-                      name={subscribed ? "bookmark" : "bookmark-outline"}
-                      size={24}
-                      color="#FE7F2D"
-                    />
-                  </BounceView>
-                </TouchableOpacity>
-                <Text
-                  style={[
-                    styles.bookmarkText,
-                    warmth === 4 && { color: "#F6F7EB" },
-                  ]}
-                >
-                  Subscribe: new chapter next week
-                </Text>
-              </View>
-              <View style={styles.shoppingContainer}>
-                <BounceView ref={cartRef}>
-                  <TouchableOpacity onPress={shop}>
-                    <Ionicons name="cart" size={24} color="#77966D" />
-                  </TouchableOpacity>
-                </BounceView>
-                <Text
-                  style={[
-                    styles.shoppingText,
-                    warmth === 4 && { color: "#F6F7EB" },
-                  ]}
-                >
-                  Buy a high quality edition of the full text
-                </Text>
-              </View>
-              <TouchableOpacity onPress={copyToClipboard}>
-                <BounceView ref={clipRef}>
-                  <Ionicons name="clipboard" size={24} color="#8980F5" />
-                </BounceView>
-              </TouchableOpacity>
-              {showTooltip && (
-                <View style={styles.tooltip}>
-                  <Text style={styles.tooltipText}>Copied!</Text>
-                </View>
-              )}
-            </View>
-            <View>
-              <TouchableOpacity
-                style={styles.returnAnchor}
-                onPress={backToFeed}
+              <Text
+                style={[
+                  styles.bookmarkText,
+                  warmth === 4 && { color: "#F6F7EB" },
+                ]}
               >
-                <Ionicons name="arrow-back" size={24} color="#8980F5" />
-                <Text
-                  style={[
-                    styles.shoppingText,
-                    warmth === 4 && { color: "#F6F7EB" },
-                  ]}
-                >
-                  Return to Feed
-                </Text>
-              </TouchableOpacity>
+                Subscribe
+              </Text>
             </View>
+            <View style={styles.shoppingContainer}>
+              <BounceView ref={cartRef}>
+                <TouchableOpacity onPress={shop}>
+                  <Ionicons name="cart" size={24} color="#77966D" />
+                </TouchableOpacity>
+              </BounceView>
+              <Text
+                style={[
+                  styles.shoppingText,
+                  warmth === 4 && { color: "#F6F7EB" },
+                ]}
+              >
+                Buy a high quality edition of the full text
+              </Text>
+            </View>
+            <TouchableOpacity onPress={copyToClipboard}>
+              <BounceView ref={clipRef}>
+                <Ionicons name="clipboard" size={24} color="#8980F5" />
+              </BounceView>
+            </TouchableOpacity>
           </View>
-        )}
-      </ScrollView>
+          <View></View>
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -724,7 +693,7 @@ const styles = StyleSheet.create({
   },
   paper: {
     backgroundColor: "#F6F7EB",
-    width: "90%",
+    width: "100%",
     padding: 16,
   },
   extractText: {
@@ -741,6 +710,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "flex-start",
+    height: 100,
   },
   subscribeContainer: {
     alignItems: "center",

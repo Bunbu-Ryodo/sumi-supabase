@@ -65,7 +65,6 @@ export default function Achievements() {
     let inProgress;
 
     if (readCount === 0) {
-      console.log("Do nothing");
     } else if (readCount < 10) {
       const progress = (readCount / 10) * 100;
       const achievement = await fetchAchievementByDescription(
@@ -99,9 +98,7 @@ export default function Achievements() {
     }
 
     if (subscribedCount === 0) {
-      console.log("Do nothing");
     } else if (subscribedCount < 10) {
-      console.log("Do we end up here?");
       const progress = (subscribedCount / 10) * 100;
       const achievement = await fetchAchievementByDescription(
         "Subscribe to 10 series"
@@ -161,20 +158,17 @@ export default function Achievements() {
       {!loading && (
         <View style={styles.achievementsWrapper}>
           <View style={styles.nameAndScoreContainer}>
-            <Text style={styles.nameAndScore}>ReaderTag: {readerTag}</Text>
+            <Text style={styles.readerTag}>ReaderTag: {readerTag}</Text>
             <View style={styles.scoreContainer}>
-              <Text style={styles.nameAndScore}>Score: {achievementScore}</Text>
-              <Ionicons
-                style={styles.trophy}
-                name="trophy"
-                size={16}
-                color="#393E41"
-              />
+              <Text style={styles.score}>Score: {achievementScore}</Text>
             </View>
           </View>
-          <Text style={styles.completedAchievementsHeader}>
-            Completed Achievements
-          </Text>
+          <View style={styles.completedAchievementsHeader}>
+            <Text style={styles.completedAchievementText}>
+              Completed Achievements
+            </Text>
+            <Ionicons name="trophy" size={20} color={"#393E41"} />
+          </View>
           <View style={styles.completedAchievementsContainer}>
             {achievements.length > 0 ? (
               achievements.map((row: AchievementTypeClient) => (
@@ -189,12 +183,15 @@ export default function Achievements() {
                 />
               ))
             ) : (
-              <Text style={styles.nameAndScore}>No achievements unlocked</Text>
+              <Text style={styles.score}>No achievements unlocked</Text>
             )}
           </View>
-          <Text style={styles.pendingAchievementsHeader}>
-            Pending Achievements
-          </Text>
+          <View style={styles.completedAchievementsHeader}>
+            <Text style={styles.completedAchievementText}>
+              Pending Achievements
+            </Text>
+            <Ionicons name="trophy-outline" size={20} color={"#393E41"} />
+          </View>
           <View style={styles.pendingAchievementsContainer}>
             {pendingAchievements.length > 0 ? (
               pendingAchievements.map((row: PendingAchievementType) => (
@@ -209,7 +206,7 @@ export default function Achievements() {
                 />
               ))
             ) : (
-              <Text style={styles.nameAndScore}>No pending achievements</Text>
+              <Text style={styles.score}>No pending achievements</Text>
             )}
           </View>
         </View>
@@ -244,18 +241,23 @@ const styles = StyleSheet.create({
   },
   nameAndScoreContainer: {
     marginTop: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  nameAndScore: {
-    fontSize: 16,
+  score: {
+    fontSize: 18,
+    fontFamily: "QuicksandReg",
+    color: "#393E41",
+    textAlign: "center",
+  },
+  readerTag: {
+    fontSize: 18,
     fontFamily: "QuicksandReg",
     color: "#393E41",
     textAlign: "center",
   },
   scoreContainer: {
     flexDirection: "row",
-  },
-  trophy: {
-    marginTop: 2,
   },
   completedAchievementsContainer: {
     marginTop: 12,
@@ -268,10 +270,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   completedAchievementsHeader: {
-    marginTop: 16,
-    textDecorationLine: "underline",
+    marginTop: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 30,
+    flexDirection: "row",
+  },
+  completedAchievementText: {
     fontFamily: "QuicksandReg",
-    fontSize: 16,
+    fontSize: 18,
+    color: "#393E41",
   },
   pendingAchievementsContainer: {
     marginTop: 12,

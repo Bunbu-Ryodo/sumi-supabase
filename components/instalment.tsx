@@ -40,7 +40,7 @@ export default function Instalment({
               Available for {daysUntilNextInstalment} days
             </Text>
             <Text style={styles.details}>Next chapter arrives</Text>
-            <Text style={styles.details}>{nextInstalmentDate}</Text>
+            <Text style={styles.details}> {nextInstalmentDate}</Text>
           </View>
         </TouchableOpacity>
       </Link>
@@ -55,14 +55,15 @@ const styles = StyleSheet.create({
     borderColor: "#393E41",
     borderRadius: 8,
     width: "100%",
+    alignItems: "center",
   },
   subscriptionWrapper: {
     width: "100%",
     margin: 8,
   },
   imageIcons: {
-    height: 100,
-    width: 90,
+    height: 120,
+    width: 120,
     borderRadius: 8,
     margin: 8,
   },
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
   },
   details: {
     fontFamily: "QuicksandReg",
-    fontSize: 12,
+    fontSize: 16,
   },
   daysLeft: {
     color: "#D64045",
