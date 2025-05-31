@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#393E41",
     borderRadius: 8,
+    marginVertical: 8,
   },
   imageIcons: {
     height: 100,
@@ -65,6 +66,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   upcomingInstalment: {
-    color: "#FE7F2D",
+    color: "#D64045",
   },
 });

@@ -52,6 +52,7 @@ export type InstalmentTypeClient = {
     chapter: string;
     subscribeart: string;
     sequeldue: number;
+    onLongPress?: () => void;
 }
 
 export type AchievementType = {

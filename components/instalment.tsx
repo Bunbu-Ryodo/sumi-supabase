@@ -32,16 +32,7 @@ export default function Instalment({
       >
         <TouchableOpacity key={id} style={styles.subscriptionButton}>
           <Image style={styles.imageIcons} source={{ uri: subscribeart }} />
-          <View style={styles.detailsPanel}>
-            <Text style={styles.details}>{title}</Text>
-            <Text style={styles.details}>{author}</Text>
-            <Text style={styles.details}>Chapter {chapter}</Text>
-            <Text style={[styles.details, styles.daysLeft]}>
-              Available for {daysUntilNextInstalment} days
-            </Text>
-            <Text style={styles.details}>Next chapter arrives</Text>
-            <Text style={styles.details}> {nextInstalmentDate}</Text>
-          </View>
+          <Text style={styles.instalmentTitle}>{title}</Text>
         </TouchableOpacity>
       </Link>
     </View>
@@ -50,20 +41,18 @@ export default function Instalment({
 
 const styles = StyleSheet.create({
   subscriptionButton: {
-    flexDirection: "row",
-    borderWidth: 1,
-    borderColor: "#393E41",
-    borderRadius: 8,
     width: "100%",
     alignItems: "center",
   },
-  subscriptionWrapper: {
-    width: "100%",
-    margin: 8,
+  subscriptionWrapper: { flex: 0.333 },
+  instalmentTitle: {
+    fontSize: 16,
+    fontFamily: "EBGaramondItalic",
+    textAlign: "center",
   },
   imageIcons: {
-    height: 120,
-    width: 120,
+    height: 81,
+    width: 81,
     borderRadius: 8,
     margin: 8,
   },
