@@ -173,8 +173,9 @@ const styles = StyleSheet.create({
   subscriptionSection: {
     marginTop: 12,
     padding: 8,
+    flexDirection: "row",
+    flexWrap: "wrap",
     width: "100%",
-    alignItems: "center",
   },
   noInstalmentsText: {
     fontFamily: "QuicksandReg",
