@@ -1,13 +1,15 @@
 import {
+  Animated,
   View,
   Text,
   StyleSheet,
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  Easing,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   getUserSession,
   lookUpUserProfile,
@@ -19,10 +21,51 @@ import {
   PendingAchievementType,
 } from "../../types/types.js";
 import { fetchAchievementByDescription } from "../../supabase_queries/achievements";
+import type { PropsWithChildren } from "react";
+
+type BounceInProps = PropsWithChildren<{}>;
+
+const BounceView: React.FC<BounceInProps> = (props) => {
+  const scale = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 1.3333,
+        duration: 300,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 200,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View
+      style={{
+        transform: [{ scale }],
+        opacity: scale.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 1],
+        }),
+      }}
+    >
+      {props.children}
+    </Animated.View>
+  );
+};
 
 export default function Achievements() {
   const [achievements, setAchievements] = useState([]);
   const [achievementScore, setAchievementScore] = useState(0);
+  const [bronzeCount, setBronzeCount] = useState(0);
+  const [silverCount, setSilverCount] = useState(0);
+  const [goldCount, setGoldCount] = useState(0);
   const [readerTag, setReaderTag] = useState("");
   const [readCount, setReadCount] = useState(0);
   const [subscribedCount, setSubscribedCount] = useState(0);
@@ -40,6 +83,9 @@ export default function Achievements() {
       if (userProfile) {
         setAchievements(userProfile.achievements || []);
         setAchievementScore(userProfile.achievementScore || 0);
+        setBronzeCount(userProfile.bronzeCount || 0);
+        setSilverCount(userProfile.silverCount || 0);
+        setGoldCount(userProfile.goldCount || 0);
         setReaderTag(userProfile.username || "");
         setReadCount(userProfile.readCount);
         setSubscribedCount(userProfile.subscribedCount);
@@ -162,6 +208,26 @@ export default function Achievements() {
             <View style={styles.scoreContainer}>
               <Text style={styles.score}>Score: {achievementScore}</Text>
             </View>
+            <View style={styles.medalContainer}>
+              <View>
+                <BounceView>
+                  <View style={styles.bronzeMedal}></View>
+                </BounceView>
+                <Text style={styles.score}>{bronzeCount}</Text>
+              </View>
+              <View>
+                <BounceView>
+                  <View style={styles.silverMedal}></View>
+                </BounceView>
+                <Text style={styles.score}>{silverCount}</Text>
+              </View>
+              <View>
+                <BounceView>
+                  <View style={styles.goldMedal}></View>
+                </BounceView>
+                <Text style={styles.score}>{goldCount}</Text>
+              </View>
+            </View>
           </View>
           <View style={styles.completedAchievementsHeader}>
             <Text style={styles.completedAchievementText}>
@@ -258,6 +324,30 @@ const styles = StyleSheet.create({
   },
   scoreContainer: {
     flexDirection: "row",
+  },
+  medalContainer: {
+    marginTop: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "33%",
+  },
+  bronzeMedal: {
+    backgroundColor: "#cd7f32",
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+  },
+  silverMedal: {
+    backgroundColor: "#C0C0C0",
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+  },
+  goldMedal: {
+    backgroundColor: "#FFD700",
+    height: 24,
+    width: 24,
+    borderRadius: 12,
   },
   completedAchievementsContainer: {
     marginTop: 12,

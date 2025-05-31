@@ -61,6 +61,7 @@ export type AchievementType = {
     description: string;
     score: number;
     icon: string;
+    tier: string;
 }
 
 export type AchievementTypeClient = {

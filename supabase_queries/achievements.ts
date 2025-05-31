@@ -18,7 +18,7 @@ export async function awardAchievement(userId: string, title: string){
     } else {
         const { data: profileData, error: profileFetchError } = await supabase
         .from("profiles")
-        .select("achievements, achievementScore")
+        .select("achievements, achievementScore, bronzeCount, silverCount, goldCount")
         .eq("user_id", userId)
         .single();
 
@@ -40,7 +40,7 @@ export async function awardAchievement(userId: string, title: string){
 
             const { error: updateError } = await supabase
             .from("profiles")
-            .update({ achievements: updatedAchievements, achievementScore: profileData.achievementScore + achievement.score })
+            .update({ achievements: updatedAchievements, achievementScore: profileData.achievementScore + achievement.score, bronzeCount: profileData.bronzeCount + (achievement.tier === "bronze" ? 1 : 0), silverCount: profileData.silverCount + (achievement.tier === "silver" ? 1 : 0), goldCount: profileData.goldCount + (achievement.tier === "gold" ? 1 : 0) })
             .eq("user_id", userId)
             .single();
 

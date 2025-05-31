@@ -49,8 +49,8 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   imageIcons: {
-    height: 100,
-    width: 90,
+    height: 130,
+    width: 130,
     borderRadius: 8,
     margin: 8,
   },
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   },
   details: {
     fontFamily: "QuicksandReg",
-    fontSize: 12,
+    fontSize: 16,
   },
   upcomingInstalment: {
     color: "#D64045",
