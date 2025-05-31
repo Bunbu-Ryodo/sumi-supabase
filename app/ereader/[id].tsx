@@ -112,12 +112,10 @@ export default function EReader() {
   });
 
   const [loading, setLoading] = useState(true);
-  const [like, setLike] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [subid, setSubid] = useState(0);
   const [read, setRead] = useState(false);
   const [userid, setUserid] = useState("");
-  const tooltipTimeout = useRef<NodeJS.Timeout | null>(null);
   const [fontSize, setFontSize] = useState(18);
   const [warmth, setWarmth] = useState(0);
 
@@ -253,14 +251,6 @@ export default function EReader() {
     const link = `http://localhost:8081/share_text/${extract.id}`;
     await Clipboard.setStringAsync(link);
   };
-
-  function toggleLike() {
-    if (heartRef.current) {
-      heartRef.current.bounce();
-    }
-
-    setLike(!like);
-  }
 
   function shop() {
     if (cartRef.current) {

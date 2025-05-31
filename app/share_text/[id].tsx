@@ -6,11 +6,19 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-
+import { Platform } from "react-native";
 import { Link, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ExtractType } from "../../types/types";
 import { getExtract } from "../../supabase_queries/extracts";
+import type { PropsWithChildren } from "react";
+import { runOnJS } from "react-native-reanimated";
+import {
+  Gesture,
+  GestureDetector,
+  Directions,
+} from "react-native-gesture-handler";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function SharedText() {
   let { id } = useLocalSearchParams();
@@ -30,6 +38,49 @@ export default function SharedText() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [fontSize, setFontSize] = useState(18);
+  const [warmth, setWarmth] = useState(0);
+
+  const fontUp = () => {
+    setFontSize((prevFont) => {
+      if (prevFont + 4 > 32) {
+        return prevFont;
+      }
+      return prevFont + 4;
+    });
+  };
+
+  const fontDown = () => {
+    setFontSize((prevFont) => {
+      if (prevFont - 4 < 18) {
+        return prevFont;
+      }
+      return prevFont - 4;
+    });
+  };
+
+  const singleTap = Gesture.Tap()
+    .maxDuration(250)
+    .onEnd(() => {
+      runOnJS(fontUp)();
+    });
+
+  const doubleTap = Gesture.Tap()
+    .numberOfTaps(2)
+    .maxDuration(250)
+    .onEnd(() => {
+      runOnJS(fontDown)();
+    });
+
+  const adjustBrightness = () => {
+    setWarmth((prevWarmth) => {
+      if (prevWarmth < 4) {
+        return prevWarmth + 1;
+      } else return 0;
+    });
+  };
+
+  const brightnessHex = ["#F6F7EB", "#FEECD1", "#FEE4BD", "#FFDAA3", "#393E41"];
 
   const fetchExtract = async () => {
     const extract = await getExtract(id);
@@ -45,36 +96,88 @@ export default function SharedText() {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <ScrollView style={styles.paper}>
-        {loading ? (
-          <ActivityIndicator size="large" color="#F6F7EB" />
-        ) : (
-          <View>
-            <View>
-              <View style={styles.titleBar}>
-                <Text style={styles.title}>{extract.title}</Text>
-                <Text style={styles.chapter}>{extract.chapter}</Text>
-              </View>
-              <Text style={styles.extractText}>{extract.fulltext}</Text>
-            </View>
-            <View style={styles.logoContainer}>
-              <View style={styles.logoBook}>
-                <View style={styles.logoTitle}></View>
-              </View>
-              <View style={styles.titleTaglineContainer}>
-                <Text style={styles.header}>Sumi</Text>
-                <Text style={styles.tagline}>Just One More Chapter</Text>
-              </View>
-            </View>
-            <Link href="/" asChild>
-              <TouchableOpacity style={styles.buttonPrimary}>
-                <Text style={styles.primaryButtonText}>Start Reading More</Text>
-              </TouchableOpacity>
-            </Link>
+    <ScrollView
+      style={[styles.paper, { backgroundColor: brightnessHex[warmth] }]}
+    >
+      {loading ? (
+        <ActivityIndicator size="large" color="#393E41" />
+      ) : (
+        <View>
+          <View style={styles.adjustFontSize}>
+            <TouchableOpacity
+              style={[
+                styles.fontUp,
+                warmth === 4 && { backgroundColor: "#F6F7EB" },
+              ]}
+              onPress={fontUp}
+            >
+              <Ionicons name="text" size={24} color="#393E41"></Ionicons>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.fontDown,
+                warmth === 4 && { backgroundColor: "#F6F7EB" },
+              ]}
+              onPress={fontDown}
+            >
+              <Ionicons name="text" size={18} color="#393E41"></Ionicons>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.brightness,
+                warmth === 4 && { backgroundColor: "#F6F7EB" },
+              ]}
+              onPress={adjustBrightness}
+            >
+              <Ionicons
+                name="sunny-outline"
+                size={18}
+                color="#393E41"
+              ></Ionicons>
+            </TouchableOpacity>
           </View>
-        )}
-      </ScrollView>
+          <View style={styles.titleBar}>
+            <Text style={[styles.title, warmth === 4 && { color: "#F6F7EB" }]}>
+              {extract.title}
+            </Text>
+            <Text
+              style={[styles.chapter, warmth === 4 && { color: "#F6F7EB" }]}
+            >
+              {extract.chapter}
+            </Text>
+          </View>
+          <GestureDetector gesture={Gesture.Exclusive(doubleTap, singleTap)}>
+            <TouchableOpacity onLongPress={adjustBrightness}>
+              <Text
+                style={[
+                  styles.extractText,
+                  { fontSize },
+                  warmth === 4 && {
+                    color: "#F6F7EB",
+                    borderBottomColor: "#F6F7EB",
+                  },
+                ]}
+              >
+                {extract.fulltext}
+              </Text>
+            </TouchableOpacity>
+          </GestureDetector>
+          <View style={styles.logoContainer}>
+            <View style={styles.logoBook}>
+              <View style={styles.logoTitle}></View>
+            </View>
+            <View style={styles.titleTaglineContainer}>
+              <Text style={styles.header}>Sumi</Text>
+              <Text style={styles.tagline}>Just One More Chapter</Text>
+            </View>
+          </View>
+          <Link href="/" asChild>
+            <TouchableOpacity style={styles.buttonPrimary}>
+              <Text style={styles.primaryButtonText}>Start Reading More</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -111,7 +214,7 @@ const styles = StyleSheet.create({
   },
   paper: {
     backgroundColor: "#F6F7EB",
-    width: "90%",
+    width: "100%",
     padding: 16,
     height: "100%",
   },
@@ -162,5 +265,40 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "QuicksandReg",
     color: "#393E41",
+  },
+  adjustFontSize: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+  },
+  fontUp: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 44,
+    width: 44,
+    borderWidth: 1,
+    borderColor: "#393E41",
+    borderRadius: 8,
+    marginHorizontal: 4,
+  },
+  fontDown: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 44,
+    width: 44,
+    borderWidth: 1,
+    borderColor: "#393E41",
+    marginHorizontal: 4,
+    borderRadius: 8,
+  },
+  brightness: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 44,
+    width: 44,
+    borderWidth: 1,
+    borderColor: "#393E41",
+    marginHorizontal: 4,
+    borderRadius: 8,
   },
 });
