@@ -85,6 +85,7 @@ export default function Achievement({
   score,
   icon,
   date,
+  tier,
 }: AchievementTypeClient) {
   return (
     <View style={styles.achievementsRow}>
@@ -98,7 +99,16 @@ export default function Achievement({
         </View>
       </BounceView>
       <View style={styles.achievementDetails}>
-        <Text style={styles.achievementTitle}>{title}</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.achievementTitle}>{title}</Text>
+          {tier === "bronze" ? (
+            <View style={styles.bronzeMedal}></View>
+          ) : tier === "silver" ? (
+            <View style={styles.silverMedal}></View>
+          ) : tier === "gold" ? (
+            <View style={styles.goldMedal}></View>
+          ) : null}
+        </View>
         <Text style={styles.achievementDescription}>
           {description} +{score}
         </Text>
@@ -181,6 +191,31 @@ const styles = StyleSheet.create({
   score: {
     fontSize: 24,
     fontFamily: "EBGaramond",
+  },
+  bronzeMedal: {
+    backgroundColor: "#cd7f32",
+    height: 16,
+    width: 16,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  silverMedal: {
+    backgroundColor: "#C0C0C0",
+    height: 16,
+    width: 16,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  goldMedal: {
+    backgroundColor: "#FFD700",
+    height: 16,
+    width: 16,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
 

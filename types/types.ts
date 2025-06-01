@@ -71,6 +71,7 @@ export type AchievementTypeClient = {
     score: number;
     icon: string;
     date: string;
+    tier: string;
 }
 
 export type PendingAchievementType = {
