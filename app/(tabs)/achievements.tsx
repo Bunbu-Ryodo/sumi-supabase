@@ -209,19 +209,19 @@ export default function Achievements() {
               <Text style={styles.score}>Score: {achievementScore}</Text>
             </View>
             <View style={styles.medalContainer}>
-              <View>
+              <View style={styles.medalCountContainer}>
                 <BounceView>
                   <View style={styles.bronzeMedal}></View>
                 </BounceView>
                 <Text style={styles.score}>{bronzeCount}</Text>
               </View>
-              <View>
+              <View style={styles.medalCountContainer}>
                 <BounceView>
                   <View style={styles.silverMedal}></View>
                 </BounceView>
                 <Text style={styles.score}>{silverCount}</Text>
               </View>
-              <View>
+              <View style={styles.medalCountContainer}>
                 <BounceView>
                   <View style={styles.goldMedal}></View>
                 </BounceView>
@@ -246,6 +246,7 @@ export default function Achievements() {
                   score={row.score}
                   date={row.date}
                   icon={row.icon}
+                  tier={row.tier}
                 />
               ))
             ) : (
@@ -329,7 +330,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "33%",
+    width: 150,
   },
   bronzeMedal: {
     backgroundColor: "#cd7f32",
@@ -392,4 +393,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  medalCountContainer: {},
 });
