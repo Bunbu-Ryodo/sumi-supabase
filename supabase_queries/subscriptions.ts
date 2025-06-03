@@ -17,8 +17,8 @@ export async function createSubscription(userId: string, textId: number, chapter
   return newSubscription;
 }
 
-export async function activateSubscription(id: number, chapter: number, userId: string){
-  const { data: profile, error: subscriptionUpdateError } = await supabase.from('subscriptions').update({active: true, chapter: chapter }).eq('id', id).select();
+export async function activateSubscription(id: number, chapter: number, userId: string, due: number){
+  const { data: profile, error: subscriptionUpdateError } = await supabase.from('subscriptions').update({active: true, chapter: chapter, due: due }).eq('id', id).select();
 
   if(subscriptionUpdateError){
     console.error("Error activating subscription:", subscriptionUpdateError);

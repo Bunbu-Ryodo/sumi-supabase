@@ -30,6 +30,10 @@ import {
 import { ExtractType } from "../../types/types.js";
 import Extract from "../../components/extract";
 
+function RightAction() {
+  return <Reanimated.View style={{ width: 250 }} />;
+}
+
 export default function FeedScreen() {
   const router = useRouter();
   const [extracts, setExtracts] = useState([] as ExtractType[]);
@@ -68,10 +72,6 @@ export default function FeedScreen() {
     });
   };
 
-  function RightAction() {
-    return <Reanimated.View style={{ width: 250 }} />;
-  }
-
   const processSubscriptions = async function (userId: string) {
     const subscriptions = await getAllDueSubscriptions(userId);
     if (subscriptions) {
@@ -98,11 +98,6 @@ export default function FeedScreen() {
           );
 
           if (updatedSubscription) {
-            console.log(
-              "Subscription updated successfully:",
-              updatedSubscription
-            );
-
             const newInstalment = await createInstalment(
               userId,
               extract.id,
@@ -115,7 +110,7 @@ export default function FeedScreen() {
             );
 
             if (newInstalment) {
-              console.log("Instalment created successfully:", newInstalment);
+              console.log("Instalment created successfully");
             }
           }
         }

@@ -118,6 +118,7 @@ export default function EReader() {
   const [userid, setUserid] = useState("");
   const [fontSize, setFontSize] = useState(18);
   const [warmth, setWarmth] = useState(0);
+  const [due, setDue] = useState(new Date().getTime());
 
   const router = useRouter();
 
@@ -179,12 +180,11 @@ export default function EReader() {
 
     const profile = await lookUpUserProfile(userId);
 
-    let interval = new Date().getTime() + 604800000;
-
     if (profile) {
       if (profile.subscriptioninterval) {
-        interval =
-          new Date().getTime() + profile.subscriptioninterval * 86400000;
+        setDue(new Date().getTime() + profile.subscriptioninterval * 86400000);
+      } else {
+        setDue(new Date().getTime() + 604800000);
       }
     }
 
@@ -201,14 +201,13 @@ export default function EReader() {
         userId,
         extract.textid,
         extract.chapter + 1,
-        interval,
+        due,
         extract.subscribeart,
         extract.title,
         extract.author
       );
 
       if (newSubscription) {
-        console.log("Subscription created successfully:", newSubscription);
         setSubid(newSubscription.id);
       }
     }
@@ -271,7 +270,7 @@ export default function EReader() {
     if (subscribed) {
       await deactivateSubscription(subid, userid, extract.chapter);
     } else {
-      await activateSubscription(subid, extract.chapter + 1, userid);
+      await activateSubscription(subid, extract.chapter + 1, userid, due);
     }
   }
 
@@ -297,7 +296,6 @@ export default function EReader() {
           filter: `id=eq.${subid}`,
         },
         (payload) => {
-          console.log("Subscription active status changed:", payload);
           setSubscribed((subscribed) => !subscribed);
         }
       )
