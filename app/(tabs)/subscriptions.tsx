@@ -39,10 +39,7 @@ export default function Subscriptions() {
     if (user) {
       const upcomingSubscriptions = await getAllUpcomingSubscriptions(user.id);
 
-      console.log("upcomingSubscriptions", upcomingSubscriptions);
-
       if (upcomingSubscriptions && upcomingSubscriptions.length > 0) {
-        console.log("upcomingSubscriptions", upcomingSubscriptions);
         populateSubscriptions(upcomingSubscriptions);
       } else {
         setLoading(false);
@@ -70,7 +67,6 @@ export default function Subscriptions() {
   async function populateSubscriptions(subscriptions: SubscriptionType[]) {
     setActiveSubscriptions(() => {
       setLoading(false);
-      console.log(subscriptions, "Subscriptions");
       return subscriptions || [];
     });
   }
@@ -101,36 +97,32 @@ export default function Subscriptions() {
             </View>
           </View>
           <View style={styles.subscriptionSection}>
-            {instalments.length > 0 ? (
-              instalments.map((instalment, index) => (
-                <Instalment
-                  key={index}
-                  id={instalment.id}
-                  extractid={instalment.extractid}
-                  title={instalment.title}
-                  author={instalment.author}
-                  chapter={instalment.chapter}
-                  subscribeart={instalment.subscribeart}
-                  sequeldue={instalment.sequeldue}
-                />
-              ))
-            ) : activeSubscriptions.length > 0 ? (
-              activeSubscriptions.map((subscription, index) => (
-                <PendingInstalment
-                  key={index}
-                  id={subscription.id}
-                  title={subscription.title}
-                  author={subscription.author}
-                  chapter={subscription.chapter}
-                  subscribeart={subscription.subscribeart}
-                  due={subscription.due}
-                />
-              ))
-            ) : (
-              <Text style={styles.noInstalmentsText}>
-                Subscribe to a series!
-              </Text>
-            )}
+            {instalments.length > 0
+              ? instalments.map((instalment, index) => (
+                  <Instalment
+                    key={index}
+                    id={instalment.id}
+                    extractid={instalment.extractid}
+                    title={instalment.title}
+                    author={instalment.author}
+                    chapter={instalment.chapter}
+                    subscribeart={instalment.subscribeart}
+                    sequeldue={instalment.sequeldue}
+                  />
+                ))
+              : activeSubscriptions.length > 0
+              ? activeSubscriptions.map((subscription, index) => (
+                  <PendingInstalment
+                    key={index}
+                    id={subscription.id}
+                    title={subscription.title}
+                    author={subscription.author}
+                    chapter={subscription.chapter}
+                    subscribeart={subscription.subscribeart}
+                    due={subscription.due}
+                  />
+                ))
+              : null}
           </View>
         </View>
       )}

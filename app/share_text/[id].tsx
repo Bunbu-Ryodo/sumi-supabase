@@ -6,18 +6,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { Platform } from "react-native";
 import { Link, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ExtractType } from "../../types/types";
 import { getExtract } from "../../supabase_queries/extracts";
-import type { PropsWithChildren } from "react";
-import { runOnJS } from "react-native-reanimated";
-import {
-  Gesture,
-  GestureDetector,
-  Directions,
-} from "react-native-gesture-handler";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function SharedText() {
@@ -58,19 +50,6 @@ export default function SharedText() {
       return prevFont - 4;
     });
   };
-
-  const singleTap = Gesture.Tap()
-    .maxDuration(250)
-    .onEnd(() => {
-      runOnJS(fontUp)();
-    });
-
-  const doubleTap = Gesture.Tap()
-    .numberOfTaps(2)
-    .maxDuration(250)
-    .onEnd(() => {
-      runOnJS(fontDown)();
-    });
 
   const adjustBrightness = () => {
     setWarmth((prevWarmth) => {
@@ -146,22 +125,18 @@ export default function SharedText() {
               {extract.chapter}
             </Text>
           </View>
-          <GestureDetector gesture={Gesture.Exclusive(doubleTap, singleTap)}>
-            <TouchableOpacity onLongPress={adjustBrightness}>
-              <Text
-                style={[
-                  styles.extractText,
-                  { fontSize },
-                  warmth === 4 && {
-                    color: "#F6F7EB",
-                    borderBottomColor: "#F6F7EB",
-                  },
-                ]}
-              >
-                {extract.fulltext}
-              </Text>
-            </TouchableOpacity>
-          </GestureDetector>
+          <Text
+            style={[
+              styles.extractText,
+              { fontSize },
+              warmth === 4 && {
+                color: "#F6F7EB",
+                borderBottomColor: "#F6F7EB",
+              },
+            ]}
+          >
+            {extract.fulltext}
+          </Text>
           <View style={styles.logoContainer}>
             <View style={styles.logoBook}>
               <View style={styles.logoTitle}></View>

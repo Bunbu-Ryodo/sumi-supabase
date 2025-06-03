@@ -60,7 +60,7 @@ export default function Settings() {
   const updateReaderTag = async () => {
     const updateReaderTag = await updateUsername(readerTag);
     if (updateReaderTag) {
-      console.log("ReaderTag updated successfully:", updateReaderTag);
+      console.log("ReaderTag updated successfully");
       setReaderTagChangeSuccess("ReaderTag changed successfully");
     } else {
       setReaderTagChangeSuccess("");
