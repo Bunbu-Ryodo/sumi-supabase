@@ -5,6 +5,7 @@ import {
   RefreshControl,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { useEffect, useState } from "react";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -29,16 +30,30 @@ import {
 } from "../../supabase_queries/subscriptions";
 import { ExtractType } from "../../types/types.js";
 import Extract from "../../components/extract";
+import {
+  BannerAd,
+  BannerAdSize,
+  TestIds,
+  useForeground,
+} from "react-native-google-mobile-ads";
+import { useRef } from "react";
+
+const adUnitId = TestIds.ADAPTIVE_BANNER;
 
 function RightAction() {
   return <Reanimated.View style={{ width: 250 }} />;
 }
 
 export default function FeedScreen() {
+  const bannerRef = useRef<BannerAd>(null);
   const router = useRouter();
   const [extracts, setExtracts] = useState([] as ExtractType[]);
   const [refreshing, setRefreshing] = useState(false);
   const [allExtractsDismissed, setAllExtractsDismissed] = useState(false);
+
+  useForeground(() => {
+    Platform.OS === "android" && bannerRef.current?.load();
+  });
 
   useEffect(() => {
     const checkUserAuthenticated = async function () {
@@ -189,6 +204,11 @@ export default function FeedScreen() {
       ) : (
         <ActivityIndicator size="large" color="#393E41" />
       )}
+      <BannerAd
+        ref={bannerRef}
+        unitId={adUnitId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+      />
     </ScrollView>
   );
 }
