@@ -194,6 +194,13 @@ export default function FeedScreen() {
               portrait={extract.portrait}
               coverart={extract.coverart}
             />
+            {index % 5 === 0 ? (
+              <BannerAd
+                ref={bannerRef}
+                unitId={adUnitId}
+                size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+              />
+            ) : null}
           </ReanimatedSwipeable>
         ))
       ) : allExtractsDismissed ? (
@@ -204,11 +211,6 @@ export default function FeedScreen() {
       ) : (
         <ActivityIndicator size="large" color="#393E41" />
       )}
-      <BannerAd
-        ref={bannerRef}
-        unitId={adUnitId}
-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-      />
     </ScrollView>
   );
 }
