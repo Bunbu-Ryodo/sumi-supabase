@@ -30,7 +30,15 @@ import {
   useForeground,
 } from "react-native-google-mobile-ads";
 
-const adUnitId = TestIds.ADAPTIVE_BANNER;
+let adUnitId = "";
+
+if (__DEV__) {
+  adUnitId = TestIds.ADAPTIVE_BANNER;
+} else if (!__DEV__ && Platform.OS === "android") {
+  adUnitId = "ca-app-pub-5850018728161057/6524403480";
+} else if (!__DEV__ && Platform.OS === "ios") {
+  adUnitId = "ca-app-pub-5850018728161057/3269917700";
+}
 
 type BounceInProps = PropsWithChildren<{}>;
 
@@ -85,7 +93,9 @@ export default function Achievements() {
   const [loading, setLoading] = useState(true); // Add a loading state
 
   useForeground(() => {
-    Platform.OS === "android" && bannerRef.current?.load();
+    if (Platform.OS === "android" || Platform.OS === "ios") {
+      bannerRef.current?.load();
+    }
   });
 
   const getProfileData = async function () {
