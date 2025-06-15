@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   Easing,
+  Platform,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useRef, useState } from "react";
@@ -22,6 +23,14 @@ import {
 } from "../../types/types.js";
 import { fetchAchievementByDescription } from "../../supabase_queries/achievements";
 import type { PropsWithChildren } from "react";
+import {
+  BannerAd,
+  BannerAdSize,
+  TestIds,
+  useForeground,
+} from "react-native-google-mobile-ads";
+
+const adUnitId = TestIds.ADAPTIVE_BANNER;
 
 type BounceInProps = PropsWithChildren<{}>;
 
@@ -61,6 +70,7 @@ const BounceView: React.FC<BounceInProps> = (props) => {
 };
 
 export default function Achievements() {
+  const bannerRef = useRef<BannerAd>(null);
   const [achievements, setAchievements] = useState([]);
   const [achievementScore, setAchievementScore] = useState(0);
   const [bronzeCount, setBronzeCount] = useState(0);
@@ -73,6 +83,10 @@ export default function Achievements() {
     PendingAchievementType[]
   >([]);
   const [loading, setLoading] = useState(true); // Add a loading state
+
+  useForeground(() => {
+    Platform.OS === "android" && bannerRef.current?.load();
+  });
 
   const getProfileData = async function () {
     setLoading(true);
@@ -183,102 +197,110 @@ export default function Achievements() {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.achievementsContentContainer}
-      style={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={loading}
-          onRefresh={getProfileData}
-          tintColor="#F6F7EB"
-        />
-      }
-    >
-      {loading ? null : (
-        <View style={styles.achievementHeader}>
-          <Text style={styles.header}>Sumi</Text>
-          <Text style={styles.tagline}>Just One More Chapter</Text>
-        </View>
-      )}
+    <>
+      <ScrollView
+        contentContainerStyle={styles.achievementsContentContainer}
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={getProfileData}
+            tintColor="#F6F7EB"
+          />
+        }
+      >
+        {loading ? null : (
+          <View style={styles.achievementHeader}>
+            <Text style={styles.header}>Sumi</Text>
+            <Text style={styles.tagline}>Just One More Chapter</Text>
+          </View>
+        )}
 
-      {!loading && (
-        <View style={styles.achievementsWrapper}>
-          <View style={styles.nameAndScoreContainer}>
-            <Text style={styles.readerTag}>ReaderTag: {readerTag}</Text>
-            <View style={styles.scoreContainer}>
-              <Text style={styles.score}>Score: {achievementScore}</Text>
+        {!loading && (
+          <View style={styles.achievementsWrapper}>
+            <View style={styles.nameAndScoreContainer}>
+              <Text style={styles.readerTag}>ReaderTag: {readerTag}</Text>
+              <View style={styles.scoreContainer}>
+                <Text style={styles.score}>Score: {achievementScore}</Text>
+              </View>
+              <View style={styles.medalContainer}>
+                <View style={styles.medalCountContainer}>
+                  <BounceView>
+                    <View style={styles.bronzeMedal}></View>
+                  </BounceView>
+                  <Text style={styles.score}>{bronzeCount}</Text>
+                </View>
+                <View style={styles.medalCountContainer}>
+                  <BounceView>
+                    <View style={styles.silverMedal}></View>
+                  </BounceView>
+                  <Text style={styles.score}>{silverCount}</Text>
+                </View>
+                <View style={styles.medalCountContainer}>
+                  <BounceView>
+                    <View style={styles.goldMedal}></View>
+                  </BounceView>
+                  <Text style={styles.score}>{goldCount}</Text>
+                </View>
+              </View>
             </View>
-            <View style={styles.medalContainer}>
-              <View style={styles.medalCountContainer}>
-                <BounceView>
-                  <View style={styles.bronzeMedal}></View>
-                </BounceView>
-                <Text style={styles.score}>{bronzeCount}</Text>
-              </View>
-              <View style={styles.medalCountContainer}>
-                <BounceView>
-                  <View style={styles.silverMedal}></View>
-                </BounceView>
-                <Text style={styles.score}>{silverCount}</Text>
-              </View>
-              <View style={styles.medalCountContainer}>
-                <BounceView>
-                  <View style={styles.goldMedal}></View>
-                </BounceView>
-                <Text style={styles.score}>{goldCount}</Text>
-              </View>
+            <View style={styles.completedAchievementsHeader}>
+              <Text style={styles.completedAchievementText}>
+                Completed Achievements
+              </Text>
+              <Ionicons name="trophy" size={20} color={"#393E41"} />
+            </View>
+            <View style={styles.completedAchievementsContainer}>
+              {achievements.length > 0 ? (
+                achievements.map((row: AchievementTypeClient) => (
+                  <Achievement
+                    id={row.id}
+                    key={row.id}
+                    title={row.title}
+                    description={row.description}
+                    score={row.score}
+                    date={row.date}
+                    icon={row.icon}
+                    tier={row.tier}
+                  />
+                ))
+              ) : (
+                <Text style={styles.score}>No achievements unlocked</Text>
+              )}
+            </View>
+            <View style={styles.completedAchievementsHeader}>
+              <Text style={styles.completedAchievementText}>
+                Pending Achievements
+              </Text>
+              <Ionicons name="trophy-outline" size={20} color={"#393E41"} />
+            </View>
+            <View style={styles.pendingAchievementsContainer}>
+              {pendingAchievements.length > 0 ? (
+                pendingAchievements.map((row: PendingAchievementType) => (
+                  <PendingAchievement
+                    id={row.id}
+                    key={row.id}
+                    title={row.title}
+                    description={row.description}
+                    score={row.score}
+                    icon={row.icon}
+                    achievementProgress={row.achievementProgress}
+                  />
+                ))
+              ) : (
+                <Text style={styles.score}>No pending achievements</Text>
+              )}
             </View>
           </View>
-          <View style={styles.completedAchievementsHeader}>
-            <Text style={styles.completedAchievementText}>
-              Completed Achievements
-            </Text>
-            <Ionicons name="trophy" size={20} color={"#393E41"} />
-          </View>
-          <View style={styles.completedAchievementsContainer}>
-            {achievements.length > 0 ? (
-              achievements.map((row: AchievementTypeClient) => (
-                <Achievement
-                  id={row.id}
-                  key={row.id}
-                  title={row.title}
-                  description={row.description}
-                  score={row.score}
-                  date={row.date}
-                  icon={row.icon}
-                  tier={row.tier}
-                />
-              ))
-            ) : (
-              <Text style={styles.score}>No achievements unlocked</Text>
-            )}
-          </View>
-          <View style={styles.completedAchievementsHeader}>
-            <Text style={styles.completedAchievementText}>
-              Pending Achievements
-            </Text>
-            <Ionicons name="trophy-outline" size={20} color={"#393E41"} />
-          </View>
-          <View style={styles.pendingAchievementsContainer}>
-            {pendingAchievements.length > 0 ? (
-              pendingAchievements.map((row: PendingAchievementType) => (
-                <PendingAchievement
-                  id={row.id}
-                  key={row.id}
-                  title={row.title}
-                  description={row.description}
-                  score={row.score}
-                  icon={row.icon}
-                  achievementProgress={row.achievementProgress}
-                />
-              ))
-            ) : (
-              <Text style={styles.score}>No pending achievements</Text>
-            )}
-          </View>
-        </View>
-      )}
-    </ScrollView>
+        )}
+      </ScrollView>
+      <BannerAd
+        key={`ad-achievements`}
+        ref={bannerRef}
+        unitId={adUnitId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+      />
+    </>
   );
 }
 

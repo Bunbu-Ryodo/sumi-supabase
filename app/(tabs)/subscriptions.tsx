@@ -5,6 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  Platform,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Instalment from "../../components/instalment";
@@ -17,8 +18,23 @@ import {
 } from "../../supabase_queries/subscriptions";
 import { InstalmentType, SubscriptionType } from "../../types/types";
 import PendingInstalment from "../../components/pendingInstalment";
+import {
+  BannerAd,
+  BannerAdSize,
+  TestIds,
+  useForeground,
+} from "react-native-google-mobile-ads";
+import { useRef } from "react";
+
+const adUnitId = TestIds.ADAPTIVE_BANNER;
 
 export default function Subscriptions() {
+  const bannerRef = useRef<BannerAd>(null);
+
+  useForeground(() => {
+    Platform.OS === "android" && bannerRef.current?.load();
+  });
+
   const fetchInstalments = async () => {
     const user = await getUserSession();
 
@@ -77,56 +93,64 @@ export default function Subscriptions() {
     SubscriptionType[]
   >([]);
   return (
-    <ScrollView
-      contentContainerStyle={styles.subscriptionWrapper}
-      style={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={loading}
-          onRefresh={fetchSubscriptionData}
-          tintColor="#F6F7EB"
-        />
-      }
-    >
-      {!loading && (
-        <View style={styles.extractWrapper}>
-          <View style={styles.subscriptionsHeader}>
-            <Text style={styles.newInstallmentsHeader}>Your Instalments</Text>
-            <View style={styles.headerIconContainer}>
-              <Ionicons name="mail-unread" size={24} color={"#393E41"} />
+    <>
+      <ScrollView
+        contentContainerStyle={styles.subscriptionWrapper}
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={fetchSubscriptionData}
+            tintColor="#F6F7EB"
+          />
+        }
+      >
+        {!loading && (
+          <View style={styles.extractWrapper}>
+            <View style={styles.subscriptionsHeader}>
+              <Text style={styles.newInstallmentsHeader}>Your Instalments</Text>
+              <View style={styles.headerIconContainer}>
+                <Ionicons name="mail-unread" size={24} color={"#393E41"} />
+              </View>
+            </View>
+            <View style={styles.subscriptionSection}>
+              {instalments.length > 0
+                ? instalments.map((instalment, index) => (
+                    <Instalment
+                      key={index}
+                      id={instalment.id}
+                      extractid={instalment.extractid}
+                      title={instalment.title}
+                      author={instalment.author}
+                      chapter={instalment.chapter}
+                      subscribeart={instalment.subscribeart}
+                      sequeldue={instalment.sequeldue}
+                    />
+                  ))
+                : activeSubscriptions.length > 0
+                ? activeSubscriptions.map((subscription, index) => (
+                    <PendingInstalment
+                      key={index}
+                      id={subscription.id}
+                      title={subscription.title}
+                      author={subscription.author}
+                      chapter={subscription.chapter}
+                      subscribeart={subscription.subscribeart}
+                      due={subscription.due}
+                    />
+                  ))
+                : null}
             </View>
           </View>
-          <View style={styles.subscriptionSection}>
-            {instalments.length > 0
-              ? instalments.map((instalment, index) => (
-                  <Instalment
-                    key={index}
-                    id={instalment.id}
-                    extractid={instalment.extractid}
-                    title={instalment.title}
-                    author={instalment.author}
-                    chapter={instalment.chapter}
-                    subscribeart={instalment.subscribeart}
-                    sequeldue={instalment.sequeldue}
-                  />
-                ))
-              : activeSubscriptions.length > 0
-              ? activeSubscriptions.map((subscription, index) => (
-                  <PendingInstalment
-                    key={index}
-                    id={subscription.id}
-                    title={subscription.title}
-                    author={subscription.author}
-                    chapter={subscription.chapter}
-                    subscribeart={subscription.subscribeart}
-                    due={subscription.due}
-                  />
-                ))
-              : null}
-          </View>
-        </View>
-      )}
-    </ScrollView>
+        )}
+      </ScrollView>
+      <BannerAd
+        key={`ad-achievements`}
+        ref={bannerRef}
+        unitId={adUnitId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+      />
+    </>
   );
 }
 

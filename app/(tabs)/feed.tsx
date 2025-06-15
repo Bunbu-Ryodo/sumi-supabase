@@ -158,60 +158,61 @@ export default function FeedScreen() {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.feedWrapper}
-      style={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={fetchExtracts}
-          tintColor="#F6F7EB"
-        />
-      }
-    >
-      {extracts && extracts.length > 0 ? (
-        extracts.map((extract: ExtractType, index: number) => (
-          <ReanimatedSwipeable
-            key={extract.id}
-            friction={2}
-            containerStyle={styles.swipeable}
-            enableTrackpadTwoFingerGesture
-            rightThreshold={40}
-            renderRightActions={RightAction}
-            onSwipeableWillOpen={() => handleDismiss(extract.id)}
-          >
-            <Extract
-              key={index}
-              id={extract.id}
-              textid={extract.textid}
-              author={extract.author}
-              title={extract.title}
-              year={extract.year}
-              chapter={extract.chapter}
-              previewtext={extract.previewtext}
-              fulltext={extract.fulltext}
-              subscribeart={extract.subscribeart}
-              portrait={extract.portrait}
-              coverart={extract.coverart}
-            />
-            {index % 5 === 0 ? (
-              <BannerAd
-                ref={bannerRef}
-                unitId={adUnitId}
-                size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+    <>
+      <ScrollView
+        contentContainerStyle={styles.feedWrapper}
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={fetchExtracts}
+            tintColor="#F6F7EB"
+          />
+        }
+      >
+        {extracts && extracts.length > 0 ? (
+          extracts.map((extract: ExtractType, index: number) => (
+            <ReanimatedSwipeable
+              key={extract.id}
+              friction={2}
+              containerStyle={styles.swipeable}
+              enableTrackpadTwoFingerGesture
+              rightThreshold={40}
+              renderRightActions={RightAction}
+              onSwipeableWillOpen={() => handleDismiss(extract.id)}
+            >
+              <Extract
+                key={index}
+                id={extract.id}
+                textid={extract.textid}
+                author={extract.author}
+                title={extract.title}
+                year={extract.year}
+                chapter={extract.chapter}
+                previewtext={extract.previewtext}
+                fulltext={extract.fulltext}
+                subscribeart={extract.subscribeart}
+                portrait={extract.portrait}
+                coverart={extract.coverart}
               />
-            ) : null}
-          </ReanimatedSwipeable>
-        ))
-      ) : allExtractsDismissed ? (
-        <TouchableOpacity style={styles.refresh} onPress={fetchExtracts}>
-          <Ionicons name="arrow-down" size={36} color="#F6F7EB" />
-          <Text style={styles.pulldown}>Pull to be served more extracts</Text>
-        </TouchableOpacity>
-      ) : (
-        <ActivityIndicator size="large" color="#393E41" />
-      )}
-    </ScrollView>
+            </ReanimatedSwipeable>
+          ))
+        ) : allExtractsDismissed ? (
+          <TouchableOpacity style={styles.refresh} onPress={fetchExtracts}>
+            <Ionicons name="arrow-down" size={36} color="#F6F7EB" />
+            <Text style={styles.pulldown}>Pull to be served more extracts</Text>
+          </TouchableOpacity>
+        ) : (
+          <ActivityIndicator size="large" color="#393E41" />
+        )}
+      </ScrollView>
+      <BannerAd
+        key={`feedad`}
+        ref={bannerRef}
+        unitId={adUnitId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+      />
+    </>
   );
 }
 
