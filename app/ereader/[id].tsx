@@ -55,7 +55,15 @@ import Toast from "react-native-toast-message";
 import type { PropsWithChildren } from "react";
 import { runOnJS } from "react-native-reanimated";
 
-const adUnitId = TestIds.ADAPTIVE_BANNER;
+let adUnitId = "";
+
+if (__DEV__) {
+  adUnitId = TestIds.ADAPTIVE_BANNER;
+} else if (!__DEV__ && Platform.OS === "android") {
+  adUnitId = "ca-app-pub-5850018728161057/6524403480";
+} else if (!__DEV__ && Platform.OS === "ios") {
+  adUnitId = "ca-app-pub-5850018728161057/3269917700";
+}
 
 type BounceInProps = PropsWithChildren<{}>;
 
@@ -353,7 +361,7 @@ export default function EReader() {
                   userid,
                   "Good Job Little Buddy"
                 );
-                if (Platform.OS === "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("Good Job Little Buddy +20000xp");
                   }
@@ -363,7 +371,7 @@ export default function EReader() {
                   userid,
                   "Bookworm"
                 );
-                if (Platform.OS === "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("Bookworm +100xp");
                   }
@@ -373,7 +381,7 @@ export default function EReader() {
                   userid,
                   "Bibliophile"
                 );
-                if (Platform.OS === "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("Bibliophile +250xp");
                   }
@@ -383,7 +391,7 @@ export default function EReader() {
                   userid,
                   "Book Enjoyer"
                 );
-                if (Platform.OS === "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("Book Enjoyer +500xp");
                   }
@@ -393,7 +401,7 @@ export default function EReader() {
                   userid,
                   "Voracious Reader"
                 );
-                if (Platform.OS === "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("Voracious Reader +1000xp");
                   }
@@ -403,7 +411,7 @@ export default function EReader() {
                   userid,
                   "We are not the same"
                 );
-                if (Platform.OS == "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("We are Not the Same +2000xp");
                   }
@@ -417,7 +425,7 @@ export default function EReader() {
                   userid,
                   "This looks nice"
                 );
-                if (Platform.OS == "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("This looks nice +20000xp");
                   }
@@ -427,7 +435,7 @@ export default function EReader() {
                   userid,
                   "Magpie"
                 );
-                if (Platform.OS == "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("Magpie +100xp");
                   }
@@ -437,7 +445,7 @@ export default function EReader() {
                   userid,
                   "Collector"
                 );
-                if (Platform.OS == "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("Collector +250xp");
                   }
@@ -447,7 +455,7 @@ export default function EReader() {
                   userid,
                   "Archivist"
                 );
-                if (Platform.OS == "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("Archivist +500xp");
                   }
@@ -457,7 +465,7 @@ export default function EReader() {
                   userid,
                   "Book Otaku"
                 );
-                if (Platform.OS == "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("Book Otaku +1000xp");
                   }
@@ -467,7 +475,7 @@ export default function EReader() {
                   userid,
                   "Hoarder"
                 );
-                if (Platform.OS == "android") {
+                if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
                     displayToast("Hoarder +2000xp");
                   }
