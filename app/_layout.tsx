@@ -12,6 +12,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 const SupabaseContext = createContext(supabase);
 
+import mobileAds from "react-native-google-mobile-ads";
+
 export const useSupabase = () => {
   const context = useContext(SupabaseContext);
   if (!context) {
@@ -26,6 +28,20 @@ export default function RootLayout() {
     EBGaramond: require("../assets/fonts/EBGaramondVariable.ttf"),
     EBGaramondItalic: require("../assets/fonts/EBGaramondItalic.ttf"),
   });
+
+  useEffect(() => {
+    async function prepare() {
+      // Keep the splash screen visible while we fetch resources
+      await SplashScreen.preventAutoHideAsync();
+
+      // Initialize Google Mobile Ads SDK
+      await mobileAds().initialize();
+
+      // Load any other resources or data that you need
+    }
+
+    prepare();
+  }, []);
 
   useEffect(() => {
     if (loaded || error) {

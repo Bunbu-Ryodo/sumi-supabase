@@ -44,10 +44,18 @@ import {
   GestureDetector,
   Directions,
 } from "react-native-gesture-handler";
+import {
+  BannerAd,
+  BannerAdSize,
+  TestIds,
+  useForeground,
+} from "react-native-google-mobile-ads";
 
 import Toast from "react-native-toast-message";
 import type { PropsWithChildren } from "react";
 import { runOnJS } from "react-native-reanimated";
+
+const adUnitId = TestIds.ADAPTIVE_BANNER;
 
 type BounceInProps = PropsWithChildren<{}>;
 
@@ -85,17 +93,12 @@ const BounceView = forwardRef<any, BounceInProps>((props, ref) => {
 });
 
 export default function EReader() {
+  const bannerRef = useRef<BannerAd>(null);
   let { id } = useLocalSearchParams();
 
-  // if (Platform.OS === "android") {
-  //   Notifications.setNotificationHandler({
-  //     handleNotification: async () => ({
-  //       shouldShowAlert: true,
-  //       shouldPlaySound: false,
-  //       shouldSetBadge: false,
-  //     }),
-  //   });
-  // }
+  useForeground(() => {
+    Platform.OS === "android" && bannerRef.current?.load();
+  });
 
   const [extract, setExtract] = useState<ExtractType>({
     id: 0,
@@ -484,112 +487,116 @@ export default function EReader() {
   }, [subid]);
 
   return (
-    <ScrollView
-      style={[styles.paper, { backgroundColor: brightnessHex[warmth] }]}
-    >
-      {loading ? (
-        <ActivityIndicator size="large" color="#393E41" />
-      ) : (
-        <View>
+    <>
+      <ScrollView
+        style={[styles.paper, { backgroundColor: brightnessHex[warmth] }]}
+      >
+        {loading ? (
+          <ActivityIndicator size="large" color="#393E41" />
+        ) : (
           <View>
-            <View style={styles.adjustFontSize}>
-              <TouchableOpacity
-                style={[
-                  styles.fontUp,
-                  warmth === 4 && { backgroundColor: "#F6F7EB" },
-                ]}
-                onPress={fontUp}
+            <View>
+              <View style={styles.adjustFontSize}>
+                <TouchableOpacity
+                  style={[
+                    styles.fontUp,
+                    warmth === 4 && { backgroundColor: "#F6F7EB" },
+                  ]}
+                  onPress={fontUp}
+                >
+                  <Ionicons name="text" size={24} color="#393E41"></Ionicons>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.fontDown,
+                    warmth === 4 && { backgroundColor: "#F6F7EB" },
+                  ]}
+                  onPress={fontDown}
+                >
+                  <Ionicons name="text" size={18} color="#393E41"></Ionicons>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.brightness,
+                    warmth === 4 && { backgroundColor: "#F6F7EB" },
+                  ]}
+                  onPress={adjustBrightness}
+                >
+                  <Ionicons
+                    name="sunny-outline"
+                    size={18}
+                    color="#393E41"
+                  ></Ionicons>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.titleBar}>
+                <Text
+                  style={[styles.title, warmth === 4 && { color: "#F6F7EB" }]}
+                >
+                  {extract.title}
+                </Text>
+                <Text
+                  style={[styles.chapter, warmth === 4 && { color: "#F6F7EB" }]}
+                >
+                  {extract.chapter}
+                </Text>
+              </View>
+              <GestureDetector
+                gesture={Gesture.Exclusive(doubleTap, singleTap)}
               >
-                <Ionicons name="text" size={24} color="#393E41"></Ionicons>
-              </TouchableOpacity>
+                <TouchableOpacity onLongPress={adjustBrightness}>
+                  <Text
+                    style={[
+                      styles.extractText,
+                      { fontSize },
+                      warmth === 4 && {
+                        color: "#F6F7EB",
+                        borderBottomColor: "#F6F7EB",
+                      },
+                    ]}
+                  >
+                    {extract.fulltext}
+                  </Text>
+                </TouchableOpacity>
+              </GestureDetector>
+            </View>
+
+            <View style={styles.markAsReadContainer}>
               <TouchableOpacity
-                style={[
-                  styles.fontDown,
-                  warmth === 4 && { backgroundColor: "#F6F7EB" },
-                ]}
-                onPress={fontDown}
+                style={
+                  read
+                    ? warmth === 4
+                      ? styles.markAsUnreadDarkMode
+                      : styles.markAsUnread
+                    : warmth === 4
+                    ? styles.buttonPrimaryDarkMode
+                    : styles.buttonPrimary
+                }
+                onPress={toggleReadStatus}
               >
-                <Ionicons name="text" size={18} color="#393E41"></Ionicons>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.brightness,
-                  warmth === 4 && { backgroundColor: "#F6F7EB" },
-                ]}
-                onPress={adjustBrightness}
-              >
-                <Ionicons
-                  name="sunny-outline"
-                  size={18}
-                  color="#393E41"
-                ></Ionicons>
+                {read ? (
+                  <Text
+                    style={[
+                      styles.markAsUnreadText,
+                      warmth === 4 && { color: "#F6F7EB" },
+                    ]}
+                  >
+                    Mark as Unread
+                  </Text>
+                ) : (
+                  <Text
+                    style={[
+                      styles.markAsReadText,
+                      warmth === 4 && { color: "#393E41" },
+                    ]}
+                  >
+                    Mark as Read
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
-            <View style={styles.titleBar}>
-              <Text
-                style={[styles.title, warmth === 4 && { color: "#F6F7EB" }]}
-              >
-                {extract.title}
-              </Text>
-              <Text
-                style={[styles.chapter, warmth === 4 && { color: "#F6F7EB" }]}
-              >
-                {extract.chapter}
-              </Text>
-            </View>
-            <GestureDetector gesture={Gesture.Exclusive(doubleTap, singleTap)}>
-              <TouchableOpacity onLongPress={adjustBrightness}>
-                <Text
-                  style={[
-                    styles.extractText,
-                    { fontSize },
-                    warmth === 4 && {
-                      color: "#F6F7EB",
-                      borderBottomColor: "#F6F7EB",
-                    },
-                  ]}
-                >
-                  {extract.fulltext}
-                </Text>
-              </TouchableOpacity>
-            </GestureDetector>
-          </View>
-          <View style={styles.markAsReadContainer}>
-            <TouchableOpacity
-              style={
-                read
-                  ? warmth === 4
-                    ? styles.markAsUnreadDarkMode
-                    : styles.markAsUnread
-                  : warmth === 4
-                  ? styles.buttonPrimaryDarkMode
-                  : styles.buttonPrimary
-              }
-              onPress={toggleReadStatus}
-            >
-              {read ? (
-                <Text
-                  style={[
-                    styles.markAsUnreadText,
-                    warmth === 4 && { color: "#F6F7EB" },
-                  ]}
-                >
-                  Mark as Unread
-                </Text>
-              ) : (
-                <Text
-                  style={[
-                    styles.markAsReadText,
-                    warmth === 4 && { color: "#393E41" },
-                  ]}
-                >
-                  Mark as Read
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
-          <View style={styles.engagementButtons}>
-            {/* <TouchableOpacity onPress={toggleLike}>
+            <View style={styles.engagementButtons}>
+              {/* <TouchableOpacity onPress={toggleLike}>
               <BounceView ref={heartRef}>
                 <Ionicons
                   name={like ? "heart" : "heart-outline"}
@@ -598,61 +605,71 @@ export default function EReader() {
                 />
               </BounceView>
             </TouchableOpacity> */}
-            <TouchableOpacity style={styles.returnAnchor} onPress={backToFeed}>
-              <Ionicons name="arrow-back" size={24} color="#8980F5" />
-              <Text
-                style={[
-                  styles.shoppingText,
-                  warmth === 4 && { color: "#F6F7EB" },
-                ]}
+              <TouchableOpacity
+                style={styles.returnAnchor}
+                onPress={backToFeed}
               >
-                Return to Feed
-              </Text>
-            </TouchableOpacity>
-            <View style={styles.subscribeContainer}>
-              <TouchableOpacity onPress={subscribe}>
-                <BounceView ref={bounceRef}>
-                  <Ionicons
-                    name={subscribed ? "bookmark" : "bookmark-outline"}
-                    size={24}
-                    color="#FE7F2D"
-                  />
+                <Ionicons name="arrow-back" size={24} color="#8980F5" />
+                <Text
+                  style={[
+                    styles.shoppingText,
+                    warmth === 4 && { color: "#F6F7EB" },
+                  ]}
+                >
+                  Return to Feed
+                </Text>
+              </TouchableOpacity>
+              <View style={styles.subscribeContainer}>
+                <TouchableOpacity onPress={subscribe}>
+                  <BounceView ref={bounceRef}>
+                    <Ionicons
+                      name={subscribed ? "bookmark" : "bookmark-outline"}
+                      size={24}
+                      color="#FE7F2D"
+                    />
+                  </BounceView>
+                </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.bookmarkText,
+                    warmth === 4 && { color: "#F6F7EB" },
+                  ]}
+                >
+                  Subscribe
+                </Text>
+              </View>
+              <View style={styles.shoppingContainer}>
+                <BounceView ref={cartRef}>
+                  <TouchableOpacity onPress={shop}>
+                    <Ionicons name="cart" size={24} color="#77966D" />
+                  </TouchableOpacity>
+                </BounceView>
+                <Text
+                  style={[
+                    styles.shoppingText,
+                    warmth === 4 && { color: "#F6F7EB" },
+                  ]}
+                >
+                  Buy a high quality edition of the full text
+                </Text>
+              </View>
+              <TouchableOpacity onPress={copyToClipboard}>
+                <BounceView ref={clipRef}>
+                  <Ionicons name="clipboard" size={24} color="#8980F5" />
                 </BounceView>
               </TouchableOpacity>
-              <Text
-                style={[
-                  styles.bookmarkText,
-                  warmth === 4 && { color: "#F6F7EB" },
-                ]}
-              >
-                Subscribe
-              </Text>
             </View>
-            <View style={styles.shoppingContainer}>
-              <BounceView ref={cartRef}>
-                <TouchableOpacity onPress={shop}>
-                  <Ionicons name="cart" size={24} color="#77966D" />
-                </TouchableOpacity>
-              </BounceView>
-              <Text
-                style={[
-                  styles.shoppingText,
-                  warmth === 4 && { color: "#F6F7EB" },
-                ]}
-              >
-                Buy a high quality edition of the full text
-              </Text>
-            </View>
-            <TouchableOpacity onPress={copyToClipboard}>
-              <BounceView ref={clipRef}>
-                <Ionicons name="clipboard" size={24} color="#8980F5" />
-              </BounceView>
-            </TouchableOpacity>
+            <View></View>
           </View>
-          <View></View>
-        </View>
-      )}
-    </ScrollView>
+        )}
+      </ScrollView>
+      <BannerAd
+        key={`ad-${id}`}
+        ref={bannerRef}
+        unitId={adUnitId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+      />
+    </>
   );
 }
 

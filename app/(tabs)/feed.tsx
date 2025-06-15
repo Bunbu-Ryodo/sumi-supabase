@@ -5,6 +5,7 @@ import {
   RefreshControl,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { useEffect, useState } from "react";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -29,16 +30,30 @@ import {
 } from "../../supabase_queries/subscriptions";
 import { ExtractType } from "../../types/types.js";
 import Extract from "../../components/extract";
+import {
+  BannerAd,
+  BannerAdSize,
+  TestIds,
+  useForeground,
+} from "react-native-google-mobile-ads";
+import { useRef } from "react";
+
+const adUnitId = TestIds.ADAPTIVE_BANNER;
 
 function RightAction() {
   return <Reanimated.View style={{ width: 250 }} />;
 }
 
 export default function FeedScreen() {
+  const bannerRef = useRef<BannerAd>(null);
   const router = useRouter();
   const [extracts, setExtracts] = useState([] as ExtractType[]);
   const [refreshing, setRefreshing] = useState(false);
   const [allExtractsDismissed, setAllExtractsDismissed] = useState(false);
+
+  useForeground(() => {
+    Platform.OS === "android" && bannerRef.current?.load();
+  });
 
   useEffect(() => {
     const checkUserAuthenticated = async function () {
@@ -143,53 +158,61 @@ export default function FeedScreen() {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.feedWrapper}
-      style={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={fetchExtracts}
-          tintColor="#F6F7EB"
-        />
-      }
-    >
-      {extracts && extracts.length > 0 ? (
-        extracts.map((extract: ExtractType, index: number) => (
-          <ReanimatedSwipeable
-            key={extract.id}
-            friction={2}
-            containerStyle={styles.swipeable}
-            enableTrackpadTwoFingerGesture
-            rightThreshold={40}
-            renderRightActions={RightAction}
-            onSwipeableWillOpen={() => handleDismiss(extract.id)}
-          >
-            <Extract
-              key={index}
-              id={extract.id}
-              textid={extract.textid}
-              author={extract.author}
-              title={extract.title}
-              year={extract.year}
-              chapter={extract.chapter}
-              previewtext={extract.previewtext}
-              fulltext={extract.fulltext}
-              subscribeart={extract.subscribeart}
-              portrait={extract.portrait}
-              coverart={extract.coverart}
-            />
-          </ReanimatedSwipeable>
-        ))
-      ) : allExtractsDismissed ? (
-        <TouchableOpacity style={styles.refresh} onPress={fetchExtracts}>
-          <Ionicons name="arrow-down" size={36} color="#F6F7EB" />
-          <Text style={styles.pulldown}>Pull to be served more extracts</Text>
-        </TouchableOpacity>
-      ) : (
-        <ActivityIndicator size="large" color="#393E41" />
-      )}
-    </ScrollView>
+    <>
+      <ScrollView
+        contentContainerStyle={styles.feedWrapper}
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={fetchExtracts}
+            tintColor="#F6F7EB"
+          />
+        }
+      >
+        {extracts && extracts.length > 0 ? (
+          extracts.map((extract: ExtractType, index: number) => (
+            <ReanimatedSwipeable
+              key={extract.id}
+              friction={2}
+              containerStyle={styles.swipeable}
+              enableTrackpadTwoFingerGesture
+              rightThreshold={40}
+              renderRightActions={RightAction}
+              onSwipeableWillOpen={() => handleDismiss(extract.id)}
+            >
+              <Extract
+                key={index}
+                id={extract.id}
+                textid={extract.textid}
+                author={extract.author}
+                title={extract.title}
+                year={extract.year}
+                chapter={extract.chapter}
+                previewtext={extract.previewtext}
+                fulltext={extract.fulltext}
+                subscribeart={extract.subscribeart}
+                portrait={extract.portrait}
+                coverart={extract.coverart}
+              />
+            </ReanimatedSwipeable>
+          ))
+        ) : allExtractsDismissed ? (
+          <TouchableOpacity style={styles.refresh} onPress={fetchExtracts}>
+            <Ionicons name="arrow-down" size={36} color="#F6F7EB" />
+            <Text style={styles.pulldown}>Pull to be served more extracts</Text>
+          </TouchableOpacity>
+        ) : (
+          <ActivityIndicator size="large" color="#393E41" />
+        )}
+      </ScrollView>
+      <BannerAd
+        key={`feedad`}
+        ref={bannerRef}
+        unitId={adUnitId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+      />
+    </>
   );
 }
 
