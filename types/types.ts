@@ -5,7 +5,6 @@ export type ExtractType = {
     title: string;
     year: string;
     chapter: number;
-    previewtext: string;
     fulltext: string;
     subscribeart: string;
     portrait: string;

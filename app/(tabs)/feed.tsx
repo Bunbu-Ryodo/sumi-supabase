@@ -199,7 +199,6 @@ export default function FeedScreen() {
                 title={extract.title}
                 year={extract.year}
                 chapter={extract.chapter}
-                previewtext={extract.previewtext}
                 fulltext={extract.fulltext}
                 subscribeart={extract.subscribeart}
                 portrait={extract.portrait}
