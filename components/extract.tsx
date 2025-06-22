@@ -62,12 +62,13 @@ export default function Extract({
   author,
   chapter,
   year,
-  previewtext,
+  fulltext,
   portrait,
   coverart,
   textid,
 }: ExtractType) {
   const [like, setLike] = useState(false);
+  const [preview, setPreview] = useState(fulltext.slice(0, 420));
   const router = useRouter();
 
   function toggleLike() {
@@ -114,7 +115,7 @@ export default function Extract({
       </View>
       <TouchableOpacity onPress={handleNavigation}>
         <View style={styles.previewText}>
-          <Text style={styles.text}>{previewtext}</Text>
+          <Text style={styles.text}>{preview}...</Text>
         </View>
       </TouchableOpacity>
 
