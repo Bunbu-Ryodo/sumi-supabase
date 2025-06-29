@@ -11,19 +11,6 @@ export default function Instalment({
   subscribeart,
   sequeldue,
 }: InstalmentTypeClient) {
-  const nextInstalmentDue =
-    new Date(sequeldue).getTime() - new Date().getTime();
-  const daysUntilNextInstalment = Math.floor(
-    nextInstalmentDue / (1000 * 60 * 60 * 24)
-  );
-
-  const nextInstalmentDate = new Date(sequeldue).toLocaleDateString("en-GB", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
   return (
     <View style={styles.subscriptionWrapper}>
       <Link
@@ -32,7 +19,9 @@ export default function Instalment({
       >
         <TouchableOpacity key={id} style={styles.subscriptionButton}>
           <Image style={styles.imageIcons} source={{ uri: subscribeart }} />
-          <Text style={styles.instalmentTitle}>{title}</Text>
+          <Text style={styles.instalmentTitle}>
+            {title}, ch. {chapter}
+          </Text>
         </TouchableOpacity>
       </Link>
     </View>

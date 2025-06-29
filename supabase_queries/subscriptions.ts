@@ -187,6 +187,25 @@ export async function createInstalment(userId: string, extractId: number, chapte
     return instalment;
 }
 
+export async function deletePreviousInstalments(userId: string, title: string){
+  if(!userId || !title){
+    throw new Error("Missing required parameters");
+  }
+
+  const { data: deletedInstalments, error } = await supabase
+    .from('instalments')
+    .delete()
+    .match({ userid: userId, title: title })
+    .select();
+
+  if(error){
+    console.error("Error deleting previous instalments:", error);
+    return null;
+  }
+
+  return deletedInstalments;
+}
+
 export async function updateSubscription(subscriptionId: number, chapter: number, due: number){
   if(!subscriptionId){
     throw new Error("Missing required parameters");
