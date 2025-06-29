@@ -54,6 +54,11 @@ import {
 import Toast from "react-native-toast-message";
 import type { PropsWithChildren } from "react";
 import { runOnJS } from "react-native-reanimated";
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.EXPO_PUBLIC_OPENAI,
+});
 
 let adUnitId = "";
 
@@ -104,6 +109,8 @@ export default function EReader() {
   const bannerRef = useRef<BannerAd>(null);
   let { id } = useLocalSearchParams();
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
   useForeground(() => {
     Platform.OS === "android" && bannerRef.current?.load();
   });
@@ -114,7 +121,6 @@ export default function EReader() {
     author: "",
     chapter: 0,
     year: "",
-    previewtext: "",
     fulltext: "",
     portrait: "",
     coverart: "",
@@ -130,8 +136,60 @@ export default function EReader() {
   const [fontSize, setFontSize] = useState(18);
   const [warmth, setWarmth] = useState(0);
   const [due, setDue] = useState(new Date().getTime());
+  const [argument, setArgument] = useState("");
+  const [thinking, setThinking] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (argument && argument.length > 0) {
+      fadeAnim.setValue(0);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1100,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [argument]);
+
+  const generateChapterArgument = async () => {
+    setArgument("");
+    setThinking(true);
+    const response = await client.responses.create({
+      model: "gpt-4o",
+      input:
+        "The following is an example of a chapter argument from the novel 'Confessions of an Italian': 'Sicilians at General Guglielmo Pep's camp in Abruzzi. I become acquainted with prison and very nearly with the scaffold, but thanks to la Pisana I lose no more than my eyesight. The miracles of love delivered by a nurse. Refugee Italians in London and soldiers in Greece. I regain my sight with the help of Lucilio, but soon thereafter I lose la Pisana and return home with only my memories still alive.' Read the following text and compose a chapter argument in a similar style. Keep the arguments relatively succinct. They should be about a paragraph or two, not as long as a page of the extract:" +
+        extract.fulltext,
+    });
+    setThinking(false);
+    setArgument(response.output_text);
+  };
+
+  const generateChapterBulletPoints = async () => {
+    setArgument("");
+    setThinking(true);
+    const response = await client.responses.create({
+      model: "gpt-4o",
+      input:
+        "Summarise the following text into bullet points to help less confident readers understand the text better. These bullets do not need to capture every descriptive detail, unless this is critical to understanding the text or the novel as a whole. The intention is to signpost the main plot points to aid understanding: " +
+        extract.fulltext,
+    });
+    setThinking(false);
+    setArgument(response.output_text);
+  };
+
+  const generateSynopsis = async () => {
+    setArgument("");
+    setThinking(true);
+    const response = await client.responses.create({
+      model: "gpt-4o",
+      input:
+        "Identify the text the following extract is from and provide a short synopsis as one would find on the back of a paperback: " +
+        extract.fulltext,
+    });
+    setThinking(false);
+    setArgument(response.output_text);
+  };
 
   const backToFeed = () => {
     router.push({
@@ -536,6 +594,37 @@ export default function EReader() {
                     color="#393E41"
                   ></Ionicons>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.summary,
+                    warmth === 4 && { backgroundColor: "#F6F7EB" },
+                  ]}
+                  onPress={generateChapterArgument}
+                >
+                  <Ionicons name="book" size={18} color="#393E41"></Ionicons>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.summary,
+                    warmth === 4 && { backgroundColor: "#F6F7EB" },
+                  ]}
+                  onPress={generateChapterBulletPoints}
+                >
+                  <Ionicons name="list" size={18} color="#393E41"></Ionicons>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.summary,
+                    warmth === 4 && { backgroundColor: "#F6F7EB" },
+                  ]}
+                  onPress={generateSynopsis}
+                >
+                  <Ionicons
+                    name="help-outline"
+                    size={18}
+                    color="#393E41"
+                  ></Ionicons>
+                </TouchableOpacity>
               </View>
               <View style={styles.titleBar}>
                 <Text
@@ -549,6 +638,23 @@ export default function EReader() {
                   {extract.chapter}
                 </Text>
               </View>
+              {thinking && (
+                <View style={{ alignItems: "center", marginBottom: 12 }}>
+                  <ActivityIndicator size="large" color="#393E41" />
+                </View>
+              )}
+              {argument && argument.length ? (
+                <Animated.View
+                  style={[styles.argumentContainer, { opacity: fadeAnim }]}
+                >
+                  <Text style={[styles.argument, { fontSize }]}>
+                    {argument}
+                  </Text>
+                </Animated.View>
+              ) : (
+                <View></View>
+              )}
+
               <GestureDetector
                 gesture={Gesture.Exclusive(doubleTap, singleTap)}
               >
@@ -870,5 +976,27 @@ const styles = StyleSheet.create({
     borderColor: "#393E41",
     marginHorizontal: 4,
     borderRadius: 8,
+  },
+  summary: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 44,
+    width: 44,
+    borderWidth: 1,
+    borderColor: "#393E41",
+    marginHorizontal: 4,
+    borderRadius: 8,
+  },
+  argumentContainer: {
+    marginBottom: 12,
+    padding: 8,
+  },
+  argument: {
+    fontFamily: "EBGaramond",
+    fontSize: 16,
+    borderBottomWidth: 1,
+    borderStyle: "dotted",
+    borderColor: "#393E41",
+    padding: 8,
   },
 });
