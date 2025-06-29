@@ -35,6 +35,7 @@ import {
   markAsUnread,
   checkReadStatus,
 } from "../../supabase_queries/profiles";
+import { spendOneCredit } from "../../supabase_queries/auth";
 import { getUserSession } from "../../supabase_queries/auth.js";
 import supabase from "../../lib/supabase.js";
 import { lookUpUserProfile } from "../../supabase_queries/auth";
@@ -153,42 +154,70 @@ export default function EReader() {
   }, [argument]);
 
   const generateChapterArgument = async () => {
-    setArgument("");
     setThinking(true);
-    const response = await client.responses.create({
-      model: "gpt-4o",
-      input:
-        "The following is an example of a chapter argument from the novel 'Confessions of an Italian': 'Sicilians at General Guglielmo Pep's camp in Abruzzi. I become acquainted with prison and very nearly with the scaffold, but thanks to la Pisana I lose no more than my eyesight. The miracles of love delivered by a nurse. Refugee Italians in London and soldiers in Greece. I regain my sight with the help of Lucilio, but soon thereafter I lose la Pisana and return home with only my memories still alive.' Read the following text and compose a chapter argument in a similar style. Keep the arguments relatively succinct. They should be about a paragraph or two, not as long as a page of the extract:" +
-        extract.fulltext,
-    });
-    setThinking(false);
-    setArgument(response.output_text);
+    const creditBalance = await spendOneCredit(userid);
+
+    if (creditBalance > -1) {
+      setArgument("");
+      const response = await client.responses.create({
+        model: "gpt-4o",
+        input:
+          "The following is an example of a chapter argument from the novel 'Confessions of an Italian': 'Sicilians at General Guglielmo Pep's camp in Abruzzi. I become acquainted with prison and very nearly with the scaffold, but thanks to la Pisana I lose no more than my eyesight. The miracles of love delivered by a nurse. Refugee Italians in London and soldiers in Greece. I regain my sight with the help of Lucilio, but soon thereafter I lose la Pisana and return home with only my memories still alive.' Read the following text and compose a chapter argument in a similar style. Keep the arguments relatively succinct, as being three or more paragraphs would defeat the purpose of having an argument, as it would become a lengthy extract of in its own right. Please don't include headings like 'chapter argument'." +
+          extract.fulltext,
+      });
+      setThinking(false);
+      setArgument(response.output_text);
+    } else {
+      setArgument(
+        "You do not have enough AI credits. Become a member to get more daily credits!"
+      );
+      setThinking(false);
+    }
   };
 
   const generateChapterBulletPoints = async () => {
-    setArgument("");
     setThinking(true);
-    const response = await client.responses.create({
-      model: "gpt-4o",
-      input:
-        "Summarise the following text into bullet points to help less confident readers understand the text better. These bullets do not need to capture every descriptive detail, unless this is critical to understanding the text or the novel as a whole. The intention is to signpost the main plot points to aid understanding: " +
-        extract.fulltext,
-    });
-    setThinking(false);
-    setArgument(response.output_text);
+    const creditBalance = await spendOneCredit(userid);
+
+    if (creditBalance > -1) {
+      setArgument("");
+
+      const response = await client.responses.create({
+        model: "gpt-4o",
+        input:
+          "Summarise the following text into bullet points to help less confident readers understand the text better. These bullets do not need to capture every descriptive detail, unless this is critical to understanding the text or the novel as a whole. The intention is to signpost the main plot points to aid understanding. No need to give the response a title or a heading. " +
+          extract.fulltext,
+      });
+      setThinking(false);
+      setArgument(response.output_text);
+    } else {
+      setArgument(
+        "You do not have enough AI credits. Become a member to get more daily credits!"
+      );
+      setThinking(false);
+    }
   };
 
   const generateSynopsis = async () => {
-    setArgument("");
     setThinking(true);
-    const response = await client.responses.create({
-      model: "gpt-4o",
-      input:
-        "Identify the text the following extract is from and provide a short synopsis as one would find on the back of a paperback: " +
-        extract.fulltext,
-    });
-    setThinking(false);
-    setArgument(response.output_text);
+    const creditBalance = await spendOneCredit(userid);
+
+    if (creditBalance > -1) {
+      setArgument("");
+      const response = await client.responses.create({
+        model: "gpt-4o",
+        input:
+          "Identify the text the following extract is from and provide a short synopsis as one would find on the back of a paperback. Omit any headers like 'Synopsis' or 'Book Summary': " +
+          extract.fulltext,
+      });
+      setThinking(false);
+      setArgument(response.output_text);
+    } else {
+      setArgument(
+        "You do not have enough AI credits. Become a member to get more daily credits!"
+      );
+      setThinking(false);
+    }
   };
 
   const backToFeed = () => {
@@ -601,7 +630,7 @@ export default function EReader() {
                   ]}
                   onPress={generateChapterArgument}
                 >
-                  <Ionicons name="book" size={18} color="#393E41"></Ionicons>
+                  <Ionicons name="school" size={18} color="#393E41"></Ionicons>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[
@@ -645,9 +674,25 @@ export default function EReader() {
               )}
               {argument && argument.length ? (
                 <Animated.View
-                  style={[styles.argumentContainer, { opacity: fadeAnim }]}
+                  style={[
+                    styles.argumentContainer,
+                    { opacity: fadeAnim, alignItems: "center" },
+                    warmth === 4 && { backgroundColor: "#F6F7EB" },
+                  ]}
                 >
-                  <Text style={[styles.argument, { fontSize }]}>
+                  <Ionicons
+                    name="school"
+                    size={24}
+                    color="#F6F7EB"
+                    style={warmth === 4 && { color: "#393E41" }}
+                  />
+                  <Text
+                    style={[
+                      styles.argument,
+                      { fontSize },
+                      warmth === 4 && { color: "#393E41" },
+                    ]}
+                  >
                     {argument}
                   </Text>
                 </Animated.View>
@@ -990,13 +1035,13 @@ const styles = StyleSheet.create({
   argumentContainer: {
     marginBottom: 12,
     padding: 8,
+    backgroundColor: "#393E41",
+    borderRadius: 8,
   },
   argument: {
     fontFamily: "EBGaramond",
     fontSize: 16,
-    borderBottomWidth: 1,
-    borderStyle: "dotted",
-    borderColor: "#393E41",
+    color: "#F6F7EB",
     padding: 8,
   },
 });
