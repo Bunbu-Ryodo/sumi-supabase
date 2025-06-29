@@ -89,7 +89,6 @@ export async function spendOneCredit(user_id) {
   const newCredits = currentCredits - 1;
 
   if (newCredits < 0) {
-    console.error('Not enough AI credits to spend');
     return -1;
   }
 

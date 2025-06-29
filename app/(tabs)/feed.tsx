@@ -26,6 +26,7 @@ import {
 import { getExtracts } from "../../supabase_queries/feed";
 import {
   getAllDueSubscriptions,
+  deletePreviousInstalments,
   getExtractByTextIdChapter,
   createInstalment,
   updateSubscription,
@@ -74,7 +75,6 @@ export default function FeedScreen() {
       if (!user) {
         router.push("/");
       } else if (user) {
-        console.log("Check user here");
         await checkUserProfileStatus(user.id);
         await fetchExtracts();
         await processSubscriptions(user.id);
@@ -84,10 +84,8 @@ export default function FeedScreen() {
   }, []);
 
   const checkUserProfileStatus = async function (userId: string) {
-    console.log("Checking user profile status for user:", userId);
     const userProfile = await lookUpUserProfile(userId);
     if (!userProfile) {
-      console.log("No user profile found, creating a new one");
       await createNewProfile(userId, new Date());
     } else if (userProfile) {
       const lastLogin = userProfile.lastlogin || new Date();
@@ -108,7 +106,6 @@ export default function FeedScreen() {
   const handleDismiss = (id: number) => {
     setExtracts((prev) => {
       if (extracts.length - 1 === 0) {
-        console.log("All extracts dismissed");
         setAllExtractsDismissed(true);
       }
       return prev.filter((extract) => extract.id !== id);
@@ -141,6 +138,8 @@ export default function FeedScreen() {
           );
 
           if (updatedSubscription) {
+            await deletePreviousInstalments(userId, extract.title);
+
             const newInstalment = await createInstalment(
               userId,
               extract.id,
