@@ -139,6 +139,7 @@ export default function EReader() {
   const [due, setDue] = useState(new Date().getTime());
   const [argument, setArgument] = useState("");
   const [thinking, setThinking] = useState(false);
+  const [creditsLeft, setCreditsLeft] = useState(0);
 
   const router = useRouter();
 
@@ -156,6 +157,7 @@ export default function EReader() {
   const generateChapterArgument = async () => {
     setThinking(true);
     const creditBalance = await spendOneCredit(userid);
+    if (creditBalance > -1) setCreditsLeft(creditBalance);
 
     if (creditBalance > -1) {
       setArgument("");
@@ -169,7 +171,7 @@ export default function EReader() {
       setArgument(response.output_text);
     } else {
       setArgument(
-        "You do not have enough AI credits. Become a member to get more daily credits!"
+        "You do not have enough AI credits. Become a member [coming soon] to get more daily credits!"
       );
       setThinking(false);
     }
@@ -667,37 +669,67 @@ export default function EReader() {
                   {extract.chapter}
                 </Text>
               </View>
-              {thinking && (
-                <View style={{ alignItems: "center", marginBottom: 12 }}>
-                  <ActivityIndicator size="large" color="#393E41" />
-                </View>
-              )}
-              {argument && argument.length ? (
-                <Animated.View
+              {thinking || argument.length ? (
+                <View
                   style={[
                     styles.argumentContainer,
-                    { opacity: fadeAnim, alignItems: "center" },
+                    { alignItems: "center" },
                     warmth === 4 && { backgroundColor: "#F6F7EB" },
                   ]}
                 >
-                  <Ionicons
-                    name="school"
-                    size={24}
-                    color="#F6F7EB"
-                    style={warmth === 4 && { color: "#393E41" }}
-                  />
-                  <Text
-                    style={[
-                      styles.argument,
-                      { fontSize },
-                      warmth === 4 && { color: "#393E41" },
-                    ]}
+                  {thinking ? (
+                    <ActivityIndicator
+                      size="large"
+                      color={warmth === 4 ? "#393E41" : "#F6F7EB"}
+                    />
+                  ) : (
+                    <Ionicons
+                      name="school"
+                      size={24}
+                      color="#F6F7EB"
+                      style={warmth === 4 && { color: "#393E41" }}
+                    />
+                  )}
+
+                  {argument && argument.length > 0 && (
+                    <Animated.View style={{ opacity: fadeAnim }}>
+                      <Text
+                        style={[
+                          styles.argument,
+                          { fontSize },
+                          warmth === 4 && { color: "#393E41" },
+                        ]}
+                      >
+                        {argument}
+                      </Text>
+                    </Animated.View>
+                  )}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
                   >
-                    {argument}
-                  </Text>
-                </Animated.View>
+                    <Ionicons
+                      name="star"
+                      size={16}
+                      color={warmth === 4 ? "#393E41" : "#F6F7EB"}
+                    />
+                    <Text
+                      style={{
+                        color: warmth === 4 ? "#393E41" : "#F6F7EB",
+                        fontFamily: "QuicksandReg",
+                        fontSize: 16,
+                        marginLeft: 4,
+                      }}
+                    >
+                      {creditsLeft || 0}
+                    </Text>
+                  </View>
+                </View>
               ) : (
-                <View></View>
+                <></>
               )}
 
               <GestureDetector
@@ -1037,6 +1069,7 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: "#393E41",
     borderRadius: 8,
+    minWidth: 48,
   },
   argument: {
     fontFamily: "EBGaramond",

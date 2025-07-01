@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   Platform,
 } from "react-native";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import Reanimated, {
   SharedValue,
@@ -40,6 +40,7 @@ import {
   useForeground,
 } from "react-native-google-mobile-ads";
 import { useRef } from "react";
+import { useFocusEffect } from "expo-router";
 
 let adUnitId = "";
 
@@ -55,6 +56,10 @@ function RightAction() {
   return <Reanimated.View style={{ width: 250 }} />;
 }
 
+function LeftAction() {
+  return <Reanimated.View style={{ width: 250 }} />;
+}
+
 export default function FeedScreen() {
   const bannerRef = useRef<BannerAd>(null);
   const router = useRouter();
@@ -67,6 +72,19 @@ export default function FeedScreen() {
       bannerRef.current?.load();
     }
   });
+
+  const swipeableRefs = useRef<{ [key: number]: any }>({});
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Close all swipeables
+      Object.values(swipeableRefs.current).forEach((ref) => {
+        if (ref && typeof ref.close === "function") {
+          ref.close();
+        }
+      });
+    }, [extracts.length])
+  );
 
   useEffect(() => {
     const checkUserAuthenticated = async function () {
@@ -89,8 +107,11 @@ export default function FeedScreen() {
       await createNewProfile(userId, new Date());
     } else if (userProfile) {
       const lastLogin = userProfile.lastlogin || new Date();
-      const timeDifference = new Date().getTime() - lastLogin.getTime();
+      const timeDifference =
+        new Date().getTime() - new Date(lastLogin.toString()).getTime();
       const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
+
+      console.log(`Days since last login: ${daysDifference}`);
 
       if (daysDifference >= 1) {
         const success = await setLoginDateTime(userId);
@@ -201,12 +222,26 @@ export default function FeedScreen() {
           extracts.map((extract: ExtractType, index: number) => (
             <ReanimatedSwipeable
               key={extract.id}
+              ref={(ref) => {
+                swipeableRefs.current[extract.id] = ref;
+              }}
               friction={2}
               containerStyle={styles.swipeable}
               enableTrackpadTwoFingerGesture
               rightThreshold={40}
+              leftThreshold={40}
               renderRightActions={RightAction}
-              onSwipeableWillOpen={() => handleDismiss(extract.id)}
+              renderLeftActions={LeftAction}
+              onSwipeableWillOpen={(direction) => {
+                if (direction === "right") {
+                  handleDismiss(extract.id);
+                } else if (direction === "left") {
+                  router.push({
+                    pathname: "/ereader/[id]",
+                    params: { id: extract.id },
+                  });
+                }
+              }}
             >
               <Extract
                 key={index}
