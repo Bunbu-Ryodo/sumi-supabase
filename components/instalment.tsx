@@ -11,6 +11,13 @@ export default function Instalment({
   subscribeart,
   sequeldue,
 }: InstalmentTypeClient) {
+  const nextInstalmentDate = new Date(sequeldue).toLocaleDateString("en-GB", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
     <View style={styles.subscriptionWrapper}>
       <Link
@@ -21,6 +28,9 @@ export default function Instalment({
           <Image style={styles.imageIcons} source={{ uri: subscribeart }} />
           <Text style={styles.instalmentTitle}>
             {title}, ch. {chapter}
+          </Text>
+          <Text style={styles.sequelDue}>
+            Next chapter {nextInstalmentDate}
           </Text>
         </TouchableOpacity>
       </Link>
@@ -37,6 +47,11 @@ const styles = StyleSheet.create({
   instalmentTitle: {
     fontSize: 16,
     fontFamily: "EBGaramondItalic",
+    textAlign: "center",
+  },
+  sequelDue: {
+    fontFamily: "QuicksandReg",
+    fontSize: 14,
     textAlign: "center",
   },
   imageIcons: {
