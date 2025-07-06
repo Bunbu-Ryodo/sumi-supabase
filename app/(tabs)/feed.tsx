@@ -66,6 +66,7 @@ export default function FeedScreen() {
   const [extracts, setExtracts] = useState([] as ExtractType[]);
   const [refreshing, setRefreshing] = useState(false);
   const [allExtractsDismissed, setAllExtractsDismissed] = useState(false);
+  const [userid, setUserId] = useState<string | null>(null);
 
   useForeground(() => {
     if (Platform.OS === "android" || Platform.OS === "ios") {
@@ -89,6 +90,7 @@ export default function FeedScreen() {
   useEffect(() => {
     const checkUserAuthenticated = async function () {
       const user = await getUserSession();
+      setUserId(user?.id || null);
 
       if (!user) {
         router.push("/");
@@ -106,21 +108,7 @@ export default function FeedScreen() {
     if (!userProfile) {
       await createNewProfile(userId, new Date());
     } else if (userProfile) {
-      const lastLogin = userProfile.lastlogin || new Date();
-      const timeDifference =
-        new Date().getTime() - new Date(lastLogin.toString()).getTime();
-      const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
-
-      console.log(`Days since last login: ${daysDifference}`);
-
-      if (daysDifference >= 1) {
-        const success = await setLoginDateTime(userId);
-        if (success) {
-          await setAiCredits(userId);
-        }
-      } else {
-        await setLoginDateTime(userId, new Date());
-      }
+      await setLoginDateTime(userId, new Date());
     }
   };
 
@@ -219,45 +207,51 @@ export default function FeedScreen() {
         }
       >
         {extracts && extracts.length > 0 ? (
-          extracts.map((extract: ExtractType, index: number) => (
-            <ReanimatedSwipeable
-              key={extract.id}
-              ref={(ref) => {
-                swipeableRefs.current[extract.id] = ref;
-              }}
-              friction={2}
-              containerStyle={styles.swipeable}
-              enableTrackpadTwoFingerGesture
-              rightThreshold={40}
-              leftThreshold={40}
-              renderRightActions={RightAction}
-              renderLeftActions={LeftAction}
-              onSwipeableWillOpen={(direction) => {
-                if (direction === "right") {
-                  handleDismiss(extract.id);
-                } else if (direction === "left") {
-                  router.push({
-                    pathname: "/ereader/[id]",
-                    params: { id: extract.id },
-                  });
-                }
-              }}
-            >
-              <Extract
-                key={index}
-                id={extract.id}
-                textid={extract.textid}
-                author={extract.author}
-                title={extract.title}
-                year={extract.year}
-                chapter={extract.chapter}
-                fulltext={extract.fulltext}
-                subscribeart={extract.subscribeart}
-                portrait={extract.portrait}
-                coverart={extract.coverart}
-              />
-            </ReanimatedSwipeable>
-          ))
+          extracts.map((extract: ExtractType, index: number) => {
+            return (
+              <ReanimatedSwipeable
+                key={extract.id}
+                ref={(ref) => {
+                  swipeableRefs.current[extract.id] = ref;
+                }}
+                friction={2}
+                containerStyle={styles.swipeable}
+                enableTrackpadTwoFingerGesture
+                rightThreshold={40}
+                leftThreshold={40}
+                renderRightActions={RightAction}
+                renderLeftActions={LeftAction}
+                onSwipeableWillOpen={(direction) => {
+                  if (direction === "right") {
+                    handleDismiss(extract.id);
+                  } else if (direction === "left") {
+                    router.push({
+                      pathname: "/ereader/[id]",
+                      params: { id: extract.id },
+                    });
+                  }
+                }}
+              >
+                <Extract
+                  key={index}
+                  id={extract.id}
+                  textid={extract.textid}
+                  author={extract.author}
+                  title={extract.title}
+                  year={extract.year}
+                  chapter={extract.chapter}
+                  fulltext={extract.fulltext}
+                  subscribeart={extract.subscribeart}
+                  portrait={extract.portrait}
+                  coverart={extract.coverart}
+                  coverartArtist={extract.coverartArtist}
+                  coverartYear={extract.coverartYear}
+                  coverartTitle={extract.coverartTitle}
+                  userid={userid || ""}
+                />
+              </ReanimatedSwipeable>
+            );
+          })
         ) : allExtractsDismissed ? (
           <TouchableOpacity style={styles.refresh} onPress={fetchExtracts}>
             <Ionicons name="arrow-down" size={36} color="#F6F7EB" />

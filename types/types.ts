@@ -9,6 +9,35 @@ export type ExtractType = {
     subscribeart: string;
     portrait: string;
     coverart: string;
+    coverartArtist: string;
+    coverartYear: number;   
+    coverartTitle: string;
+}
+
+export type ArtworkType = {
+    id: number,
+    userid: string,
+    title: string,
+    artist: string,
+    year: number,
+    url: string
+}
+
+export type ExtractComponent = {
+    id: number;
+    textid: number;
+    author: string;
+    title: string;
+    year: string;
+    chapter: number;
+    fulltext: string;
+    subscribeart: string;
+    portrait: string;
+    coverart: string;
+    coverartArtist: string;
+    coverartYear: number;   
+    coverartTitle: string;
+    userid: string;
 }
 
 export type SubscriptionType = {

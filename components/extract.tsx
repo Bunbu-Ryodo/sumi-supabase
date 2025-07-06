@@ -18,8 +18,13 @@ import React, {
   useState,
 } from "react";
 import type { PropsWithChildren } from "react";
-import { ExtractType } from "../types/types.js";
+import { ExtractComponent } from "../types/types.js";
 import { useRouter } from "expo-router";
+import supabase from "@/lib/supabase.js";
+import {
+  saveUserArtwork,
+  checkUserArtworkExists,
+} from "@/supabase_queries/artworks";
 
 type BounceInProps = PropsWithChildren<{}>;
 
@@ -65,18 +70,16 @@ export default function Extract({
   fulltext,
   portrait,
   coverart,
+  coverartArtist,
+  coverartYear,
+  coverartTitle,
   textid,
-}: ExtractType) {
+  userid,
+}: ExtractComponent) {
   const [like, setLike] = useState(false);
   const [preview, setPreview] = useState(fulltext.slice(0, 420));
+  const [saved, setSaved] = useState(false);
   const router = useRouter();
-
-  function toggleLike() {
-    if (heartRef.current) {
-      heartRef.current.bounce();
-    }
-    setLike(!like);
-  }
 
   const copyToClipboard = async () => {
     if (clipRef.current) {
@@ -96,7 +99,40 @@ export default function Extract({
   useEffect(() => {}, []);
 
   const clipRef = useRef<any>(null);
-  const heartRef = useRef<any>(null);
+  const saveRef = useRef<any>(null);
+
+  const saveArtwork = async () => {
+    if (!saved) {
+      if (saveRef.current) {
+        saveRef.current.bounce();
+      }
+
+      const artworkExists = await checkUserArtworkExists(
+        userid,
+        coverartTitle,
+        coverartArtist,
+        coverartYear
+      );
+
+      if (!artworkExists) {
+        console.log(coverart, "Cover Art");
+        const artwork = await saveUserArtwork(
+          userid,
+          coverartTitle,
+          coverartArtist,
+          coverartYear,
+          coverart
+        );
+        if (artwork) {
+          setSaved(true);
+          console.log("Artwork saved to scrapbook");
+        }
+      } else {
+        setSaved(true);
+        console.log("Artwork already exists in scrapbook");
+      }
+    }
+  };
 
   return (
     <View style={styles.extract}>
@@ -122,22 +158,26 @@ export default function Extract({
       <TouchableOpacity onPress={handleNavigation} style={styles.thumbnail}>
         <Image source={{ uri: coverart }} style={styles.thumbnail} />
       </TouchableOpacity>
-      {/* <View style={styles.engagementButtons}>
-        <TouchableOpacity style={styles.icon} onPress={toggleLike}>
-          <BounceView ref={heartRef}>
-            <Ionicons
-              name={like ? "heart" : "heart-outline"}
-              size={24}
-              color="#D64045"
-            />
-          </BounceView>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.icon} onPress={copyToClipboard}>
-          <BounceView ref={clipRef}>
-            <Ionicons name="clipboard" size={24} color="#8980F5" />
-          </BounceView>
-        </TouchableOpacity>
-      </View> */}
+      <TouchableOpacity
+        style={[!saved ? styles.saveButton : styles.savedButton]}
+        onPress={saveArtwork}
+        disabled={saved}
+      >
+        <BounceView ref={saveRef}>
+          <Ionicons
+            name={saved ? "save" : "save-outline"}
+            size={24}
+            color={saved ? "#393E41" : "#F6F7EB"}
+            style={styles.icon}
+            onPress={saveArtwork}
+          ></Ionicons>
+        </BounceView>
+        {!saved ? (
+          <Text style={styles.saveArtwork}>Save Artwork</Text>
+        ) : (
+          <Text style={styles.savedArtwork}>Saved</Text>
+        )}
+      </TouchableOpacity>
     </View>
   );
 }
@@ -212,11 +252,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
     width: "100%",
     flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "flex-start",
+    alignItems: "center",
   },
   icon: {
     cursor: "pointer",
+    marginRight: 8,
   },
   subscribe: {
     flexDirection: "row",
@@ -227,5 +267,37 @@ const styles = StyleSheet.create({
     color: "#393E41",
     textDecorationLine: "underline",
     marginLeft: 12,
+  },
+  saveArtwork: {
+    fontFamily: "QuicksandReg",
+    fontSize: 14,
+    color: "#F6F7EB",
+  },
+  savedArtwork: {
+    fontFamily: "QuicksandReg",
+    fontSize: 14,
+    color: "#393E41",
+  },
+  saveButton: {
+    marginTop: 8,
+    padding: 16,
+    backgroundColor: "#393E41",
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    fontFamily: "QuicksandReg",
+    width: "100%",
+    flexDirection: "row",
+  },
+  savedButton: {
+    marginTop: 8,
+    padding: 16,
+    backgroundColor: "#F6F7EB",
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    fontFamily: "QuicksandReg",
+    width: "100%",
+    flexDirection: "row",
   },
 });

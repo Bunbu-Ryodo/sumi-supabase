@@ -21,12 +21,14 @@ export default function SharedText() {
     author: "",
     chapter: 0,
     year: "",
-    previewtext: "",
     fulltext: "",
     portrait: "",
     coverart: "",
     textid: 0,
     subscribeart: "",
+    coverartArtist: "",
+    coverartYear: "",
+    coverartTitle: "",
   });
 
   const [loading, setLoading] = useState(true);

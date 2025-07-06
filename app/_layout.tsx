@@ -141,6 +141,22 @@ export default function RootLayout() {
             name="share_text/[id]"
             options={{ headerShown: false }}
           ></Stack.Screen>
+          <Stack.Screen
+            name="post_artwork/[id]"
+            options={{
+              headerShown: true,
+              title: "Post Artwork",
+              headerStyle: {
+                backgroundColor: "#393E41",
+              },
+              headerTitleStyle: {
+                fontFamily: "QuicksandReg",
+                color: "#F6F7EB",
+              },
+              headerTintColor: "#F6F7EB",
+              headerShadowVisible: false,
+            }}
+          ></Stack.Screen>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>
         <Toast config={toastConfig} />
