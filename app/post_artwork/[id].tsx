@@ -18,8 +18,18 @@ import {
 } from "react-native-google-mobile-ads";
 import { ArtworkType } from "@/types/types";
 import { useLocalSearchParams } from "expo-router";
-import { getUserArtworkById } from "../../supabase_queries/artworks";
-import { getUserSession } from "../../supabase_queries/auth.js";
+import {
+  getUserArtworkById,
+  deleteUserArtwork,
+} from "../../supabase_queries/artworks";
+import {
+  postArtworkToFeed,
+  deleteArtworkFromFeed,
+} from "../../supabase_queries/artworks";
+import { lookUpUserProfile } from "../../supabase_queries/auth.js";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
 
 let adUnitId = "";
 
@@ -31,7 +41,24 @@ if (__DEV__) {
   adUnitId = "ca-app-pub-5850018728161057/3269917700";
 }
 
+const postToast = (url: string) => {
+  Toast.show({
+    type: "postedArtwork",
+    text1: "Posted Artwork to Feed",
+    text2: url,
+  });
+};
+
+const deleteToast = (url: string) => {
+  Toast.show({
+    type: "postedArtwork",
+    text1: "Deleted Artwork From Feed",
+    text2: url,
+  });
+};
+
 export default function PostArtwork() {
+  const router = useRouter();
   let { id } = useLocalSearchParams();
   const [artwork, setArtwork] = useState<ArtworkType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,7 +72,45 @@ export default function PostArtwork() {
     const artworkId = Array.isArray(id) ? id[0] : id;
     const artwork = await getUserArtworkById(artworkId);
     setArtwork(artwork);
-    console.log(artwork, "ARTWORK DATA");
+  };
+
+  const postToFeed = async () => {
+    if (artwork) {
+      const { title, artist, year, url, userid } = artwork;
+      const profile = await lookUpUserProfile(userid);
+      const { username } = profile;
+      const posted = await postArtworkToFeed(
+        userid,
+        username,
+        artist,
+        title,
+        url,
+        year
+      );
+      if (posted) {
+        fetchArtwork();
+        postToast(url);
+      }
+    }
+  };
+
+  const deleteFromFeed = async () => {
+    if (artwork) {
+      const { title, artist, year, url } = artwork;
+      console.log(artwork?.userid);
+      console.log(title, artist, year);
+
+      const deleted = await deleteArtworkFromFeed(
+        artwork?.userid,
+        title,
+        artist,
+        year
+      );
+      if (deleted) {
+        fetchArtwork();
+        deleteToast(url);
+      }
+    }
   };
 
   useEffect(() => {
@@ -70,6 +135,15 @@ export default function PostArtwork() {
     imageHeight = (screenWidth * imgDimensions.height) / imgDimensions.width;
   }
 
+  const deleteArtwork = async () => {
+    if (artwork) {
+      const deleted = await deleteUserArtwork(artwork?.userid, artwork?.id);
+      if (deleted) {
+        router.push("/subscriptions");
+      }
+    }
+  };
+
   return (
     <ScrollView
       contentContainerStyle={styles.postArtworkWrapper}
@@ -92,13 +166,28 @@ export default function PostArtwork() {
           ) : (
             <Text>No artwork found.</Text>
           )}
-          <TouchableOpacity style={styles.postButton}>
-            <Text style={styles.signInButtonText}>
-              Post Artwork To Public Feed
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.postButton}>
-            <Text style={styles.signInButtonText}>
+          <View style={styles.artworkDetailsContainer}>
+            <Text style={styles.artworkTitle}>{artwork?.title}</Text>
+            <Text style={styles.artworkDetails}>{artwork?.artist}</Text>
+            <Text style={styles.artworkDetails}>{artwork?.year}</Text>
+          </View>
+          {artwork && artwork.posted ? (
+            <TouchableOpacity
+              style={styles.postButton}
+              onPress={deleteFromFeed}
+            >
+              <Ionicons name="close" size={24} color="#F6F7EB" />
+              <Text style={styles.buttonText}>Remove Artwork From Feed</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.postButton} onPress={postToFeed}>
+              <Ionicons name="share-social" size={24} color="#F6F7EB" />
+              <Text style={styles.buttonText}>Post Artwork To Public Feed</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={styles.deleteButton} onPress={deleteArtwork}>
+            <Ionicons name="trash" size={24} color="#F6F7EB" />
+            <Text style={styles.buttonText}>
               Delete Artwork from My Collection
             </Text>
           </TouchableOpacity>
@@ -112,7 +201,9 @@ const styles = StyleSheet.create({
   postArtworkWrapper: {
     width: "100%",
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#F6F7EB",
+    minHeight: 450,
   },
   container: {
     flex: 1,
@@ -128,15 +219,42 @@ const styles = StyleSheet.create({
   postButton: {
     marginTop: 8,
     padding: 16,
+    flexDirection: "row",
     backgroundColor: "#393E41",
     borderRadius: 8,
     alignItems: "center",
+    justifyContent: "center",
     fontFamily: "QuicksandReg",
     width: "100%",
   },
-  signInButtonText: {
+  deleteButton: {
+    marginTop: 8,
+    padding: 16,
+    flexDirection: "row",
+    backgroundColor: "#D64045",
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    fontFamily: "QuicksandReg",
+    width: "100%",
+  },
+  buttonText: {
     color: "#F6F7EB",
     fontFamily: "QuicksandReg",
     fontSize: 16,
+    marginLeft: 8,
   },
+  artworkTitle: {
+    fontFamily: "EBGaramondItalic",
+    fontSize: 18,
+    color: "#393E41",
+    textAlign: "center",
+  },
+  artworkDetails: {
+    fontFamily: "EBGaramond",
+    fontSize: 18,
+    color: "#393E41",
+    textAlign: "center",
+  },
+  artworkDetailsContainer: {},
 });

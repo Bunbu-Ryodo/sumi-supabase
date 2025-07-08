@@ -97,7 +97,6 @@ export default function Subscriptions() {
 
       if (art && art.length > 0) {
         setArtworks(art);
-        console.log("Fetched artworks:", art);
       }
     }
   };

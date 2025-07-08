@@ -9,6 +9,7 @@ import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Toast, { BaseToast } from "react-native-toast-message";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Image } from "react-native";
 
 const SupabaseContext = createContext(supabase);
 
@@ -103,6 +104,36 @@ export default function RootLayout() {
             }}
           >
             {text2 ?? ""}
+          </Text>
+        </View>
+      </View>
+    ),
+    postedArtwork: ({ text1, text2 }: { text1?: string; text2?: string }) => (
+      <View
+        style={{
+          width: "85%",
+          borderRadius: 8,
+          backgroundColor: "#F6F7EB",
+          borderWidth: 1,
+          borderColor: "#393E41",
+          padding: 12,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          style={{ height: 44, width: 44, borderRadius: 8, marginRight: 8 }}
+          source={{ uri: text2 }}
+        />
+        <View>
+          <Text
+            style={{
+              fontFamily: "QuicksandReg",
+              fontSize: 16,
+              color: "#393E41",
+            }}
+          >
+            {text1 ?? ""}
           </Text>
         </View>
       </View>

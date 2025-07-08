@@ -94,14 +94,14 @@ export async function deleteUserArtwork(userId: string, id: number) {
     return data;
 }
 
-export async function postArtworkToFeed(userid: string, username: number,  bronzeCount: number, silverCount: number, goldCount: number, artist: string, title: string, url: string, year: number){
-    if (!userid || !username || !bronzeCount || !silverCount || !goldCount || !artist || !title || !url || !year) {
+export async function postArtworkToFeed(userid: string, username: number, artist: string, title: string, url: string, year: number){
+    if (!userid || !username || !artist || !title || !url || !year) {
         throw new Error("Missing required parameters");
     }
     
     const { data, error } = await supabase
         .from("publicartworks")
-        .insert([{ userid, username, bronzeCount, silverCount, goldCount, artist, title, url, year }])
+        .insert([{ userid, username, artist, title, url, year }])
         .select()
         .single();
     
@@ -109,6 +109,59 @@ export async function postArtworkToFeed(userid: string, username: number,  bronz
         console.error("Error posting artwork to feed:", error);
         return null;
     }
+
+    const { error: updatedError } = await supabase
+        .from("userartworks")
+        .update({ posted: true })
+        .eq("userid", userid)
+        .eq("title", title)
+        .eq("artist", artist)
+        .eq("year", year)
+        .select()
+        .single();
     
+    if(updatedError){
+        console.error("Error updating user artwork after posting:", updatedError);
+        return null;
+    }
+    
+    return data;
+}
+
+export async function deleteArtworkFromFeed(userid: string, title: string, artist: string, year: number) {
+    if (!userid || !title || !artist || !year) {
+        throw new Error("Missing required parameters");
+    }
+    
+    const { data, error } = await supabase
+        .from("publicartworks")
+        .delete()
+        .eq("userid", userid)
+        .eq("title", title)
+        .eq("artist", artist)
+        .eq("year", year)
+        .select()
+        .single();
+    
+    if (error) {
+        console.error("Error deleting artwork from feed:", error);
+        return null;
+    }
+
+      const { error: updatedError } = await supabase
+        .from("userartworks")
+        .update({ posted: false })
+        .eq("userid", userid)
+        .eq("title", title)
+        .eq("artist", artist)
+        .eq("year", year)
+        .select()
+        .single();
+
+    if(updatedError){
+        console.error("Error deleting artwork from feed:", error);
+        return null;
+    }
+
     return data;
 }

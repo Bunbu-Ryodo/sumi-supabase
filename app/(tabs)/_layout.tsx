@@ -67,19 +67,6 @@ export default function TabLayout() {
           }}
         ></Tabs.Screen>
         <Tabs.Screen
-          name="scrapbook"
-          options={{
-            title: "Scrapbook",
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons
-                name={focused ? "camera" : "camera-outline"}
-                size={24}
-                color={color}
-              />
-            ),
-          }}
-        ></Tabs.Screen>
-        <Tabs.Screen
           name="settings"
           options={{
             title: "Settings",

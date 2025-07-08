@@ -21,6 +21,7 @@ export type ArtworkType = {
     artist: string,
     year: number,
     url: string
+    posted: boolean;
 }
 
 export type ExtractComponent = {
