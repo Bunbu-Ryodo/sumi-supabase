@@ -9,6 +9,7 @@ import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Toast, { BaseToast } from "react-native-toast-message";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Image } from "react-native";
 
 const SupabaseContext = createContext(supabase);
 
@@ -107,6 +108,36 @@ export default function RootLayout() {
         </View>
       </View>
     ),
+    postedArtwork: ({ text1, text2 }: { text1?: string; text2?: string }) => (
+      <View
+        style={{
+          width: "85%",
+          borderRadius: 8,
+          backgroundColor: "#F6F7EB",
+          borderWidth: 1,
+          borderColor: "#393E41",
+          padding: 12,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          style={{ height: 44, width: 44, borderRadius: 8, marginRight: 8 }}
+          source={{ uri: text2 }}
+        />
+        <View>
+          <Text
+            style={{
+              fontFamily: "QuicksandReg",
+              fontSize: 16,
+              color: "#393E41",
+            }}
+          >
+            {text1 ?? ""}
+          </Text>
+        </View>
+      </View>
+    ),
   };
 
   return (
@@ -140,6 +171,22 @@ export default function RootLayout() {
           <Stack.Screen
             name="share_text/[id]"
             options={{ headerShown: false }}
+          ></Stack.Screen>
+          <Stack.Screen
+            name="post_artwork/[id]"
+            options={{
+              headerShown: true,
+              title: "Post Artwork",
+              headerStyle: {
+                backgroundColor: "#393E41",
+              },
+              headerTitleStyle: {
+                fontFamily: "QuicksandReg",
+                color: "#F6F7EB",
+              },
+              headerTintColor: "#F6F7EB",
+              headerShadowVisible: false,
+            }}
           ></Stack.Screen>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>

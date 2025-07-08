@@ -127,6 +127,9 @@ export default function EReader() {
     coverart: "",
     textid: 0,
     subscribeart: "",
+    coverartArtist: "",
+    coverartYear: 0,
+    coverartTitle: "",
   });
 
   const [loading, setLoading] = useState(true);
