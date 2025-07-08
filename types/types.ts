@@ -24,6 +24,16 @@ export type ArtworkType = {
     posted: boolean;
 }
 
+export type ArtworkPostType = {
+    id: number;
+    username: string,
+    userid: string;
+    artist: string;
+    title: string;
+    year: number;
+    url: string;
+}
+
 export type ExtractComponent = {
     id: number;
     textid: number;

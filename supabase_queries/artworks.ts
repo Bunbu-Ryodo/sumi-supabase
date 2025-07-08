@@ -165,3 +165,16 @@ export async function deleteArtworkFromFeed(userid: string, title: string, artis
 
     return data;
 }
+
+export async function getPublicArtworks() {
+    const { data, error } = await supabase
+        .from("publicartworks")
+        .select("*")
+    
+    if (error) {
+        console.error("Error fetching public artworks:", error);
+        return [];
+    }
+    
+    return data || [];
+}

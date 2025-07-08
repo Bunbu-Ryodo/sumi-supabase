@@ -97,8 +97,6 @@ export default function PostArtwork() {
   const deleteFromFeed = async () => {
     if (artwork) {
       const { title, artist, year, url } = artwork;
-      console.log(artwork?.userid);
-      console.log(title, artist, year);
 
       const deleted = await deleteArtworkFromFeed(
         artwork?.userid,

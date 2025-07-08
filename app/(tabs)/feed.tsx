@@ -24,6 +24,7 @@ import {
   setAiCredits,
 } from "../../supabase_queries/auth.js";
 import { getExtracts } from "../../supabase_queries/feed";
+import { getPublicArtworks } from "../../supabase_queries/artworks";
 import {
   getAllDueSubscriptions,
   deletePreviousInstalments,
@@ -31,8 +32,9 @@ import {
   createInstalment,
   updateSubscription,
 } from "../../supabase_queries/subscriptions";
-import { ExtractType } from "../../types/types.js";
+import { ExtractType, ArtworkPostType } from "../../types/types.js";
 import Extract from "../../components/extract";
+import ArtworkPost from "../../components/artworkpost";
 import {
   BannerAd,
   BannerAdSize,
@@ -60,12 +62,24 @@ function LeftAction() {
   return <Reanimated.View style={{ width: 250 }} />;
 }
 
+function shuffle(array: (ExtractType | ArtworkPostType)[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
 export default function FeedScreen() {
   const bannerRef = useRef<BannerAd>(null);
   const router = useRouter();
   const [extracts, setExtracts] = useState([] as ExtractType[]);
+  const [artworks, setArtworks] = useState([] as ArtworkPostType[]);
+  const [combined, setCombined] = useState(
+    [] as (ExtractType | ArtworkPostType)[]
+  );
   const [refreshing, setRefreshing] = useState(false);
-  const [allExtractsDismissed, setAllExtractsDismissed] = useState(false);
+  const [combinedDismissed, setCombinedDismissed] = useState(false);
   const [userid, setUserId] = useState<string | null>(null);
 
   useForeground(() => {
@@ -96,12 +110,21 @@ export default function FeedScreen() {
         router.push("/");
       } else if (user) {
         await checkUserProfileStatus(user.id);
-        await fetchExtracts();
+        await fetchEverything();
         await processSubscriptions(user.id);
       }
     };
     checkUserAuthenticated();
   }, []);
+
+  useEffect(() => {
+    if (extracts.length > 0 || artworks.length > 0) {
+      const combinedData = [...extracts, ...artworks];
+
+      const shuffledCombinedData = shuffle(combinedData);
+      setCombined(shuffledCombinedData);
+    }
+  }, [extracts, artworks]);
 
   const checkUserProfileStatus = async function (userId: string) {
     const userProfile = await lookUpUserProfile(userId);
@@ -112,12 +135,27 @@ export default function FeedScreen() {
     }
   };
 
-  const handleDismiss = (id: number) => {
-    setExtracts((prev) => {
-      if (extracts.length - 1 === 0) {
-        setAllExtractsDismissed(true);
+  const handleDismissExtract = (id: number, textid: number) => {
+    setCombined((prev) => {
+      if (combined.length - 1 === 0) {
+        setCombinedDismissed(true);
       }
-      return prev.filter((extract) => extract.id !== id);
+      return prev.filter(
+        (item) =>
+          item.id !== id && ("textid" in item ? item.textid !== textid : true)
+      );
+    });
+  };
+
+  const handleDismissArtworkPost = (id: number, url: string) => {
+    setCombined((prev) => {
+      if (combined.length - 1 === 0) {
+        setCombinedDismissed(true);
+      }
+      return prev.filter(
+        (item) =>
+          item.id !== id && ("url" in item ? item.url !== item.url : true)
+      );
     });
   };
 
@@ -172,24 +210,28 @@ export default function FeedScreen() {
   };
 
   const fetchExtracts = async function () {
-    setRefreshing(true);
-    setAllExtractsDismissed(false);
-
-    const shuffle = (array: ExtractType[]) => {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    };
-
     const extracts = await getExtracts();
     if (extracts) {
-      const shuffledExtracts = shuffle(extracts);
-      setExtracts(shuffledExtracts);
+      setExtracts(extracts);
     } else {
       setExtracts([]);
     }
+  };
+
+  const fetchArtworks = async function () {
+    const artworks = await getPublicArtworks();
+    if (artworks) {
+      setArtworks(artworks);
+    } else {
+      setArtworks([]);
+    }
+  };
+
+  const fetchEverything = async function () {
+    setRefreshing(true);
+    setCombinedDismissed(false);
+    await fetchExtracts();
+    await fetchArtworks();
     setRefreshing(false);
   };
 
@@ -201,12 +243,100 @@ export default function FeedScreen() {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={fetchExtracts}
+            onRefresh={fetchEverything}
             tintColor="#F6F7EB"
           />
         }
       >
-        {extracts && extracts.length > 0 ? (
+        {combined.length > 0 ? (
+          combined.map((item, index) => {
+            if ("textid" in item) {
+              return (
+                <ReanimatedSwipeable
+                  key={`swipeable-extract-key-${item.id}`}
+                  ref={(ref) => {
+                    swipeableRefs.current[item.id] = ref;
+                  }}
+                  friction={2}
+                  containerStyle={styles.swipeable}
+                  enableTrackpadTwoFingerGesture
+                  rightThreshold={40}
+                  leftThreshold={40}
+                  renderRightActions={RightAction}
+                  renderLeftActions={LeftAction}
+                  onSwipeableWillOpen={(direction) => {
+                    if (direction === "right") {
+                      handleDismissExtract(item.id, item.textid);
+                    } else if (direction === "left") {
+                      router.push({
+                        pathname: "/ereader/[id]",
+                        params: { id: item.id },
+                      });
+                    }
+                  }}
+                >
+                  <Extract
+                    key={`extract-key-${item.id}`}
+                    id={item.id}
+                    textid={item.textid}
+                    author={item.author}
+                    title={item.title}
+                    year={item.year}
+                    chapter={item.chapter}
+                    fulltext={item.fulltext}
+                    subscribeart={item.subscribeart}
+                    portrait={item.portrait}
+                    coverart={item.coverart}
+                    coverartArtist={item.coverartArtist}
+                    coverartYear={item.coverartYear}
+                    coverartTitle={item.coverartTitle}
+                    userid={userid || ""}
+                  />
+                </ReanimatedSwipeable>
+              );
+            } else if ("url" in item) {
+              return (
+                <ReanimatedSwipeable
+                  key={`swipeable-artwork-key-${item.id}`}
+                  ref={(ref) => {
+                    swipeableRefs.current[item.id] = ref;
+                  }}
+                  friction={2}
+                  containerStyle={styles.swipeable}
+                  enableTrackpadTwoFingerGesture
+                  rightThreshold={40}
+                  leftThreshold={40}
+                  renderRightActions={RightAction}
+                  onSwipeableWillOpen={(direction) => {
+                    if (direction === "right") {
+                      handleDismissArtworkPost(item.id, item.url);
+                    }
+                  }}
+                >
+                  <ArtworkPost
+                    key={`artwork-${index}`}
+                    id={item.id}
+                    artist={item.artist}
+                    title={item.title}
+                    year={item.year}
+                    url={item.url}
+                    userid={item.userid}
+                    username={item.username}
+                  />
+                </ReanimatedSwipeable>
+              );
+            }
+            return null;
+          })
+        ) : combinedDismissed ? (
+          <TouchableOpacity style={styles.refresh} onPress={fetchExtracts}>
+            <Ionicons name="arrow-down" size={36} color="#F6F7EB" />
+            <Text style={styles.pulldown}>Pull to be served more extracts</Text>
+          </TouchableOpacity>
+        ) : (
+          <ActivityIndicator size="large" color="#393E41" />
+        )}
+        {/* {extracts && extracts.length > 0 ? (
           extracts.map((extract: ExtractType, index: number) => {
             return (
               <ReanimatedSwipeable
@@ -259,7 +389,7 @@ export default function FeedScreen() {
           </TouchableOpacity>
         ) : (
           <ActivityIndicator size="large" color="#393E41" />
-        )}
+        )} */}
       </ScrollView>
       <BannerAd
         key={`feedad`}
