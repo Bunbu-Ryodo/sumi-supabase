@@ -22,14 +22,8 @@ import {
   getUserArtworkById,
   deleteUserArtwork,
 } from "../../supabase_queries/artworks";
-import {
-  postArtworkToFeed,
-  deleteArtworkFromFeed,
-} from "../../supabase_queries/artworks";
-import { lookUpUserProfile } from "../../supabase_queries/auth.js";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
-import Toast from "react-native-toast-message";
 
 let adUnitId = "";
 
@@ -41,23 +35,7 @@ if (__DEV__) {
   adUnitId = "ca-app-pub-5850018728161057/3269917700";
 }
 
-const postToast = (url: string) => {
-  Toast.show({
-    type: "postedArtwork",
-    text1: "Posted Artwork to Feed",
-    text2: url,
-  });
-};
-
-const deleteToast = (url: string) => {
-  Toast.show({
-    type: "postedArtwork",
-    text1: "Deleted Artwork From Feed",
-    text2: url,
-  });
-};
-
-export default function PostArtwork() {
+export default function ViewArtwork() {
   const router = useRouter();
   let { id } = useLocalSearchParams();
   const [artwork, setArtwork] = useState<ArtworkType | null>(null);
@@ -72,43 +50,6 @@ export default function PostArtwork() {
     const artworkId = Array.isArray(id) ? id[0] : id;
     const artwork = await getUserArtworkById(artworkId);
     setArtwork(artwork);
-  };
-
-  const postToFeed = async () => {
-    if (artwork) {
-      const { title, artist, year, url, userid } = artwork;
-      const profile = await lookUpUserProfile(userid);
-      const { username } = profile;
-      const posted = await postArtworkToFeed(
-        userid,
-        username,
-        artist,
-        title,
-        url,
-        year
-      );
-      if (posted) {
-        fetchArtwork();
-        postToast(url);
-      }
-    }
-  };
-
-  const deleteFromFeed = async () => {
-    if (artwork) {
-      const { title, artist, year, url } = artwork;
-
-      const deleted = await deleteArtworkFromFeed(
-        artwork?.userid,
-        title,
-        artist,
-        year
-      );
-      if (deleted) {
-        fetchArtwork();
-        deleteToast(url);
-      }
-    }
   };
 
   useEffect(() => {
@@ -127,7 +68,7 @@ export default function PostArtwork() {
   }, [artwork]);
 
   const screenWidth = Dimensions.get("window").width - 20;
-  let imageHeight = 200; // fallback
+  let imageHeight = 200;
 
   if (imgDimensions) {
     imageHeight = (screenWidth * imgDimensions.height) / imgDimensions.width;
@@ -164,27 +105,13 @@ export default function PostArtwork() {
           ) : (
             <Text>No artwork found.</Text>
           )}
-          <View style={styles.artworkDetailsContainer}>
+          <View>
             <Text style={styles.artworkTitle}>{artwork?.title}</Text>
             <Text style={styles.artworkDetails}>{artwork?.artist}</Text>
             <Text style={styles.artworkDetails}>{artwork?.year}</Text>
           </View>
-          {artwork && artwork.posted ? (
-            <TouchableOpacity
-              style={styles.postButton}
-              onPress={deleteFromFeed}
-            >
-              <Ionicons name="close" size={24} color="#F6F7EB" />
-              <Text style={styles.buttonText}>Remove Artwork From Feed</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.postButton} onPress={postToFeed}>
-              <Ionicons name="share-social" size={24} color="#F6F7EB" />
-              <Text style={styles.buttonText}>Post Artwork To Public Feed</Text>
-            </TouchableOpacity>
-          )}
           <TouchableOpacity style={styles.deleteButton} onPress={deleteArtwork}>
-            <Ionicons name="trash" size={24} color="#F6F7EB" />
+            <Ionicons name="trash" size={24} color="#393E41" />
             <Text style={styles.buttonText}>
               Delete Artwork from My Collection
             </Text>
@@ -198,10 +125,10 @@ export default function PostArtwork() {
 const styles = StyleSheet.create({
   postArtworkWrapper: {
     width: "100%",
+    height: "100%",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#F6F7EB",
-    minHeight: 450,
   },
   container: {
     flex: 1,
@@ -213,6 +140,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: "center",
     justifyContent: "center",
+    height: "50%",
   },
   postButton: {
     marginTop: 8,
@@ -229,7 +157,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     padding: 16,
     flexDirection: "row",
-    backgroundColor: "#D64045",
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
@@ -237,10 +164,11 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   buttonText: {
-    color: "#F6F7EB",
+    color: "#393E41",
     fontFamily: "QuicksandReg",
     fontSize: 16,
     marginLeft: 8,
+    textDecorationLine: "underline",
   },
   artworkTitle: {
     fontFamily: "EBGaramondItalic",
@@ -254,5 +182,4 @@ const styles = StyleSheet.create({
     color: "#393E41",
     textAlign: "center",
   },
-  artworkDetailsContainer: {},
 });
