@@ -1,1 +1,2 @@
-Sumi MVP but with Supabase and better code and more features
+npm i
+npx expo run:android --device
