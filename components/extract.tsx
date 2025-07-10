@@ -81,14 +81,6 @@ export default function Extract({
   const [saved, setSaved] = useState(false);
   const router = useRouter();
 
-  const copyToClipboard = async () => {
-    if (clipRef.current) {
-      clipRef.current.bounce();
-    }
-    const link = `http://localhost:8081/share_text/${id}`;
-    await Clipboard.setStringAsync(link);
-  };
-
   const handleNavigation = () => {
     router.push({
       pathname: "/ereader/[id]",
@@ -155,9 +147,6 @@ export default function Extract({
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleNavigation} style={styles.thumbnail}>
-        <Image source={{ uri: coverart }} style={styles.thumbnail} />
-      </TouchableOpacity>
       <TouchableOpacity
         style={[!saved ? styles.saveButton : styles.savedButton]}
         onPress={saveArtwork}
@@ -165,9 +154,9 @@ export default function Extract({
       >
         <BounceView ref={saveRef}>
           <Ionicons
-            name={saved ? "save" : "save-outline"}
+            name={!saved ? "color-palette-outline" : "color-palette"}
             size={24}
-            color={saved ? "#393E41" : "#F6F7EB"}
+            color={"#393E41"}
             style={styles.icon}
             onPress={saveArtwork}
           ></Ionicons>
@@ -175,8 +164,11 @@ export default function Extract({
         {!saved ? (
           <Text style={styles.saveArtwork}>Save Artwork</Text>
         ) : (
-          <Text style={styles.savedArtwork}>Saved</Text>
+          <Text style={styles.savedArtwork}>Saved!</Text>
         )}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleNavigation} style={styles.thumbnail}>
+        <Image source={{ uri: coverart }} style={styles.thumbnail} />
       </TouchableOpacity>
     </View>
   );
@@ -271,7 +263,8 @@ const styles = StyleSheet.create({
   saveArtwork: {
     fontFamily: "QuicksandReg",
     fontSize: 14,
-    color: "#F6F7EB",
+    color: "#393E41",
+    textDecorationLine: "underline",
   },
   savedArtwork: {
     fontFamily: "QuicksandReg",
@@ -280,22 +273,18 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginTop: 8,
-    padding: 16,
-    backgroundColor: "#393E41",
+    marginBottom: 8,
     borderRadius: 8,
     alignItems: "center",
-    justifyContent: "center",
     fontFamily: "QuicksandReg",
     width: "100%",
     flexDirection: "row",
   },
   savedButton: {
     marginTop: 8,
-    padding: 16,
-    backgroundColor: "#F6F7EB",
+    marginBottom: 8,
     borderRadius: 8,
     alignItems: "center",
-    justifyContent: "center",
     fontFamily: "QuicksandReg",
     width: "100%",
     flexDirection: "row",

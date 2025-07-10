@@ -95,17 +95,12 @@ export async function checkForSubscription(userId: string, textId: number){
         throw new Error("Missing required parameters");
     }
 
-    const { data: existingSubscription, error } = await supabase
+    const { data: existingSubscription } = await supabase
         .from('subscriptions')
         .select()
         .match({ userid: userId, textid: textId })
         .select()
         .single();
-
-    if(error){
-      console.error("Error fetching subscription:", error);
-      return null;
-    }
 
     return existingSubscription;
 }

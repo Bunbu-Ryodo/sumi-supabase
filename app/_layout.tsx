@@ -173,7 +173,7 @@ export default function RootLayout() {
             options={{ headerShown: false }}
           ></Stack.Screen>
           <Stack.Screen
-            name="post_artwork/[id]"
+            name="view_artwork/[id]"
             options={{
               headerShown: true,
               title: "Post Artwork",

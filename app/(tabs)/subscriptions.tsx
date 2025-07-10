@@ -103,7 +103,7 @@ export default function Subscriptions() {
 
   const handleNavigation = (id: number) => {
     router.push({
-      pathname: "/post_artwork/[id]",
+      pathname: "/view_artwork/[id]",
       params: { id: id }, // Assuming 'new' is the ID for creating a new artwork
     });
   };
