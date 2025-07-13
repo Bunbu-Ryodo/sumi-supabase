@@ -108,7 +108,7 @@ export default function RootLayout() {
         </View>
       </View>
     ),
-    postedArtwork: ({ text1, text2 }: { text1?: string; text2?: string }) => (
+    settingsUpdateError: ({ text1 }: { text1?: string }) => (
       <View
         style={{
           width: "85%",
@@ -118,14 +118,60 @@ export default function RootLayout() {
           borderColor: "#393E41",
           padding: 12,
           flexDirection: "row",
-          alignItems: "center",
         }}
       >
-        <Image
-          style={{ height: 44, width: 44, borderRadius: 8, marginRight: 8 }}
-          source={{ uri: text2 }}
-        />
+        <View
+          style={{
+            height: 44,
+            width: 44,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#d64045",
+            borderRadius: 8,
+            marginRight: 8,
+          }}
+        >
+          <Ionicons name="close" size={24} color="#F6F7EB"></Ionicons>
+        </View>
         <View>
+          <Text
+            style={{
+              fontFamily: "QuicksandReg",
+              fontSize: 16,
+              color: "#393E41",
+            }}
+          >
+            {text1 ?? ""}
+          </Text>
+        </View>
+      </View>
+    ),
+    settingsUpdateSuccess: ({ text1 }: { text1?: string }) => (
+      <View
+        style={{
+          width: "85%",
+          borderRadius: 8,
+          backgroundColor: "#F6F7EB",
+          borderWidth: 1,
+          borderColor: "#393E41",
+          padding: 12,
+          flexDirection: "row",
+        }}
+      >
+        <View
+          style={{
+            height: 44,
+            width: 44,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#393E41",
+            borderRadius: 8,
+            marginRight: 8,
+          }}
+        >
+          <Ionicons name="checkmark" size={24} color="#F6F7EB"></Ionicons>
+        </View>
+        <View style={{ alignContent: "center", justifyContent: "center" }}>
           <Text
             style={{
               fontFamily: "QuicksandReg",
