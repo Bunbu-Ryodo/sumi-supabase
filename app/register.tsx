@@ -14,6 +14,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [registerError, setRegisterError] = useState("");
+  const [registerSuccess, setRegisterSuccess] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
@@ -24,6 +25,9 @@ export default function Register() {
 
   const handleEmailChange = (email: string) => {
     setEmail(email);
+  };
+
+  const checkEmail = (email: string) => {
     if (!validateEmail(email)) {
       setEmailError("Invalid email address");
     } else {
@@ -31,13 +35,27 @@ export default function Register() {
     }
   };
 
-  async function signUpNewUser() {
+  const checkPasswords = () => {
     if (password !== confirmPassword) {
       setPasswordError("Passwords do not match");
+      setRegisterSuccess("");
+    } else {
+      setPasswordError("");
+      setRegisterSuccess("");
+    }
+  };
+
+  async function signUpNewUser() {
+    setRegisterError("");
+    setRegisterSuccess("");
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
     }
 
     if (!validateEmail(email)) {
       setEmailError("Invalid email address");
+      setRegisterSuccess("");
       return;
     }
     await supabase.auth
@@ -47,14 +65,13 @@ export default function Register() {
       })
       .then(({ data, error }) => {
         if (error) {
-          console.error("Sign up error:", error.message);
           setRegisterError("Error registering, please try again");
           return;
+        } else {
+          setRegisterSuccess("Verification email sent");
         }
-        setRegisterError("Verification email sent");
       })
       .catch((error) => {
-        console.error("Unexpected error:", error.message);
         setRegisterError(error.message);
       });
   }
@@ -73,8 +90,13 @@ export default function Register() {
         <TextInput
           style={[styles.formInput, emailError ? styles.errorInput : null]}
           keyboardType="email-address"
+          value={email}
           onChangeText={handleEmailChange}
+          onBlur={() => checkEmail(email)}
         ></TextInput>
+        {emailError ? (
+          <Text style={styles.passwordEmailErrorText}>{emailError}</Text>
+        ) : null}
         <Text style={styles.formLabel}>Create Password</Text>
         <TextInput
           secureTextEntry={true}
@@ -85,8 +107,17 @@ export default function Register() {
         <TextInput
           secureTextEntry={true}
           onChangeText={setConfirmPassword}
+          onBlur={checkPasswords}
           style={[styles.formInput, passwordError ? styles.errorInput : null]}
         ></TextInput>
+        {passwordError ? (
+          <Text style={styles.passwordEmailErrorText}>{passwordError}</Text>
+        ) : null}
+        {registerError ? (
+          <Text style={styles.errorText}>{registerError}</Text>
+        ) : registerSuccess ? (
+          <Text style={styles.registerSuccess}>{registerSuccess}</Text>
+        ) : null}
         <TouchableOpacity style={styles.registerButton} onPress={signUpNewUser}>
           <Text style={styles.registerButtonText}>Register</Text>
         </TouchableOpacity>
@@ -95,9 +126,6 @@ export default function Register() {
             <Text style={styles.backButtonText}>Back to Sign In</Text>
           </TouchableOpacity>
         </Link>
-        {registerError ? (
-          <Text style={styles.errorText}>{registerError}</Text>
-        ) : null}
       </View>
     </View>
   );
@@ -197,13 +225,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   errorText: {
-    color: "#FE7F2D",
+    color: "#D64045",
     marginTop: 12,
     fontSize: 16,
     fontFamily: "QuicksandReg",
-    alignSelf: "center",
+  },
+  passwordEmailErrorText: {
+    color: "#D64045",
+    marginBottom: 6,
+    fontSize: 16,
+    fontFamily: "QuicksandReg",
+  },
+  registerSuccess: {
+    color: "#83F65E",
+    marginBottom: 6,
+    fontSize: 16,
+    fontFamily: "QuicksandReg",
   },
   errorInput: {
-    borderColor: "#FE7F2D",
+    borderColor: "#D64045",
   },
 });
