@@ -62,14 +62,12 @@ export default function Index() {
       })
       .then(({ error }) => {
         if (error) {
-          console.error("Sign in error:", error.message);
           setSigninError(error.message);
           return;
         }
         router.push("/feed");
       })
       .catch((error) => {
-        console.error("Unexpected error:", error.message);
         setSigninError(error.message);
       });
   }
@@ -92,6 +90,9 @@ export default function Index() {
           style={styles.formInput}
           onChangeText={setPassword}
         ></TextInput>
+        {signinError ? (
+          <Text style={styles.errorText}>{signinError}</Text>
+        ) : null}
 
         <TouchableOpacity style={styles.signInButton} onPress={signInUser}>
           <Text style={styles.signInButtonText}>Sign In</Text>
@@ -101,9 +102,6 @@ export default function Index() {
             <Text style={styles.registerButtonText}>Register</Text>
           </TouchableOpacity>
         </Link>
-        {signinError ? (
-          <Text style={styles.errorText}>{signinError}</Text>
-        ) : null}
       </View>
       <Link href={"/passwordreset"} asChild>
         <TouchableOpacity>
@@ -209,11 +207,9 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   errorText: {
-    color: "#FE7F2D",
-    marginTop: 12,
+    color: "#D64045",
     fontSize: 16,
     fontFamily: "QuicksandReg",
-    alignSelf: "center",
   },
   forgottenPasswordText: {
     color: "#8980F5",

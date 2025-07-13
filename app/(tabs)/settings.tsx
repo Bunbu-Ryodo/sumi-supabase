@@ -16,6 +16,7 @@ import { getUsername } from "../../supabase_queries/settings";
 import { getUserSession } from "../../supabase_queries/auth";
 import supabase from "../../lib/supabase.js";
 import { updateSubscriptionInterval } from "../../supabase_queries/profiles";
+import Toast from "react-native-toast-message";
 
 export default function Settings() {
   const router = useRouter();
@@ -25,9 +26,21 @@ export default function Settings() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordChangeError, setPasswordChangeError] = useState("");
-  const [readerTagChangeSuccess, setReaderTagChangeSuccess] = useState("");
-  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState("");
   const [interval, setInterval] = useState(0);
+
+  const displayToast = (message: string) => {
+    Toast.show({
+      type: "settingsUpdateSuccess",
+      text1: message,
+    });
+  };
+
+  const displayErrorToast = (message: string) => {
+    Toast.show({
+      type: "settingsUpdateError",
+      text1: message,
+    });
+  };
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -60,10 +73,15 @@ export default function Settings() {
   const updateReaderTag = async () => {
     const updateReaderTag = await updateUsername(readerTag);
     if (updateReaderTag) {
-      console.log("ReaderTag updated successfully");
-      setReaderTagChangeSuccess("ReaderTag changed successfully");
+      displayToast("ReaderTag updated successfully");
+    }
+  };
+
+  const checkPasswordMatch = () => {
+    if (newPassword !== confirmNewPassword) {
+      setPasswordChangeError("Passwords do not match");
     } else {
-      setReaderTagChangeSuccess("");
+      setPasswordChangeError("");
     }
   };
 
@@ -74,11 +92,10 @@ export default function Settings() {
     }
     const passwordUpdated = await updatePassword(newPassword);
     if (passwordUpdated) {
-      setPasswordChangeSuccess("Password changed successfully");
+      displayToast("Password updated successfully");
       setPasswordChangeError("");
     } else {
-      setPasswordChangeError("Error changing password");
-      setPasswordChangeSuccess("");
+      displayErrorToast("Error updating password");
     }
   };
 
@@ -94,10 +111,7 @@ export default function Settings() {
         <Text style={styles.formLabel}>Change ReaderTag</Text>
         <TextInput
           defaultValue={username}
-          style={[
-            styles.formInput,
-            readerTagChangeSuccess ? styles.successInput : null,
-          ]}
+          style={styles.formInput}
           onChangeText={setReaderTag}
         ></TextInput>
         <TouchableOpacity
@@ -106,19 +120,12 @@ export default function Settings() {
         >
           <Text style={styles.changeReaderTagButtonText}>Change ReaderTag</Text>
         </TouchableOpacity>
-        {readerTagChangeSuccess ? (
-          <Text style={styles.successText}>{readerTagChangeSuccess}</Text>
-        ) : null}
         <Text style={styles.formLabel}>Change Password</Text>
         <TextInput
           secureTextEntry={true}
           style={[
             styles.formInput,
-            passwordChangeError
-              ? styles.errorInput
-              : passwordChangeSuccess
-              ? styles.successInput
-              : null,
+            passwordChangeError ? styles.errorInput : null,
           ]}
           onChangeText={setNewPassword}
         ></TextInput>
@@ -127,27 +134,21 @@ export default function Settings() {
           secureTextEntry={true}
           style={[
             styles.formInput,
-            passwordChangeError
-              ? styles.errorInput
-              : passwordChangeSuccess
-              ? styles.successInput
-              : null,
+            passwordChangeError ? styles.errorInput : null,
           ]}
           onChangeText={setConfirmNewPassword}
+          onBlur={checkPasswordMatch}
         ></TextInput>
+        {passwordChangeError ? (
+          <Text style={styles.errorText}>{passwordChangeError}</Text>
+        ) : null}
         <TouchableOpacity
           style={styles.changePasswordButton}
           onPress={changePassword}
         >
           <Text style={styles.changePasswordButtonText}>Change Password</Text>
         </TouchableOpacity>
-        {passwordChangeError ? (
-          <Text style={styles.errorPasswordText}>{passwordChangeError}</Text>
-        ) : passwordChangeSuccess ? (
-          <Text style={styles.successPasswordText}>
-            {passwordChangeSuccess}
-          </Text>
-        ) : null}
+
         <Text style={styles.subscriptionFrequencyLabel}>
           Set Subscription Frequency
         </Text>
@@ -308,20 +309,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   errorText: {
-    color: "#FE7F2D",
+    marginTop: 8,
+    color: "#D64045",
     fontSize: 16,
     fontFamily: "QuicksandReg",
-    alignSelf: "center",
   },
   errorPasswordText: {
-    color: "#FE7F2D",
+    color: "#D64045",
     fontSize: 16,
     fontFamily: "QuicksandReg",
-    alignSelf: "center",
-    marginBottom: 12,
   },
   errorInput: {
-    borderColor: "#FE7F2D",
+    borderColor: "#D64045",
   },
   successInput: {
     borderColor: "#77966D",
