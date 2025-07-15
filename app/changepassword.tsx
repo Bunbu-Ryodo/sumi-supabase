@@ -8,6 +8,7 @@ import {
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { updatePassword } from "../supabase_queries/auth.js";
+import Toast from "react-native-toast-message";
 
 export default function ChangePassword() {
   const [password, setPassword] = useState("");
@@ -15,13 +16,20 @@ export default function ChangePassword() {
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
+  const displayErrorToast = (message: string) => {
+    Toast.show({
+      type: "settingsUpdateError",
+      text1: message,
+    });
+  };
+
   const handlePasswordReset = async function () {
     if (password !== confirmPassword) {
       setErrorMessage("Passwords dont match");
     } else {
       setErrorMessage("");
       await updatePassword(password).catch((error) => {
-        console.error("Error setting new password:", error.message);
+        displayErrorToast(error.message);
         setErrorMessage("Something went wrong");
       });
       router.push("/");
@@ -41,6 +49,9 @@ export default function ChangePassword() {
           style={styles.formInput}
           onChangeText={setConfirmPassword}
         ></TextInput>
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
         <TouchableOpacity
           style={styles.passwordResetButton}
           onPress={handlePasswordReset}
@@ -48,9 +59,6 @@ export default function ChangePassword() {
           <Text style={styles.passwordResetButtonText}>Send Reset Link</Text>
         </TouchableOpacity>
       </View>
-      {errorMessage ? (
-        <Text style={styles.errorText}>{errorMessage}</Text>
-      ) : null}
     </View>
   );
 }
@@ -99,10 +107,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   errorText: {
-    color: "#FE7F2D",
-    marginTop: 12,
+    color: "#D64045",
     fontSize: 16,
     fontFamily: "QuicksandReg",
-    alignSelf: "center",
   },
 });
