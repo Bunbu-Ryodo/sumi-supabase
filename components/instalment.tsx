@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
   },
-  subscriptionWrapper: { flex: 0.333 },
+  subscriptionWrapper: { width: "33.33%", marginBottom: 12 },
   instalmentTitle: {
     fontSize: 16,
     fontFamily: "EBGaramondItalic",

@@ -142,6 +142,10 @@ export default function FeedScreen() {
           subscriptions[i].chapter
         );
 
+        if (!extract) {
+          continue;
+        }
+
         const userProfile = await lookUpUserProfile(userId);
         let interval;
         if (userProfile.subscriptioninterval) {
