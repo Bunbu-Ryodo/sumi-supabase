@@ -373,7 +373,12 @@ export default function EReader() {
     if (subscribed) {
       await deactivateSubscription(subid, userid, extract.chapter);
     } else {
-      await activateSubscription(subid, extract.chapter + 1, userid, due);
+      await activateSubscription(
+        subid,
+        extract.chapter + 1,
+        userid,
+        new Date().getTime()
+      );
     }
   }
 

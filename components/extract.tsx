@@ -197,7 +197,6 @@ const styles = StyleSheet.create({
   },
   previewText: {
     marginTop: 12,
-    marginBottom: 12,
   },
   portrait: {
     borderRadius: 8,
