@@ -107,7 +107,6 @@ export default function Extract({
       );
 
       if (!artworkExists) {
-        console.log(coverart, "Cover Art");
         const artwork = await saveUserArtwork(
           userid,
           coverartTitle,
