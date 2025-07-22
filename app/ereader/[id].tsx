@@ -285,7 +285,7 @@ export default function EReader() {
 
     if (profile) {
       if (profile.subscriptioninterval) {
-        setDue(new Date().getTime() + profile.subscriptioninterval * 86400000);
+        setDue(new Date().getTime() + 30000);
       } else {
         setDue(new Date().getTime() + 604800000);
       }

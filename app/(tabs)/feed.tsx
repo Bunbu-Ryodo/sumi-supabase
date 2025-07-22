@@ -146,14 +146,18 @@ export default function FeedScreen() {
           continue;
         }
 
+        console.log(
+          `Processing subscription for ${extract.title} by ${extract.author}`
+        );
+
         const userProfile = await lookUpUserProfile(userId);
         let interval;
-        if (userProfile.subscriptioninterval) {
-          interval =
-            new Date().getTime() + userProfile.subscriptioninterval * 86400000;
-        } else {
-          interval = new Date().getTime() + 7 * 86400000;
-        }
+        // if (userProfile.subscriptioninterval) {
+        //   interval = new Date().getTime() + userProfile.subscriptioninterval * 86400000;
+        // } else {
+        //   interval = new Date().getTime() + 7 * 86400000;
+        // }
+        interval = new Date().getTime() + 3000;
 
         if (extract) {
           const updatedSubscription = await updateSubscription(
@@ -163,6 +167,10 @@ export default function FeedScreen() {
           );
 
           if (updatedSubscription) {
+            console.log(
+              `Subscription updated for ${extract.title} to chapter ${updatedSubscription[i].chapter}`
+            );
+            console.log(updatedSubscription, "updatedSubscription");
             await deletePreviousInstalments(userId, extract.title);
 
             const newInstalment = await createInstalment(
@@ -209,6 +217,11 @@ export default function FeedScreen() {
     setRefreshing(false);
   };
 
+  const refreshData = async () => {
+    await fetchExtracts();
+    await processSubscriptions(userid);
+  };
+
   return (
     <>
       <ScrollView
@@ -217,7 +230,7 @@ export default function FeedScreen() {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={fetchExtracts}
+            onRefresh={refreshData}
             tintColor="#F6F7EB"
           />
         }
@@ -267,7 +280,7 @@ export default function FeedScreen() {
             </ReanimatedSwipeable>
           ))
         ) : allExtractsDismissed ? (
-          <TouchableOpacity style={styles.refresh} onPress={fetchExtracts}>
+          <TouchableOpacity style={styles.refresh} onPress={refreshData}>
             <Ionicons name="arrow-down" size={36} color="#F6F7EB" />
             <Text style={styles.pulldown}>Pull to be served more extracts</Text>
           </TouchableOpacity>
