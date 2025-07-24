@@ -54,6 +54,7 @@ export default function Subscriptions() {
   const router = useRouter();
 
   const [artworks, setArtworks] = useState<ArtworkType[]>([]);
+  const [userid, setUserId] = useState<string | null>(null);
   const bannerRef = useRef<BannerAd>(null);
 
   const ref = React.useRef<ICarouselInstance>(null);
@@ -77,11 +78,10 @@ export default function Subscriptions() {
       bannerRef.current?.load();
     }
   });
-  const fetchInstalments = async () => {
-    const user = await getUserSession();
 
-    if (user) {
-      const instalments = await getAllInstalments(user.id);
+  const fetchInstalments = async () => {
+    if (userid) {
+      const instalments = await getAllInstalments(userid);
 
       if (instalments && instalments.length > 0) {
         populateInstalments(instalments);
@@ -90,10 +90,8 @@ export default function Subscriptions() {
   };
 
   const fetchUserArtworks = async () => {
-    const user = await getUserSession();
-
-    if (user) {
-      const art = await getUserArtworks(user.id);
+    if (userid) {
+      const art = await getUserArtworks(userid);
 
       if (art && art.length > 0) {
         setArtworks(art);
@@ -122,10 +120,14 @@ export default function Subscriptions() {
 
   const fetchSubscriptionData = async () => {
     setLoading(true);
-    await fetchInstalments();
-    await fetchSubscriptions();
-    await fetchUserArtworks();
-    setLoading(false);
+    const user = await getUserSession();
+    if (user) {
+      setUserId(user.id);
+      await fetchInstalments();
+      await fetchSubscriptions();
+      await fetchUserArtworks();
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

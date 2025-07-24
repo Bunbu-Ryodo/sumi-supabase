@@ -11,13 +11,6 @@ export default function Instalment({
   subscribeart,
   sequeldue,
 }: InstalmentTypeClient) {
-  const nextInstalmentDate = new Date(sequeldue).toLocaleDateString("en-GB", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
   return (
     <View style={styles.subscriptionWrapper}>
       <Link
@@ -29,9 +22,19 @@ export default function Instalment({
           <Text style={styles.instalmentTitle}>
             {title}, ch. {chapter}
           </Text>
-          <Text style={styles.sequelDue}>
-            Next chapter {nextInstalmentDate}
-          </Text>
+          {sequeldue ? (
+            <Text style={styles.sequelDue}>
+              Next chapter{" "}
+              {new Date(sequeldue).toLocaleDateString("en-GB", {
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </Text>
+          ) : (
+            <Text style={styles.noSubscribes}>The End</Text>
+          )}
         </TouchableOpacity>
       </Link>
     </View>

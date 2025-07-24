@@ -156,13 +156,12 @@ export async function getExtractByTextIdChapter(textId: number, chapter: number)
     .single();
 
     if(error){
-      console.error("Error fetching extract:", error);
       return null;
     }
     return extract;
 }
 
-export async function createInstalment(userId: string, extractId: number, chapter: number, title: string, author: string, subscriptionId: number, subscribeart: string, sequeldue: number){
+export async function createInstalment(userId: string, extractId: number, chapter: number, title: string, author: string, subscriptionId: number, subscribeart: string, sequeldue?: number){
   if(!userId || !extractId || !chapter || !title || !author){
     throw new Error("Missing required parameters");
   }
@@ -210,7 +209,8 @@ export async function updateSubscription(subscriptionId: number, chapter: number
     .from('subscriptions')
     .update({chapter: chapter, due: due}) 
     .eq('id', subscriptionId)
-    .select();
+    .select()
+    .single();
 
   if(error){
     console.error("Error updating subscription:", error);
