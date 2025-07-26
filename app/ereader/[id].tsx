@@ -358,7 +358,7 @@ export default function EReader() {
     }
 
     if (subscribed) {
-      await deactivateSubscription(subid, userid, extract.chapter);
+      await deactivateSubscription(subid, userid, 1);
     } else {
       await activateSubscription(
         subid,
@@ -450,6 +450,7 @@ export default function EReader() {
                     displayToast("Good Job Little Buddy +20000xp");
                   }
                 }
+                //10
               } else if (payload.new.readCount === 10) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -460,6 +461,7 @@ export default function EReader() {
                     displayToast("Bookworm +100xp");
                   }
                 }
+                //25
               } else if (payload.new.readCount === 25) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -470,6 +472,7 @@ export default function EReader() {
                     displayToast("Bibliophile +250xp");
                   }
                 }
+                //50
               } else if (payload.new.readCount === 50) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -480,6 +483,7 @@ export default function EReader() {
                     displayToast("Book Enjoyer +500xp");
                   }
                 }
+                //100
               } else if (payload.new.readCount === 100) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -490,6 +494,7 @@ export default function EReader() {
                     displayToast("Voracious Reader +1000xp");
                   }
                 }
+                //200
               } else if (payload.new.readCount === 200) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -514,6 +519,7 @@ export default function EReader() {
                     displayToast("This looks nice +20000xp");
                   }
                 }
+                //10
               } else if (payload.new.subscribedCount === 10) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -524,6 +530,7 @@ export default function EReader() {
                     displayToast("Magpie +100xp");
                   }
                 }
+                //25
               } else if (payload.new.subscribedCount === 25) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -534,6 +541,7 @@ export default function EReader() {
                     displayToast("Collector +250xp");
                   }
                 }
+                //50
               } else if (payload.new.subscribedCount === 50) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -544,6 +552,7 @@ export default function EReader() {
                     displayToast("Archivist +500xp");
                   }
                 }
+                //100
               } else if (payload.new.subscribedCount === 100) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -554,6 +563,7 @@ export default function EReader() {
                     displayToast("Book Otaku +1000xp");
                   }
                 }
+                //200
               } else if (payload.new.subscribedCount === 200) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -832,7 +842,7 @@ export default function EReader() {
                     warmth === 4 && { color: "#F6F7EB" },
                   ]}
                 >
-                  Buy a high quality edition of the full text
+                  Buy Full Text [Coming Soon]
                 </Text>
               </View>
               <TouchableOpacity onPress={copyToClipboard}>

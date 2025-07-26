@@ -133,7 +133,7 @@ export default function RootLayout() {
         >
           <Ionicons name="close" size={24} color="#F6F7EB"></Ionicons>
         </View>
-        <View>
+        <View style={{ alignContent: "center", justifyContent: "center" }}>
           <Text
             style={{
               fontFamily: "QuicksandReg",

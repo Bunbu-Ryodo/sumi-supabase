@@ -149,23 +149,20 @@ export default function FeedScreen() {
         );
 
         if (!extract) {
-          await deactivateSubscription(
-            subscriptions[i].id,
-            user.id,
-            subscriptions[i].chapter
-          );
+          await deactivateSubscription(subscriptions[i].id, user.id, 1);
           continue;
         }
 
         const userProfile = await lookUpUserProfile(userId);
         let interval;
-        // UNCOMMENT BEFORE MERGE REQUEST
-        // if (userProfile.subscriptioninterval) {
-        //   interval = new Date().getTime() + userProfile.subscriptioninterval * 86400000;
-        // } else {
-        //   interval = new Date().getTime() + 7 * 86400000;
-        // }
-        interval = new Date().getTime() + 1000;
+        if (userProfile.subscriptioninterval) {
+          interval =
+            new Date().getTime() + userProfile.subscriptioninterval * 86400000;
+        } else {
+          interval = new Date().getTime() + 7 * 86400000;
+        }
+        //For testing
+        // interval = new Date().getTime() + 1000;
 
         if (extract) {
           const updatedSubscription = await updateSubscription(

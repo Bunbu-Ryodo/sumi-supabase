@@ -22,11 +22,10 @@ export default function Settings() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [readerTag, setReaderTag] = useState("");
-  const [loading, setLoading] = useState(true);
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordChangeError, setPasswordChangeError] = useState("");
-  const [interval, setInterval] = useState(3);
+  const [interval, setInterval] = useState<number | null>(null);
 
   const displayToast = (message: string) => {
     Toast.show({
@@ -44,21 +43,17 @@ export default function Settings() {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      setLoading(true);
       const user = await getUserSession();
       if (user) {
         const profile = await lookUpUserProfile(user.id);
         if (profile) {
           setUsername(profile.username);
           setReaderTag(profile.readertag);
-          setInterval(profile.subscription_interval);
+          setInterval(profile.subscriptioninterval);
         }
       }
     };
-    if (loading) {
-      fetchUserProfile();
-      setLoading(false);
-    }
+    fetchUserProfile();
   }, []);
 
   const changeSubscriptionInterval = async (interval: number) => {
