@@ -105,6 +105,7 @@ export default function FeedScreen() {
       if (!user) {
         router.push("/");
       } else if (user) {
+        setUserid(user.id);
         await checkUserProfileStatus(user.id);
         await fetchExtracts();
         await processSubscriptions(user.id);
@@ -223,6 +224,7 @@ export default function FeedScreen() {
   };
 
   const fetchExtracts = async function () {
+    setRefreshing(true);
     setAllExtractsDismissed(false);
 
     const shuffle = (array: ExtractType[]) => {
@@ -240,6 +242,7 @@ export default function FeedScreen() {
     } else {
       setExtracts([]);
     }
+    setRefreshing(false);
   };
 
   //Refresh data is for testing, should only processSubscriptions on initial load on login
