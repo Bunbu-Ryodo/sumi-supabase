@@ -149,6 +149,7 @@ export default function FeedScreen() {
   };
 
   const processSubscriptions = async function (userId: string) {
+    setInstalmentCount(0);
     const subscriptions = await getAllDueSubscriptions(userId);
     if (subscriptions) {
       let count = 0;
@@ -160,6 +161,13 @@ export default function FeedScreen() {
         );
 
         if (!extract) {
+          console.log("We should deactivate when no more extracts");
+          console.log(
+            subscriptions[i].id,
+            userid,
+            subscriptions[i].chapter,
+            "Deactivate Subscriptions Data"
+          );
           await deactivateSubscription(
             subscriptions[i].id,
             userid,
@@ -176,7 +184,7 @@ export default function FeedScreen() {
         // } else {
         //   interval = new Date().getTime() + 7 * 86400000;
         // }
-        interval = new Date().getTime() + 3000;
+        interval = new Date().getTime() + 1000;
 
         if (extract) {
           const updatedSubscription = await updateSubscription(
@@ -194,6 +202,7 @@ export default function FeedScreen() {
             );
 
             if (!nextExtract) {
+              console.log("No next extract found, so use The End text");
               const newInstalment = await createInstalment(
                 userId,
                 extract.id,

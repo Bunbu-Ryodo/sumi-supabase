@@ -52,9 +52,7 @@ if (__DEV__) {
 
 export default function Subscriptions() {
   const router = useRouter();
-
   const [artworks, setArtworks] = useState<ArtworkType[]>([]);
-  const [userid, setUserId] = useState<string | null>(null);
   const bannerRef = useRef<BannerAd>(null);
 
   const ref = React.useRef<ICarouselInstance>(null);
@@ -79,9 +77,10 @@ export default function Subscriptions() {
     }
   });
 
-  const fetchInstalments = async () => {
+  const fetchInstalments = async (userid: string) => {
     if (userid) {
       const instalments = await getAllInstalments(userid);
+      console.log(instalments, "Instalments fetched");
 
       if (instalments && instalments.length > 0) {
         populateInstalments(instalments);
@@ -89,9 +88,10 @@ export default function Subscriptions() {
     }
   };
 
-  const fetchUserArtworks = async () => {
+  const fetchUserArtworks = async (userid: string) => {
     if (userid) {
       const art = await getUserArtworks(userid);
+      console.log(artworks, "User artworks fetched");
 
       if (art && art.length > 0) {
         setArtworks(art);
@@ -106,11 +106,9 @@ export default function Subscriptions() {
     });
   };
 
-  const fetchSubscriptions = async () => {
-    const user = await getUserSession();
-
-    if (user) {
-      const upcomingSubscriptions = await getAllUpcomingSubscriptions(user.id);
+  const fetchSubscriptions = async (userid: string) => {
+    if (userid) {
+      const upcomingSubscriptions = await getAllUpcomingSubscriptions(userid);
 
       if (upcomingSubscriptions && upcomingSubscriptions.length > 0) {
         populateSubscriptions(upcomingSubscriptions);
@@ -122,10 +120,9 @@ export default function Subscriptions() {
     setLoading(true);
     const user = await getUserSession();
     if (user) {
-      setUserId(user.id);
-      await fetchInstalments();
-      await fetchSubscriptions();
-      await fetchUserArtworks();
+      await fetchInstalments(user.id);
+      await fetchSubscriptions(user.id);
+      await fetchUserArtworks(user.id);
       setLoading(false);
     }
   };

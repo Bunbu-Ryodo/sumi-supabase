@@ -71,18 +71,20 @@ export async function deactivateSubscription(id: number, userId: string, chapter
     const currentCount = profileData.subscribedCount || 0;
     const newCount = currentCount - 1;
 
-    const { error: updateError } = await supabase
+    const {data: countUpdate, error: updateError } = await supabase
       .from('profiles')
       .update({ subscribedCount: newCount })
       .eq('user_id', userId);
     
+    console.log("Updated subscription count:", countUpdate);
+
     if(updateError){
       console.error("Error updating subscription count:", updateError);
       return null;
     }
 
-    const { error: instalmentDeleteError } = await supabase.from('instalments').delete().match({userid: userId, subscriptionid: id}).select();
-
+    const { data, error: instalmentDeleteError } = await supabase.from('instalments').delete().match({userid: userId, subscriptionid: id}).select();
+    console.log("Deleted instalments:", data);
     if(instalmentDeleteError){
       console.error("Error deleting instalments:", instalmentDeleteError);
       return null;
