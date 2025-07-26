@@ -52,7 +52,6 @@ if (__DEV__) {
 
 export default function Subscriptions() {
   const router = useRouter();
-
   const [artworks, setArtworks] = useState<ArtworkType[]>([]);
   const bannerRef = useRef<BannerAd>(null);
 
@@ -77,11 +76,10 @@ export default function Subscriptions() {
       bannerRef.current?.load();
     }
   });
-  const fetchInstalments = async () => {
-    const user = await getUserSession();
 
-    if (user) {
-      const instalments = await getAllInstalments(user.id);
+  const fetchInstalments = async (userid: string) => {
+    if (userid) {
+      const instalments = await getAllInstalments(userid);
 
       if (instalments && instalments.length > 0) {
         populateInstalments(instalments);
@@ -89,12 +87,9 @@ export default function Subscriptions() {
     }
   };
 
-  const fetchUserArtworks = async () => {
-    const user = await getUserSession();
-
-    if (user) {
-      const art = await getUserArtworks(user.id);
-
+  const fetchUserArtworks = async (userid: string) => {
+    if (userid) {
+      const art = await getUserArtworks(userid);
       if (art && art.length > 0) {
         setArtworks(art);
       }
@@ -108,11 +103,9 @@ export default function Subscriptions() {
     });
   };
 
-  const fetchSubscriptions = async () => {
-    const user = await getUserSession();
-
-    if (user) {
-      const upcomingSubscriptions = await getAllUpcomingSubscriptions(user.id);
+  const fetchSubscriptions = async (userid: string) => {
+    if (userid) {
+      const upcomingSubscriptions = await getAllUpcomingSubscriptions(userid);
 
       if (upcomingSubscriptions && upcomingSubscriptions.length > 0) {
         populateSubscriptions(upcomingSubscriptions);
@@ -122,10 +115,13 @@ export default function Subscriptions() {
 
   const fetchSubscriptionData = async () => {
     setLoading(true);
-    await fetchInstalments();
-    await fetchSubscriptions();
-    await fetchUserArtworks();
-    setLoading(false);
+    const user = await getUserSession();
+    if (user) {
+      await fetchInstalments(user.id);
+      await fetchSubscriptions(user.id);
+      await fetchUserArtworks(user.id);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -165,7 +161,11 @@ export default function Subscriptions() {
         {!loading && (
           <View style={styles.extractWrapper}>
             <View style={styles.subscriptionsHeader}>
-              <Text style={styles.newInstallmentsHeader}>Your Instalments</Text>
+              <Text style={styles.newInstallmentsHeader}>
+                {instalments.length > 0
+                  ? "Your Instalments"
+                  : "Subscribe To A Series!"}
+              </Text>
               <View style={styles.headerIconContainer}>
                 <Ionicons name="mail-unread" size={24} color={"#393E41"} />
               </View>
@@ -184,27 +184,17 @@ export default function Subscriptions() {
                       sequeldue={instalment.sequeldue}
                     />
                   ))
-                : activeSubscriptions.length > 0
-                ? activeSubscriptions.map((subscription, index) => (
-                    <PendingInstalment
-                      key={index}
-                      id={subscription.id}
-                      title={subscription.title}
-                      author={subscription.author}
-                      chapter={subscription.chapter}
-                      subscribeart={subscription.subscribeart}
-                      due={subscription.due}
-                    />
-                  ))
                 : null}
             </View>
             <View style={styles.artworksHeader}>
-              <Text style={styles.yourArtworks}>Your Artworks</Text>
+              <Text style={styles.yourArtworks}>
+                {artworks.length > 0 ? "Your Artworks" : "Save Some Artworks!"}
+              </Text>
               <View style={styles.headerIconContainer}>
                 <Ionicons name="color-palette" size={24} color={"#393E41"} />
               </View>
             </View>
-            {artworks && artworks.length > 0 && (
+            {artworks && artworks.length > 0 ? (
               <View
                 style={{
                   flex: 1,
@@ -256,7 +246,7 @@ export default function Subscriptions() {
                   onPress={onPressPagination}
                 />
               </View>
-            )}
+            ) : null}
           </View>
         )}
       </ScrollView>
@@ -327,6 +317,8 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
     fontSize: 16,
     color: "#393E41",
+    textAlign: "center",
+    alignSelf: "center",
   },
   thumbnailContainer: {
     alignItems: "center",

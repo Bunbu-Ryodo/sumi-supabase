@@ -4,7 +4,6 @@ export async function updatePassword(password){
     const { data: passwordUpdated, error } = await supabase.auth.updateUser({ password: password })
 
     if(error){
-        console.error('Error updating password:', error);
         return null;
     }
     return passwordUpdated;

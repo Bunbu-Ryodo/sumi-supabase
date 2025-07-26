@@ -249,19 +249,6 @@ export default function EReader() {
     });
   };
 
-  const singleTap = Gesture.Tap()
-    .maxDuration(250)
-    .onEnd(() => {
-      runOnJS(fontUp)();
-    });
-
-  const doubleTap = Gesture.Tap()
-    .numberOfTaps(2)
-    .maxDuration(250)
-    .onEnd(() => {
-      runOnJS(fontDown)();
-    });
-
   const adjustBrightness = () => {
     setWarmth((prevWarmth) => {
       if (prevWarmth < 4) {
@@ -285,7 +272,7 @@ export default function EReader() {
 
     if (profile) {
       if (profile.subscriptioninterval) {
-        setDue(new Date().getTime() + profile.subscriptioninterval * 86400000);
+        setDue(new Date().getTime() + 30000);
       } else {
         setDue(new Date().getTime() + 604800000);
       }
@@ -371,7 +358,7 @@ export default function EReader() {
     }
 
     if (subscribed) {
-      await deactivateSubscription(subid, userid, extract.chapter);
+      await deactivateSubscription(subid, userid, 1);
     } else {
       await activateSubscription(
         subid,
@@ -527,6 +514,7 @@ export default function EReader() {
                     displayToast("This looks nice +20000xp");
                   }
                 }
+                //10
               } else if (payload.new.subscribedCount === 10) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -537,6 +525,7 @@ export default function EReader() {
                     displayToast("Magpie +100xp");
                   }
                 }
+                //25
               } else if (payload.new.subscribedCount === 25) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -547,6 +536,7 @@ export default function EReader() {
                     displayToast("Collector +250xp");
                   }
                 }
+                //50
               } else if (payload.new.subscribedCount === 50) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -557,6 +547,7 @@ export default function EReader() {
                     displayToast("Archivist +500xp");
                   }
                 }
+                //100
               } else if (payload.new.subscribedCount === 100) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -567,6 +558,7 @@ export default function EReader() {
                     displayToast("Book Otaku +1000xp");
                   }
                 }
+                //200
               } else if (payload.new.subscribedCount === 200) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
@@ -740,24 +732,20 @@ export default function EReader() {
                 <></>
               )}
 
-              <GestureDetector
-                gesture={Gesture.Exclusive(doubleTap, singleTap)}
-              >
-                <TouchableOpacity onLongPress={adjustBrightness}>
-                  <Text
-                    style={[
-                      styles.extractText,
-                      { fontSize },
-                      warmth === 4 && {
-                        color: "#F6F7EB",
-                        borderBottomColor: "#F6F7EB",
-                      },
-                    ]}
-                  >
-                    {extract.fulltext}
-                  </Text>
-                </TouchableOpacity>
-              </GestureDetector>
+              <TouchableOpacity>
+                <Text
+                  style={[
+                    styles.extractText,
+                    { fontSize },
+                    warmth === 4 && {
+                      color: "#F6F7EB",
+                      borderBottomColor: "#F6F7EB",
+                    },
+                  ]}
+                >
+                  {extract.fulltext}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.markAsReadContainer}>
@@ -849,7 +837,7 @@ export default function EReader() {
                     warmth === 4 && { color: "#F6F7EB" },
                   ]}
                 >
-                  Buy a high quality edition of the full text
+                  Buy Full Text [Coming Soon]
                 </Text>
               </View>
               <TouchableOpacity onPress={copyToClipboard}>

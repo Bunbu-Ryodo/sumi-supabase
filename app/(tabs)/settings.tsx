@@ -13,7 +13,7 @@ import {
   updateUsername,
 } from "../../supabase_queries/settings";
 import { getUsername } from "../../supabase_queries/settings";
-import { getUserSession } from "../../supabase_queries/auth";
+import { getUserSession, lookUpUserProfile } from "../../supabase_queries/auth";
 import supabase from "../../lib/supabase.js";
 import { updateSubscriptionInterval } from "../../supabase_queries/profiles";
 import Toast from "react-native-toast-message";
@@ -22,11 +22,10 @@ export default function Settings() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [readerTag, setReaderTag] = useState("");
-  const [loading, setLoading] = useState(true);
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordChangeError, setPasswordChangeError] = useState("");
-  const [interval, setInterval] = useState(0);
+  const [interval, setInterval] = useState<number | null>(null);
 
   const displayToast = (message: string) => {
     Toast.show({
@@ -43,27 +42,27 @@ export default function Settings() {
   };
 
   useEffect(() => {
-    const fetchUsername = async () => {
-      const username = await getUsername();
-      if (username !== null) {
-        setUsername(username);
-      }
-    };
-    if (loading) {
-      fetchUsername();
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const changeSubscriptionInterval = async () => {
+    const fetchUserProfile = async () => {
       const user = await getUserSession();
       if (user) {
-        await updateSubscriptionInterval(user.id, interval);
+        const profile = await lookUpUserProfile(user.id);
+        if (profile) {
+          setUsername(profile.username);
+          setReaderTag(profile.readertag);
+          setInterval(profile.subscriptioninterval);
+        }
       }
     };
-    changeSubscriptionInterval();
-  }, [interval]);
+    fetchUserProfile();
+  }, []);
+
+  const changeSubscriptionInterval = async (interval: number) => {
+    setInterval(interval);
+    const user = await getUserSession();
+    if (user) {
+      await updateSubscriptionInterval(user.id, interval);
+    }
+  };
 
   const Logout = async function () {
     await supabase.auth.signOut();
@@ -157,7 +156,7 @@ export default function Settings() {
             <TouchableOpacity
               key={option.value}
               style={styles.radioButtonContainer}
-              onPress={() => setInterval(option.value)}
+              onPress={() => changeSubscriptionInterval(option.value)}
             >
               <View
                 style={[

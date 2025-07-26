@@ -30,6 +30,7 @@ import {
   getExtractByTextIdChapter,
   createInstalment,
   updateSubscription,
+  deactivateSubscription,
 } from "../../supabase_queries/subscriptions";
 import { ExtractType } from "../../types/types.js";
 import Extract from "../../components/extract";
@@ -41,6 +42,7 @@ import {
 } from "react-native-google-mobile-ads";
 import { useRef } from "react";
 import { useFocusEffect } from "expo-router";
+import Toast from "react-native-toast-message";
 
 let adUnitId = "";
 
@@ -67,6 +69,14 @@ export default function FeedScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [allExtractsDismissed, setAllExtractsDismissed] = useState(false);
   const [userid, setUserid] = useState("");
+  const [instalmentCount, setInstalmentCount] = useState(0);
+
+  const displayNewInstalmentsToast = (count: number) => {
+    Toast.show({
+      type: "newInstalments",
+      text1: `${count} new instalment${count > 1 ? "s" : ""}!`,
+    });
+  };
 
   useForeground(() => {
     if (Platform.OS === "android" || Platform.OS === "ios") {
@@ -89,15 +99,19 @@ export default function FeedScreen() {
 
   useEffect(() => {
     const checkUserAuthenticated = async function () {
+      setRefreshing(true);
       const user = await getUserSession();
 
       if (!user) {
         router.push("/");
       } else if (user) {
-        setUserid(user.id);
         await checkUserProfileStatus(user.id);
         await fetchExtracts();
         await processSubscriptions(user.id);
+      }
+      setRefreshing(false);
+      if (instalmentCount > 0) {
+        displayNewInstalmentsToast(instalmentCount);
       }
     };
     checkUserAuthenticated();
@@ -108,19 +122,7 @@ export default function FeedScreen() {
     if (!userProfile) {
       await createNewProfile(userId, new Date());
     } else if (userProfile) {
-      const lastLogin = userProfile.lastlogin || new Date();
-      const timeDifference =
-        new Date().getTime() - new Date(lastLogin.toString()).getTime();
-      const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
-
-      if (daysDifference >= 1) {
-        const success = await setLoginDateTime(userId);
-        if (success) {
-          await setAiCredits(userId);
-        }
-      } else {
-        await setLoginDateTime(userId, new Date());
-      }
+      await setLoginDateTime(userId, new Date());
     }
   };
 
@@ -134,8 +136,12 @@ export default function FeedScreen() {
   };
 
   const processSubscriptions = async function (userId: string) {
+    setInstalmentCount(0);
+    const user = await getUserSession();
     const subscriptions = await getAllDueSubscriptions(userId);
-    if (subscriptions) {
+    if (user && subscriptions) {
+      let count = 0;
+
       for (let i = 0; i < subscriptions.length; i++) {
         const extract = await getExtractByTextIdChapter(
           subscriptions[i].textid,
@@ -143,6 +149,7 @@ export default function FeedScreen() {
         );
 
         if (!extract) {
+          await deactivateSubscription(subscriptions[i].id, user.id, 1);
           continue;
         }
 
@@ -154,6 +161,8 @@ export default function FeedScreen() {
         } else {
           interval = new Date().getTime() + 7 * 86400000;
         }
+        //For testing
+        // interval = new Date().getTime() + 1000;
 
         if (extract) {
           const updatedSubscription = await updateSubscription(
@@ -165,22 +174,48 @@ export default function FeedScreen() {
           if (updatedSubscription) {
             await deletePreviousInstalments(userId, extract.title);
 
-            const newInstalment = await createInstalment(
-              userId,
-              extract.id,
-              extract.chapter,
-              extract.title,
-              extract.author,
-              updatedSubscription[i].id,
-              updatedSubscription[i].subscribeart,
-              updatedSubscription[i].due
+            const nextExtract = await getExtractByTextIdChapter(
+              subscriptions[i].textid,
+              subscriptions[i].chapter + 1
             );
 
-            if (newInstalment) {
-              console.log("Instalment created successfully");
+            if (!nextExtract) {
+              const newInstalment = await createInstalment(
+                userId,
+                extract.id,
+                extract.chapter,
+                extract.title,
+                extract.author,
+                updatedSubscription.id,
+                updatedSubscription.subscribeart
+              );
+
+              if (newInstalment) {
+                count++;
+                console.log("Instalment created successfully");
+              }
+            } else {
+              const newInstalment = await createInstalment(
+                userId,
+                extract.id,
+                extract.chapter,
+                extract.title,
+                extract.author,
+                updatedSubscription.id,
+                updatedSubscription.subscribeart,
+                updatedSubscription.due
+              );
+
+              if (newInstalment) {
+                count++;
+                console.log("Instalment created successfully");
+              }
             }
           }
         }
+      }
+      if (count > 0) {
+        setInstalmentCount(count);
       }
     } else {
       console.log("Subscriptions up to date");
@@ -188,7 +223,6 @@ export default function FeedScreen() {
   };
 
   const fetchExtracts = async function () {
-    setRefreshing(true);
     setAllExtractsDismissed(false);
 
     const shuffle = (array: ExtractType[]) => {
@@ -206,8 +240,22 @@ export default function FeedScreen() {
     } else {
       setExtracts([]);
     }
-    setRefreshing(false);
   };
+
+  //Refresh data is for testing, should only processSubscriptions on initial load on login
+  // const refreshData = async () => {
+  //   setInstalmentCount(0);
+  //   setRefreshing(true);
+  //   const user = await getUserSession();
+  //   if (user) {
+  //     await fetchExtracts();
+  //     await processSubscriptions(user.id);
+  //   }
+  //   setRefreshing(false);
+  //   if (instalmentCount > 0) {
+  //     displayNewInstalmentsToast(instalmentCount);
+  //   }
+  // };
 
   return (
     <>
