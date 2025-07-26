@@ -84,7 +84,6 @@ export async function deactivateSubscription(id: number, userId: string, chapter
     }
 
     const { data, error: instalmentDeleteError } = await supabase.from('instalments').delete().match({userid: userId, subscriptionid: id}).select();
-    console.log("Deleted instalments:", data);
     if(instalmentDeleteError){
       console.error("Error deleting instalments:", instalmentDeleteError);
       return null;

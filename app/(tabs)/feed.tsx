@@ -243,19 +243,19 @@ export default function FeedScreen() {
   };
 
   //Refresh data is for testing, should only processSubscriptions on initial load on login
-  const refreshData = async () => {
-    setInstalmentCount(0);
-    setRefreshing(true);
-    const user = await getUserSession();
-    if (user) {
-      await fetchExtracts();
-      await processSubscriptions(user.id);
-    }
-    setRefreshing(false);
-    if (instalmentCount > 0) {
-      displayNewInstalmentsToast(instalmentCount);
-    }
-  };
+  // const refreshData = async () => {
+  //   setInstalmentCount(0);
+  //   setRefreshing(true);
+  //   const user = await getUserSession();
+  //   if (user) {
+  //     await fetchExtracts();
+  //     await processSubscriptions(user.id);
+  //   }
+  //   setRefreshing(false);
+  //   if (instalmentCount > 0) {
+  //     displayNewInstalmentsToast(instalmentCount);
+  //   }
+  // };
 
   return (
     <>
@@ -265,7 +265,7 @@ export default function FeedScreen() {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={refreshData}
+            onRefresh={fetchExtracts}
             tintColor="#F6F7EB"
           />
         }
@@ -315,7 +315,7 @@ export default function FeedScreen() {
             </ReanimatedSwipeable>
           ))
         ) : allExtractsDismissed ? (
-          <TouchableOpacity style={styles.refresh} onPress={refreshData}>
+          <TouchableOpacity style={styles.refresh} onPress={fetchExtracts}>
             <Ionicons name="arrow-down" size={36} color="#F6F7EB" />
             <Text style={styles.pulldown}>Pull to be served more extracts</Text>
           </TouchableOpacity>
