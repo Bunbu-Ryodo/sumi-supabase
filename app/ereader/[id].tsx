@@ -249,19 +249,6 @@ export default function EReader() {
     });
   };
 
-  const singleTap = Gesture.Tap()
-    .maxDuration(250)
-    .onEnd(() => {
-      runOnJS(fontUp)();
-    });
-
-  const doubleTap = Gesture.Tap()
-    .numberOfTaps(2)
-    .maxDuration(250)
-    .onEnd(() => {
-      runOnJS(fontDown)();
-    });
-
   const adjustBrightness = () => {
     setWarmth((prevWarmth) => {
       if (prevWarmth < 4) {
@@ -740,24 +727,20 @@ export default function EReader() {
                 <></>
               )}
 
-              <GestureDetector
-                gesture={Gesture.Exclusive(doubleTap, singleTap)}
-              >
-                <TouchableOpacity onLongPress={adjustBrightness}>
-                  <Text
-                    style={[
-                      styles.extractText,
-                      { fontSize },
-                      warmth === 4 && {
-                        color: "#F6F7EB",
-                        borderBottomColor: "#F6F7EB",
-                      },
-                    ]}
-                  >
-                    {extract.fulltext}
-                  </Text>
-                </TouchableOpacity>
-              </GestureDetector>
+              <TouchableOpacity>
+                <Text
+                  style={[
+                    styles.extractText,
+                    { fontSize },
+                    warmth === 4 && {
+                      color: "#F6F7EB",
+                      borderBottomColor: "#F6F7EB",
+                    },
+                  ]}
+                >
+                  {extract.fulltext}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.markAsReadContainer}>

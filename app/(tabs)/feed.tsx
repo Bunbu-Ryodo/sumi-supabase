@@ -105,7 +105,6 @@ export default function FeedScreen() {
       if (!user) {
         router.push("/");
       } else if (user) {
-        setUserid(user.id);
         await checkUserProfileStatus(user.id);
         await fetchExtracts();
         await processSubscriptions(user.id);
@@ -123,19 +122,7 @@ export default function FeedScreen() {
     if (!userProfile) {
       await createNewProfile(userId, new Date());
     } else if (userProfile) {
-      const lastLogin = userProfile.lastlogin || new Date();
-      const timeDifference =
-        new Date().getTime() - new Date(lastLogin.toString()).getTime();
-      const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
-
-      if (daysDifference >= 1) {
-        const success = await setLoginDateTime(userId);
-        if (success) {
-          await setAiCredits(userId);
-        }
-      } else {
-        await setLoginDateTime(userId, new Date());
-      }
+      await setLoginDateTime(userId, new Date());
     }
   };
 
@@ -150,8 +137,9 @@ export default function FeedScreen() {
 
   const processSubscriptions = async function (userId: string) {
     setInstalmentCount(0);
+    const user = await getUserSession();
     const subscriptions = await getAllDueSubscriptions(userId);
-    if (subscriptions) {
+    if (user && subscriptions) {
       let count = 0;
 
       for (let i = 0; i < subscriptions.length; i++) {
@@ -161,16 +149,9 @@ export default function FeedScreen() {
         );
 
         if (!extract) {
-          console.log("We should deactivate when no more extracts");
-          console.log(
-            subscriptions[i].id,
-            userid,
-            subscriptions[i].chapter,
-            "Deactivate Subscriptions Data"
-          );
           await deactivateSubscription(
             subscriptions[i].id,
-            userid,
+            user.id,
             subscriptions[i].chapter
           );
           continue;
@@ -202,7 +183,6 @@ export default function FeedScreen() {
             );
 
             if (!nextExtract) {
-              console.log("No next extract found, so use The End text");
               const newInstalment = await createInstalment(
                 userId,
                 extract.id,
@@ -267,9 +247,13 @@ export default function FeedScreen() {
 
   //Refresh data is for testing, should only processSubscriptions on initial load on login
   const refreshData = async () => {
+    setInstalmentCount(0);
     setRefreshing(true);
-    await fetchExtracts();
-    await processSubscriptions(userid);
+    const user = await getUserSession();
+    if (user) {
+      await fetchExtracts();
+      await processSubscriptions(user.id);
+    }
     setRefreshing(false);
     if (instalmentCount > 0) {
       displayNewInstalmentsToast(instalmentCount);

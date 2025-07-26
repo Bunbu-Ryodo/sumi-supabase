@@ -80,7 +80,6 @@ export default function Subscriptions() {
   const fetchInstalments = async (userid: string) => {
     if (userid) {
       const instalments = await getAllInstalments(userid);
-      console.log(instalments, "Instalments fetched");
 
       if (instalments && instalments.length > 0) {
         populateInstalments(instalments);
@@ -91,8 +90,6 @@ export default function Subscriptions() {
   const fetchUserArtworks = async (userid: string) => {
     if (userid) {
       const art = await getUserArtworks(userid);
-      console.log(artworks, "User artworks fetched");
-
       if (art && art.length > 0) {
         setArtworks(art);
       }
@@ -164,7 +161,11 @@ export default function Subscriptions() {
         {!loading && (
           <View style={styles.extractWrapper}>
             <View style={styles.subscriptionsHeader}>
-              <Text style={styles.newInstallmentsHeader}>Your Instalments</Text>
+              <Text style={styles.newInstallmentsHeader}>
+                {instalments.length > 0
+                  ? "Your Instalments"
+                  : "Subscribe To A Series!"}
+              </Text>
               <View style={styles.headerIconContainer}>
                 <Ionicons name="mail-unread" size={24} color={"#393E41"} />
               </View>
@@ -183,27 +184,17 @@ export default function Subscriptions() {
                       sequeldue={instalment.sequeldue}
                     />
                   ))
-                : activeSubscriptions.length > 0
-                ? activeSubscriptions.map((subscription, index) => (
-                    <PendingInstalment
-                      key={index}
-                      id={subscription.id}
-                      title={subscription.title}
-                      author={subscription.author}
-                      chapter={subscription.chapter}
-                      subscribeart={subscription.subscribeart}
-                      due={subscription.due}
-                    />
-                  ))
                 : null}
             </View>
             <View style={styles.artworksHeader}>
-              <Text style={styles.yourArtworks}>Your Artworks</Text>
+              <Text style={styles.yourArtworks}>
+                {artworks.length > 0 ? "Your Artworks" : "Save Some Artworks!"}
+              </Text>
               <View style={styles.headerIconContainer}>
                 <Ionicons name="color-palette" size={24} color={"#393E41"} />
               </View>
             </View>
-            {artworks && artworks.length > 0 && (
+            {artworks && artworks.length > 0 ? (
               <View
                 style={{
                   flex: 1,
@@ -255,7 +246,7 @@ export default function Subscriptions() {
                   onPress={onPressPagination}
                 />
               </View>
-            )}
+            ) : null}
           </View>
         )}
       </ScrollView>
@@ -326,6 +317,8 @@ const styles = StyleSheet.create({
     fontFamily: "QuicksandReg",
     fontSize: 16,
     color: "#393E41",
+    textAlign: "center",
+    alignSelf: "center",
   },
   thumbnailContainer: {
     alignItems: "center",
