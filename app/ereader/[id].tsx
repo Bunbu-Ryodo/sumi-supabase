@@ -197,7 +197,7 @@ export default function EReader() {
       setArgument(response.output_text);
     } else {
       setArgument(
-        "You do not have enough AI credits. Become a member to get more daily credits!"
+        "You do not have enough AI credits. Become a member [coming soon] to get more daily credits!"
       );
       setThinking(false);
     }
@@ -219,7 +219,7 @@ export default function EReader() {
       setArgument(response.output_text);
     } else {
       setArgument(
-        "You do not have enough AI credits. Become a member to get more daily credits!"
+        "You do not have enough AI credits. Become a member [coming soon] to get more daily credits!"
       );
       setThinking(false);
     }
