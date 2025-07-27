@@ -102,6 +102,7 @@ export default function Settings() {
   };
 
   const intervals = [
+    { label: "Daily", value: 1 },
     { label: "Every few days", value: 3 },
     { label: "Every week", value: 7 },
     { label: "Bi-weekly", value: 14 },
