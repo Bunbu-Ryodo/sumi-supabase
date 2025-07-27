@@ -21,7 +21,6 @@ import {
   lookUpUserProfile,
   getUserSession,
   setLoginDateTime,
-  setAiCredits,
 } from "../../supabase_queries/auth.js";
 import { getExtracts } from "../../supabase_queries/feed";
 import {

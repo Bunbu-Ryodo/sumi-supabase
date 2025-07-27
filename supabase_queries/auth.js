@@ -52,20 +52,6 @@ export async function setLoginDateTime(user_id, lastLogin){
     return data;
 }
 
-export async function setAiCredits(user_id){
-    const { data, error: updateError } = await supabase
-      .from('profiles')
-      .update({ aiCredits: 3 })
-      .eq('user_id', user_id)
-      .select();
-
-    if(updateError){
-      console.error('Error updating credits:', updateError.message);
-      return null;
-    }
-    return data;
-  }
-
 export async function spendOneCredit(user_id) {
   const { data: profileData, error: fetchError } = await supabase
     .from('profiles')

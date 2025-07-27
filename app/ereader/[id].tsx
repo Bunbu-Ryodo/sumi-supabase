@@ -443,11 +443,11 @@ export default function EReader() {
               if (payload.new.readCount === 1) {
                 const achievementAdded = await addAchievementToProfile(
                   userid,
-                  "Good Job Little Buddy"
+                  "Beats Doomscrolling, Right?"
                 );
                 if (Platform.OS === "android" || Platform.OS === "ios") {
                   if (achievementAdded) {
-                    displayToast("Good Job Little Buddy +20000xp");
+                    displayToast("Beats Doomscrolling, Right? +20000xp");
                   }
                 }
               } else if (payload.new.readCount === 10) {
