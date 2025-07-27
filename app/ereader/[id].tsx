@@ -332,14 +332,14 @@ export default function EReader() {
     }
   };
 
-  const copyToClipboard = async () => {
-    if (clipRef.current) {
-      clipRef.current.bounce();
-    }
+  // const copyToClipboard = async () => {
+  //   if (clipRef.current) {
+  //     clipRef.current.bounce();
+  //   }
 
-    const link = `http://localhost:8081/share_text/${extract.id}`;
-    await Clipboard.setStringAsync(link);
-  };
+  //   const link = `http://localhost:8081/share_text/${extract.id}`;
+  //   await Clipboard.setStringAsync(link);
+  // };
 
   function shop() {
     if (cartRef.current) {
@@ -840,11 +840,11 @@ export default function EReader() {
                   Buy Full Text [Coming Soon]
                 </Text>
               </View>
-              <TouchableOpacity onPress={copyToClipboard}>
+              {/* <TouchableOpacity onPress={copyToClipboard}>
                 <BounceView ref={clipRef}>
                   <Ionicons name="clipboard" size={24} color="#8980F5" />
                 </BounceView>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <View></View>
           </View>
