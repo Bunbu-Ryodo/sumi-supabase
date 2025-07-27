@@ -27,7 +27,7 @@ export default function SharedText() {
     textid: 0,
     subscribeart: "",
     coverartArtist: "",
-    coverartYear: "",
+    coverartYear: 0,
     coverartTitle: "",
   });
 

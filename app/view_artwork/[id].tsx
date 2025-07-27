@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: "center",
     justifyContent: "center",
-    height: "50%",
+    flex: 1,
   },
   postButton: {
     marginTop: 8,

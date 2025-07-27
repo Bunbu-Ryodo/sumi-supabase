@@ -260,7 +260,7 @@ export default function RootLayout() {
             name="view_artwork/[id]"
             options={{
               headerShown: true,
-              title: "Post Artwork",
+              title: "View Artwork",
               headerStyle: {
                 backgroundColor: "#393E41",
               },

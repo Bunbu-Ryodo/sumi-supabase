@@ -52,55 +52,6 @@ export async function setLoginDateTime(user_id, lastLogin){
     return data;
 }
 
-export async function spendOneCredit(user_id) {
-  const { data: profileData, error: fetchError } = await supabase
-    .from('profiles')
-    .select('aiCredits')
-    .eq('user_id', user_id)
-    .single();
-
-  if (fetchError) {
-    console.error('Error getting profile', fetchError.message);
-    return null;
-  }
-
-  if (!profileData || typeof profileData.aiCredits !== 'number') {
-    console.error('Profile data missing or aiCredits not a number:', profileData);
-    return null;
-  }
-
-  console.log('Current AI credits:', profileData.aiCredits);
-
-  const currentCredits = profileData.aiCredits;
-  const newCredits = currentCredits - 1;
-
-  if (newCredits < 0) {
-    return -1;
-  }
-
-  const { data: updatedData, error: updateError } = await supabase
-    .from('profiles')
-    .update({ aiCredits: newCredits })
-    .eq('user_id', user_id)
-    .select()
-    .single();
-
-  if (updateError) {
-    console.error('Error updating AI credits:', updateError.message);
-    return currentCredits;
-  }
-
-  if (!updatedData || typeof updatedData.aiCredits !== 'number') {
-    console.error('Updated data missing or aiCredits not a number:', updatedData);
-    return currentCredits;
-  }
-
-  console.log('AI credits updated successfully:', updatedData.aiCredits);
-  return updatedData.aiCredits;
-}
-
-
-
 export async function resetPassword(email){
   await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: 'http://localhost:8081/changepassword',
