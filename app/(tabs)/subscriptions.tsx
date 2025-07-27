@@ -25,7 +25,6 @@ import {
   SubscriptionType,
   ArtworkType,
 } from "../../types/types";
-import PendingInstalment from "../../components/pendingInstalment";
 import {
   BannerAd,
   BannerAdSize,

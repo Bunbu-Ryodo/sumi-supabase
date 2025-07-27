@@ -3,6 +3,7 @@ import {
   TextInput,
   ScrollView,
   View,
+  ActivityIndicator,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
@@ -20,6 +21,7 @@ import Toast from "react-native-toast-message";
 
 export default function Settings() {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
   const [readerTag, setReaderTag] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -51,6 +53,7 @@ export default function Settings() {
           setReaderTag(profile.readertag);
           setInterval(profile.subscriptioninterval);
         }
+        setLoading(false);
       }
     };
     fetchUserProfile();
@@ -99,6 +102,7 @@ export default function Settings() {
   };
 
   const intervals = [
+    { label: "Daily", value: 1 },
     { label: "Every few days", value: 3 },
     { label: "Every week", value: 7 },
     { label: "Bi-weekly", value: 14 },
@@ -106,72 +110,78 @@ export default function Settings() {
 
   return (
     <ScrollView style={styles.settingsWrapper}>
-      <View style={styles.form}>
-        <Text style={styles.formLabel}>Change ReaderTag</Text>
-        <TextInput
-          defaultValue={username}
-          style={styles.formInput}
-          onChangeText={setReaderTag}
-        ></TextInput>
-        <TouchableOpacity
-          style={styles.changeReaderTagButton}
-          onPress={updateReaderTag}
-        >
-          <Text style={styles.changeReaderTagButtonText}>Change ReaderTag</Text>
-        </TouchableOpacity>
-        <Text style={styles.formLabel}>Change Password</Text>
-        <TextInput
-          secureTextEntry={true}
-          style={[
-            styles.formInput,
-            passwordChangeError ? styles.errorInput : null,
-          ]}
-          onChangeText={setNewPassword}
-        ></TextInput>
-        <Text style={styles.formLabel}>Confirm New Password</Text>
-        <TextInput
-          secureTextEntry={true}
-          style={[
-            styles.formInput,
-            passwordChangeError ? styles.errorInput : null,
-          ]}
-          onChangeText={setConfirmNewPassword}
-          onBlur={checkPasswordMatch}
-        ></TextInput>
-        {passwordChangeError ? (
-          <Text style={styles.errorText}>{passwordChangeError}</Text>
-        ) : null}
-        <TouchableOpacity
-          style={styles.changePasswordButton}
-          onPress={changePassword}
-        >
-          <Text style={styles.changePasswordButtonText}>Change Password</Text>
-        </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator size="large" color="#F6F7EB" />
+      ) : (
+        <View style={styles.form}>
+          <Text style={styles.formLabel}>Change ReaderTag</Text>
+          <TextInput
+            defaultValue={username}
+            style={styles.formInput}
+            onChangeText={setReaderTag}
+          ></TextInput>
+          <TouchableOpacity
+            style={styles.changeReaderTagButton}
+            onPress={updateReaderTag}
+          >
+            <Text style={styles.changeReaderTagButtonText}>
+              Change ReaderTag
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.formLabel}>Change Password</Text>
+          <TextInput
+            secureTextEntry={true}
+            style={[
+              styles.formInput,
+              passwordChangeError ? styles.errorInput : null,
+            ]}
+            onChangeText={setNewPassword}
+          ></TextInput>
+          <Text style={styles.formLabel}>Confirm New Password</Text>
+          <TextInput
+            secureTextEntry={true}
+            style={[
+              styles.formInput,
+              passwordChangeError ? styles.errorInput : null,
+            ]}
+            onChangeText={setConfirmNewPassword}
+            onBlur={checkPasswordMatch}
+          ></TextInput>
+          {passwordChangeError ? (
+            <Text style={styles.errorText}>{passwordChangeError}</Text>
+          ) : null}
+          <TouchableOpacity
+            style={styles.changePasswordButton}
+            onPress={changePassword}
+          >
+            <Text style={styles.changePasswordButtonText}>Change Password</Text>
+          </TouchableOpacity>
 
-        <Text style={styles.subscriptionFrequencyLabel}>
-          Set Subscription Frequency
-        </Text>
-        <View style={styles.intervalDropdown}>
-          {intervals.map((option) => (
-            <TouchableOpacity
-              key={option.value}
-              style={styles.radioButtonContainer}
-              onPress={() => changeSubscriptionInterval(option.value)}
-            >
-              <View
-                style={[
-                  styles.radioButton,
-                  interval === option.value && styles.radioButtonSelected,
-                ]}
-              />
-              <Text style={styles.radioButtonLabel}>{option.label}</Text>
-            </TouchableOpacity>
-          ))}
+          <Text style={styles.subscriptionFrequencyLabel}>
+            Set Subscription Frequency
+          </Text>
+          <View style={styles.intervalDropdown}>
+            {intervals.map((option) => (
+              <TouchableOpacity
+                key={option.value}
+                style={styles.radioButtonContainer}
+                onPress={() => changeSubscriptionInterval(option.value)}
+              >
+                <View
+                  style={[
+                    styles.radioButton,
+                    interval === option.value && styles.radioButtonSelected,
+                  ]}
+                />
+                <Text style={styles.radioButtonLabel}>{option.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <TouchableOpacity style={styles.logoutButton} onPress={Logout}>
+            <Text style={styles.logoutButtonText}>Logout</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.logoutButton} onPress={Logout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
+      )}
     </ScrollView>
   );
 }
