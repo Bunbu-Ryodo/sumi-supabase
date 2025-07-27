@@ -52,22 +52,6 @@ export async function setLoginDateTime(user_id, lastLogin){
     return data;
 }
 
-export async function addTonsOfCredits(user_id, amount){
-
-  const { data, error: updateError } = await supabase
-    .from('profiles')
-    .update({ ai_credits: amount })
-    .eq('user_id', user_id)
-    .select();
-
-  if(updateError){
-    console.error('Error updating AI credits:', updateError.message);
-    return null;
-  }
-
-  return data;
-}
-
 export async function resetPassword(email){
   await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: 'http://localhost:8081/changepassword',
