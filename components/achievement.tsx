@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
   achievementTitle: {
     fontFamily: "QuicksandReg",
     fontSize: 16,
+    maxWidth: 200,
   },
   achievementDescription: {
     marginTop: 4,
@@ -174,11 +175,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#393E41",
     backgroundColor: "transparent",
+    maxWidth: 200,
   },
   progress: {
     height: 12,
     backgroundColor: "#FE7F2D",
     borderRadius: 40,
+    maxWidth: 200,
   },
   achievementDetails: {
     minWidth: 200,
