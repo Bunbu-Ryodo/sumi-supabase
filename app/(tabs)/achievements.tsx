@@ -275,7 +275,7 @@ export default function Achievements() {
                   />
                 ))
               ) : (
-                <Text style={styles.score}>No achievements unlocked</Text>
+                <Text style={styles.score}>No achievements unlocked.</Text>
               )}
             </View>
             <View style={styles.completedAchievementsHeader}>
@@ -298,7 +298,7 @@ export default function Achievements() {
                   />
                 ))
               ) : (
-                <Text style={styles.score}>No pending achievements</Text>
+                <Text style={styles.score}>No pending achievements.</Text>
               )}
             </View>
           </View>

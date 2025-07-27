@@ -173,7 +173,7 @@ export default function EReader() {
     //   setArgument(response.output_text);
     // } else {
     setArgument(
-      "You must become a paying member [coming soon] to get generate AI summaries"
+      "You must become a paying member [coming soon] to get generate AI summaries."
     );
     setThinking(false);
     // }
@@ -196,7 +196,7 @@ export default function EReader() {
     //   setArgument(response.output_text);
     // } else {
     setArgument(
-      "You must become a paying member [coming soon] to get generate AI summaries"
+      "You must become a paying member [coming soon] to get generate AI summaries."
     );
     setThinking(false);
     // }
@@ -218,7 +218,7 @@ export default function EReader() {
     //   setArgument(response.output_text);
     // } else {
     setArgument(
-      "You must become a paying member [coming soon] to get generate AI summaries"
+      "You must become a paying member [coming soon] to get generate AI summaries."
     );
     setThinking(false);
     // }
