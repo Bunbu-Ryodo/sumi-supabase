@@ -6,7 +6,6 @@ export default function Instalment({
   id,
   extractid,
   title,
-  author,
   chapter,
   subscribeart,
   sequeldue,

@@ -9,10 +9,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import Reanimated, {
-  SharedValue,
-  useAnimatedStyle,
-} from "react-native-reanimated";
+import Reanimated from "react-native-reanimated";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { useRouter } from "expo-router";

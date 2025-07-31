@@ -13,7 +13,6 @@ import {
   updatePassword,
   updateUsername,
 } from "../../supabase_queries/settings";
-import { getUsername } from "../../supabase_queries/settings";
 import { getUserSession, lookUpUserProfile } from "../../supabase_queries/auth";
 import supabase from "../../lib/supabase.js";
 import { updateSubscriptionInterval } from "../../supabase_queries/profiles";

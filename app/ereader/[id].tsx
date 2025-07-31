@@ -1,4 +1,3 @@
-import * as Clipboard from "expo-clipboard";
 import { Platform } from "react-native";
 import {
   View,
@@ -38,12 +37,6 @@ import {
 import { getUserSession } from "../../supabase_queries/auth.js";
 import supabase from "../../lib/supabase.js";
 import { lookUpUserProfile } from "../../supabase_queries/auth";
-import * as Notifications from "expo-notifications";
-import {
-  Gesture,
-  GestureDetector,
-  Directions,
-} from "react-native-gesture-handler";
 import {
   BannerAd,
   BannerAdSize,
@@ -53,12 +46,11 @@ import {
 
 import Toast from "react-native-toast-message";
 import type { PropsWithChildren } from "react";
-import { runOnJS } from "react-native-reanimated";
-import OpenAI from "openai";
+// import OpenAI from "openai";
 
-const client = new OpenAI({
-  apiKey: process.env.EXPO_PUBLIC_OPENAI,
-});
+// const client = new OpenAI({
+//   apiKey: process.env.EXPO_PUBLIC_OPENAI,
+// });
 
 let adUnitId = "";
 

@@ -10,12 +10,7 @@ import {
   Dimensions,
 } from "react-native";
 import { useState, useEffect } from "react";
-import {
-  BannerAd,
-  BannerAdSize,
-  TestIds,
-  useForeground,
-} from "react-native-google-mobile-ads";
+import { TestIds } from "react-native-google-mobile-ads";
 import { ArtworkType } from "@/types/types";
 import { useLocalSearchParams } from "expo-router";
 import {

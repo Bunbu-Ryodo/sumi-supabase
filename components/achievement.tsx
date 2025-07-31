@@ -1,13 +1,5 @@
 import { AchievementTypeClient } from "../types/types";
-import {
-  Animated,
-  View,
-  Text,
-  StyleSheet,
-  useAnimatedValue,
-  Easing,
-  TouchableOpacity,
-} from "react-native";
+import { Animated, View, Text, StyleSheet, Easing } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import type { PropsWithChildren } from "react";
 // import type { ViewStyle } from "react-native";
