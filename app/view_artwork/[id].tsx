@@ -22,11 +22,14 @@ import { useRouter } from "expo-router";
 
 let adUnitId = "";
 
-if (__DEV__) {
+// Use test ads when in dev mode OR when EXPO_PUBLIC_USE_TEST_ADS is set
+const useTestAds = __DEV__ || process.env.EXPO_PUBLIC_USE_TEST_ADS === "true";
+
+if (useTestAds) {
   adUnitId = TestIds.ADAPTIVE_BANNER;
-} else if (!__DEV__ && Platform.OS === "android") {
+} else if (Platform.OS === "android") {
   adUnitId = "ca-app-pub-5850018728161057/6524403480";
-} else if (!__DEV__ && Platform.OS === "ios") {
+} else if (Platform.OS === "ios") {
   adUnitId = "ca-app-pub-5850018728161057/3269917700";
 }
 

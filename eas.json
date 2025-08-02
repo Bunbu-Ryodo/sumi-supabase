@@ -11,6 +11,12 @@
     "preview": {
       "distribution": "internal"
     },
+    "testing": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_USE_TEST_ADS": "true"
+      }
+    },
     "production": {
       "autoIncrement": true
     }
