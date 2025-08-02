@@ -7,9 +7,8 @@ import { createContext, useContext } from "react";
 import { View, Text } from "react-native";
 import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Toast, { BaseToast } from "react-native-toast-message";
+import Toast from "react-native-toast-message";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Image } from "react-native";
 
 const SupabaseContext = createContext(supabase);
 

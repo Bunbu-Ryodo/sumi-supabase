@@ -1,4 +1,3 @@
-import * as Clipboard from "expo-clipboard";
 import {
   Text,
   View,
@@ -20,7 +19,6 @@ import React, {
 import type { PropsWithChildren } from "react";
 import { ExtractComponent } from "../types/types.js";
 import { useRouter } from "expo-router";
-import supabase from "@/lib/supabase.js";
 import {
   saveUserArtwork,
   checkUserArtworkExists,

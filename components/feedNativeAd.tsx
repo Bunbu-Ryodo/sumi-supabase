@@ -2,7 +2,6 @@ import { View, Text, StyleSheet } from "react-native";
 import {
   NativeAd,
   NativeAdView,
-  NativeAsset,
   NativeMediaView,
   TestIds,
 } from "react-native-google-mobile-ads";

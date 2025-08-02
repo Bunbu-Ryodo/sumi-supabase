@@ -1,4 +1,3 @@
-import * as Clipboard from "expo-clipboard";
 import { Platform } from "react-native";
 import {
   View,
@@ -38,12 +37,6 @@ import {
 import { getUserSession } from "../../supabase_queries/auth.js";
 import supabase from "../../lib/supabase.js";
 import { lookUpUserProfile } from "../../supabase_queries/auth";
-import * as Notifications from "expo-notifications";
-import {
-  Gesture,
-  GestureDetector,
-  Directions,
-} from "react-native-gesture-handler";
 import {
   BannerAd,
   BannerAdSize,
@@ -53,20 +46,22 @@ import {
 
 import Toast from "react-native-toast-message";
 import type { PropsWithChildren } from "react";
-import { runOnJS } from "react-native-reanimated";
-import OpenAI from "openai";
+// import OpenAI from "openai";
 
-const client = new OpenAI({
-  apiKey: process.env.EXPO_PUBLIC_OPENAI,
-});
+// const client = new OpenAI({
+//   apiKey: process.env.EXPO_PUBLIC_OPENAI,
+// });
 
 let adUnitId = "";
 
-if (__DEV__) {
+// Use test ads when in dev mode OR when EXPO_PUBLIC_USE_TEST_ADS is set
+const useTestAds = __DEV__ || process.env.EXPO_PUBLIC_USE_TEST_ADS === "true";
+
+if (useTestAds) {
   adUnitId = TestIds.ADAPTIVE_BANNER;
-} else if (!__DEV__ && Platform.OS === "android") {
+} else if (Platform.OS === "android") {
   adUnitId = "ca-app-pub-5850018728161057/6524403480";
-} else if (!__DEV__ && Platform.OS === "ios") {
+} else if (Platform.OS === "ios") {
   adUnitId = "ca-app-pub-5850018728161057/3269917700";
 }
 
